@@ -1,6 +1,6 @@
 extends Control
 
-## Upgrades screen: spend cash to increase spawn speed, income and offline cap.
+## Upgrades screen: spend cash to raise the free-spawn tier and offline cap.
 
 var _cash_label: Label
 var _list: VBoxContainer
@@ -95,7 +95,7 @@ func _refresh() -> void:
 		var badge := Label.new()
 		badge.text = _badge_text(id)
 		badge.theme_type_variation = &"TitleLabel"
-		badge.add_theme_font_size_override("font_size", 30 if id != "income_multiplier" else 40)
+		badge.add_theme_font_size_override("font_size", 22 if id == "spawn_tier" else 30)
 		badge.add_theme_color_override("font_color", Color("#0B1020"))
 		badge.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		badge.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
@@ -131,10 +131,8 @@ func _refresh() -> void:
 
 func _badge_text(id: String) -> String:
 	match id:
-		"spawn_speed":
-			return "SPD"
-		"income_multiplier":
-			return "$"
+		"spawn_tier":
+			return "TIER"
 		"offline_cap":
 			return "OFF"
 		_:
@@ -144,7 +142,7 @@ func _badge_text(id: String) -> String:
 func _badge_style(id: String) -> StyleBoxFlat:
 	var color := Color("#B6F23C")
 	match id:
-		"income_multiplier":
+		"spawn_tier":
 			color = Color("#FFC83D")
 		"offline_cap":
 			color = Color("#4FE0FF")
@@ -162,10 +160,8 @@ func _badge_style(id: String) -> StyleBoxFlat:
 
 func _effect_text(id: String) -> String:
 	match id:
-		"spawn_speed":
-			return "free bombs spawn faster"
-		"income_multiplier":
-			return "all cash income"
+		"spawn_tier":
+			return "free bombs spawn at a higher tier"
 		"offline_cap":
 			return "offline earning limit"
 		_:

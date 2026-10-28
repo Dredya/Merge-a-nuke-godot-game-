@@ -16,6 +16,8 @@ var cash: float = 0.0
 var slot_count: int = MAX_SLOTS
 var slots: Array[int] = []
 var owned_nukes: Dictionary = {}
+# Highest tier the player has ever owned; drives the raid target scale.
+var highest_tier_reached: int = 0
 var lock_until: float = 0.0
 var lock_cooldown_until: float = 0.0
 # Retention
@@ -79,6 +81,7 @@ func set_slot(index: int, tier_number: int) -> void:
 	if index < 0 or index >= slots.size():
 		return
 	slots[index] = clampi(tier_number, 0, MAX_TIER)
+	_note_tier(slots[index])
 	slots_changed.emit()
 
 
@@ -88,6 +91,7 @@ func commit_slots(new_slots: Array[int]) -> void:
 		return
 	for i in range(slots.size()):
 		slots[i] = clampi(new_slots[i], 0, MAX_TIER)
+		_note_tier(slots[i])
 	slots_changed.emit()
 
 
@@ -99,12 +103,13 @@ func empty_slot_count() -> int:
 	return count
 
 
-func spawn_tier1_free() -> int:
+func spawn_free(tier_number: int = 1) -> int:
+	var tier := clampi(tier_number, 1, MAX_TIER)
 	for i in range(slots.size()):
 		if slots[i] == 0:
-			slots[i] = 1
+			slots[i] = tier
 			slots_changed.emit()
-			_track_owned(1)
+			_track_owned(tier)
 			return i
 	return -1
 
@@ -121,3 +126,9 @@ func income_per_second_total() -> float:
 
 func _track_owned(tier_number: int) -> void:
 	owned_nukes[tier_number] = int(owned_nukes.get(tier_number, 0)) + 1
+	_note_tier(tier_number)
+
+
+func _note_tier(tier_number: int) -> void:
+	if tier_number > highest_tier_reached:
+		highest_tier_reached = tier_number

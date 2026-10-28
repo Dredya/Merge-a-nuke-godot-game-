@@ -10,9 +10,8 @@ signal upgrades_loaded
 
 var upgrades: Array = []
 var upgrade_levels: Dictionary = {}
-var income_multiplier: float = 1.0
 var event_income_multiplier: float = 1.0
-var spawn_speed_level: int = 0
+var spawn_tier_level: int = 0
 var offline_cap_hours: float = 8.0
 
 var _income_timer: Timer
@@ -96,32 +95,22 @@ func _apply_upgrade_effect(id: String, u: Dictionary) -> void:
 	match id:
 		"slot_count":
 			GameState.slot_count += int(effect)
-		"spawn_speed":
-			spawn_speed_level = get_upgrade_level(id)
-		"income_multiplier":
-			_recompute_multipliers()
+		"spawn_tier":
+			spawn_tier_level = get_upgrade_level(id)
 		"offline_cap":
 			offline_cap_hours = 8.0 + float(get_upgrade_level(id)) * effect
 	_recompute_multipliers()
 
 
 func _recompute_multipliers() -> void:
-	var mult := 1.0
-	var level := get_upgrade_level("income_multiplier")
-	var u := get_upgrade("income_multiplier")
-	var effect := float(u.get("effect_per_level", 0.1)) if not u.is_empty() else 0.1
-	mult += float(level) * effect
-	income_multiplier = mult
-	# spawn speed level
-	spawn_speed_level = get_upgrade_level("spawn_speed")
-	# offline cap
+	spawn_tier_level = get_upgrade_level("spawn_tier")
 	var ou := get_upgrade("offline_cap")
 	var oeffect := float(ou.get("effect_per_level", 2.0)) if not ou.is_empty() else 2.0
 	offline_cap_hours = 8.0 + float(get_upgrade_level("offline_cap")) * oeffect
 
 
 func _on_income_tick() -> void:
-	var income := GameState.income_per_second_total() * income_multiplier * event_income_multiplier
+	var income := GameState.income_per_second_total() * event_income_multiplier
 	if income > 0.0:
 		GameState.add_cash(income)
 		income_granted.emit(income)

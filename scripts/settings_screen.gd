@@ -69,6 +69,7 @@ func _on_reset_confirmed() -> void:
 	GameState.slots.resize(GameState.MAX_SLOTS)
 	for i in range(GameState.MAX_SLOTS):
 		GameState.slots[i] = 0
+	GameState.highest_tier_reached = 0
 	GameState.lock_until = 0.0
 	GameState.lock_cooldown_until = 0.0
 	GameState.tutorial_completed = false

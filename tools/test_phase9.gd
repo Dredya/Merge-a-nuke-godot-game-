@@ -44,7 +44,6 @@ func _ready() -> void:
 func _run() -> void:
 	_test_data()
 	_test_factory()
-	_report_progression_risk()
 
 	var packed: PackedScene = load("res://scenes/main.tscn")
 	if packed == null:
@@ -318,15 +317,6 @@ func _count_triangles(root: Node) -> int:
 		if instance != null and instance.mesh != null:
 			total += int(instance.mesh.get_faces().size() / 3)
 	return total
-
-
-func _report_progression_risk() -> void:
-	var spawn_seconds := 4.0 / (1.0 + float(Economy.spawn_speed_level) * 0.2)
-	var tier25_years := pow(2.0, 24.0) * spawn_seconds / 31557600.0
-	var tier100_years := pow(2.0, 99.0) * spawn_seconds / 31557600.0
-	var exponent := int(floor(log(tier100_years) / log(10.0)))
-	var mantissa := tier100_years / pow(10.0, float(exponent))
-	print("QA RISK: free spawns are tier 1 only; 25 needs 2^24 spawns (~%.1f years at %.1fs), 100 needs 2^99 (~%.2fe%d years)." % [tier25_years, spawn_seconds, mantissa, exponent])
 
 
 func _restore_save() -> void:

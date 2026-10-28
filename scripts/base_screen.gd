@@ -144,8 +144,8 @@ func _ensure_slot_capacity() -> void:
 
 
 func _spawn_wait() -> float:
-	var wait := 4.0 / (1.0 + float(Economy.spawn_speed_level) * 0.2)
-	return maxf(wait, 0.9)
+	# Fixed spawn cadence; progression comes from the Spawn Tier upgrade.
+	return 6.0
 
 
 # --- Board visuals ----------------------------------------------------------
@@ -647,7 +647,7 @@ func _on_lock_pressed() -> void:
 
 
 func _update_hud() -> void:
-	var income := GameState.income_per_second_total() * Economy.income_multiplier * Economy.event_income_multiplier
+	var income := GameState.income_per_second_total() * Economy.event_income_multiplier
 	cash_label.text = "$" + Economy.format_number(GameState.cash)
 	income_label.text = "+$" + Economy.format_number(income) + " / sec"
 
@@ -827,8 +827,10 @@ func _on_auto_spawn() -> void:
 	if tutorial_popup.visible or daily_popup.visible or offline_popup.visible:
 		return
 	_suppress_slot_refresh = true
-	var index := GameState.spawn_tier1_free()
+	# Spawn Tier upgrade raises free-spawn tier; cap at 99 so tier 100 stays a merge reward.
+	var spawn_tier := clampi(1 + Economy.spawn_tier_level, 1, 99)
+	var index := GameState.spawn_free(spawn_tier)
 	_suppress_slot_refresh = false
 	if index >= 0:
-		_create_bomb(index, 1, true)
+		_create_bomb(index, spawn_tier, true)
 		_update_hud()

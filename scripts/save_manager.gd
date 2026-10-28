@@ -37,6 +37,7 @@ func save() -> void:
 		"cash": GameState.cash,
 		"slot_count": GameState.slot_count,
 		"slots": GameState.slots,
+		"highest_tier_reached": GameState.highest_tier_reached,
 		"upgrade_levels": Economy.upgrade_levels,
 		"lock_until": GameState.lock_until,
 		"lock_cooldown_until": GameState.lock_cooldown_until,
@@ -97,6 +98,9 @@ func load_save() -> void:
 		saved_size = (saved_slots as Array).size()
 		for i in range(min(saved_size, GameState.slots.size())):
 			GameState.slots[i] = clampi(int((saved_slots as Array)[i]), 0, GameState.MAX_TIER)
+	GameState.highest_tier_reached = int(data.get("highest_tier_reached", 0))
+	for slot_tier in GameState.slots:
+		GameState.highest_tier_reached = maxi(GameState.highest_tier_reached, slot_tier)
 	# Old six-slot saves are migrated into the fixed 4x3 board.
 	for i in range(GameState.slots.size()):
 		if i >= saved_size:
@@ -138,7 +142,7 @@ func load_save() -> void:
 			elapsed = cap
 		if elapsed < 0.0:
 			elapsed = 0.0
-		var income := GameState.income_per_second_total() * Economy.income_multiplier
+		var income := GameState.income_per_second_total() * Economy.event_income_multiplier
 		var amount := elapsed * income
 		if elapsed >= MIN_OFFLINE_SECONDS and amount > 0.0:
 			pending_offline = amount
@@ -157,7 +161,7 @@ func _handle_resume() -> void:
 		elapsed = cap
 	if elapsed < 0.0:
 		elapsed = 0.0
-	var income := GameState.income_per_second_total() * Economy.income_multiplier
+	var income := GameState.income_per_second_total() * Economy.event_income_multiplier
 	var amount := elapsed * income
 	if elapsed >= MIN_OFFLINE_SECONDS and amount > 0.0:
 		pending_offline = amount

@@ -31,5 +31,5 @@ func _apply_safe_area() -> void:
 
 func _refresh() -> void:
 	cash_label.text = "Cash: " + Economy.format_number(GameState.cash)
-	var income := GameState.income_per_second_total() * Economy.income_multiplier
+	var income := GameState.income_per_second_total() * Economy.event_income_multiplier
 	income_label.text = "Income/s: " + Economy.format_number(income)
