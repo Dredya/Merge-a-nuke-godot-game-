@@ -1,0 +1,5 @@
+[
+  {"id": "merge_10", "name": "Merge 10 times", "type": "merge", "target": 10, "reward_cash": 500},
+  {"id": "raid_3", "name": "Raid 3 bases", "type": "raid", "target": 3, "reward_cash": 1000},
+  {"id": "earn_1000", "name": "Earn 1000 cash", "type": "earn", "target": 1000, "reward_cash": 250}
+]

@@ -35,7 +35,7 @@ Update this list after every phase (mark `[x]` when complete).
 - [x] Phase 5 — Economy: cash/sec and offline earnings. (done in Phase 2)
 - [x] Phase 6 — Raid system (attack AI bases, steal cash). (done in Phase 3)
 - [x] Phase 7 — Base shield (timed protection). (done in Phase 3)
-- [ ] Phase 8 — Codes & daily rewards.
+- [x] Phase 8 - Codes & daily rewards: redeem codes, daily login streak, missions, events, AdService/IAPService stubs.
 - [ ] Phase 9 — Polish, Android export, and release readiness.
 
 ## Notes

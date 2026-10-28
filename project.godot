@@ -34,6 +34,11 @@ AdService="*res://scripts/ad_service.gd"
 SaveManager="*res://scripts/save_manager.gd"
 RaidService="*res://scripts/raid_service.gd"
 AudioManager="*res://scripts/audio_manager.gd"
+IAPService="*res://scripts/iap_service.gd"
+CodeManager="*res://scripts/code_manager.gd"
+DailyRewardManager="*res://scripts/daily_reward_manager.gd"
+MissionManager="*res://scripts/mission_manager.gd"
+EventManager="*res://scripts/event_manager.gd"
 
 [editor_plugins]
 

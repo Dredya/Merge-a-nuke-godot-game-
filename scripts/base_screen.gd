@@ -9,18 +9,33 @@ const LOCK_COST := 500.0
 const LOCK_DURATION := 120.0
 const LOCK_COOLDOWN := 300.0
 
+@onready var event_banner: Label = $MarginContainer/VBoxContainer/EventBanner
 @onready var slot_grid: GridContainer = $MarginContainer/VBoxContainer/SlotGrid
 @onready var buy_button: Button = $MarginContainer/VBoxContainer/ButtonRow/BuyBombButton
 @onready var upgrades_button: Button = $MarginContainer/VBoxContainer/ButtonRow/UpgradesButton
 @onready var raid_button: Button = $MarginContainer/VBoxContainer/ButtonRow/RaidButton
 @onready var lock_button: Button = $MarginContainer/VBoxContainer/ButtonRow/LockButton
+@onready var redeem_button: Button = $MarginContainer/VBoxContainer/ButtonRow/RedeemButton
+@onready var missions_button: Button = $MarginContainer/VBoxContainer/ButtonRow/MissionsButton
 @onready var shield_panel: PanelContainer = $ShieldPanel
 @onready var shield_label: Label = $ShieldPanel/ShieldLabel
-@onready var auto_timer: Timer = $AutoSpawnTimer
+@onready var redeem_popup: PanelContainer = $RedeemPopup
+@onready var code_input: LineEdit = $RedeemPopup/VBoxContainer/CodeInput
+@onready var redeem_submit_button: Button = $RedeemPopup/VBoxContainer/RedeemSubmitButton
+@onready var redeem_close_button: Button = $RedeemPopup/VBoxContainer/RedeemCloseButton
+@onready var redeem_result_label: Label = $RedeemPopup/VBoxContainer/RedeemResultLabel
+@onready var daily_popup: PanelContainer = $DailyRewardPopup
+@onready var daily_day_label: Label = $DailyRewardPopup/VBoxContainer/DayLabel
+@onready var daily_amount_label: Label = $DailyRewardPopup/VBoxContainer/AmountLabel
+@onready var claim_daily_button: Button = $DailyRewardPopup/VBoxContainer/ClaimDailyButton
+@onready var missions_popup: PanelContainer = $MissionsPopup
+@onready var missions_list: VBoxContainer = $MissionsPopup/VBoxContainer/MissionsList
+@onready var missions_close_button: Button = $MissionsPopup/VBoxContainer/MissionsCloseButton
 @onready var welcome_popup: PanelContainer = $WelcomePopup
 @onready var welcome_amount_label: Label = $WelcomePopup/VBoxContainer/AmountLabel
 @onready var claim_button: Button = $WelcomePopup/VBoxContainer/ClaimButton
 @onready var claim_x2_button: Button = $WelcomePopup/VBoxContainer/ClaimX2Button
+@onready var auto_timer: Timer = $AutoSpawnTimer
 
 var slot_nodes: Array[Control] = []
 var slot_nuke: Array[Control] = []
@@ -45,14 +60,26 @@ func _ready() -> void:
 	upgrades_button.pressed.connect(_on_upgrades_pressed)
 	raid_button.pressed.connect(_on_raid_pressed)
 	lock_button.pressed.connect(_on_lock_pressed)
+	redeem_button.pressed.connect(func(): redeem_popup.visible = true)
+	missions_button.pressed.connect(_on_missions_pressed)
 	auto_timer.timeout.connect(_on_auto_spawn)
 	claim_button.pressed.connect(_on_claim_offline.bind(1))
 	claim_x2_button.pressed.connect(_on_claim_x2)
+	redeem_submit_button.pressed.connect(_on_redeem_submit)
+	redeem_close_button.pressed.connect(func(): redeem_popup.visible = false)
+	claim_daily_button.pressed.connect(_on_claim_daily)
+	missions_close_button.pressed.connect(func(): missions_popup.visible = false)
 	GameState.slots_changed.connect(_on_slots_changed)
 	Economy.income_granted.connect(_on_income_granted)
 	SaveManager.offline_earnings_ready.connect(_on_offline_ready)
+	DailyRewardManager.daily_reward_available.connect(_on_daily_reward_available)
+	EventManager.event_changed.connect(_on_event_changed)
 	_refresh_all_slots()
 	_update_auto_timer_wait()
+	_update_event_banner()
+	code_input.virtual_keyboard_enabled = true
+	# Keyboard handling: keep popup visible; Godot handles panning partially.
+	# Ensure code input doesn't get covered by setting popup top anchor (done in scene).
 
 
 func _build_slots() -> void:
@@ -149,6 +176,9 @@ func _end_drag() -> void:
 		GameState.set_slot(target, new_tier)
 		slot_tier[target] = new_tier
 		_play_merge_feedback(target)
+		var mm = get_node_or_null("/root/MissionManager")
+		if mm != null:
+			mm.on_merge()
 	else:
 		var old_target_tier := slot_tier[target]
 		_place_nuke(target, dragged_tier)
@@ -390,3 +420,67 @@ func _on_claim_x2() -> void:
 	AdService.show_rewarded_ad()
 	# Stub grants immediately; grant x2.
 	_on_claim_offline(2)
+
+
+func _on_redeem_submit() -> void:
+	var result := CodeManager.redeem(code_input.text)
+	redeem_result_label.text = str(result.get("message", ""))
+	if bool(result.get("ok", false)):
+		code_input.text = ""
+
+
+func _on_claim_daily() -> void:
+	DailyRewardManager.claim()
+	daily_popup.visible = false
+
+
+func _on_daily_reward_available(day: int, amount: float) -> void:
+	daily_day_label.text = "Day %d" % day
+	daily_amount_label.text = "+" + Economy.format_number(amount)
+	daily_popup.visible = true
+
+
+func _on_missions_pressed() -> void:
+	_refresh_missions_list()
+	missions_popup.visible = true
+
+
+func _refresh_missions_list() -> void:
+	for child in missions_list.get_children():
+		child.queue_free()
+	for m in MissionManager.get_missions():
+		if not (m is Dictionary):
+			continue
+		var id := str(m.get("id", ""))
+		var target := int(m.get("target", 1))
+		var progress := int(GameState.mission_progress.get(id, 0))
+		var claimed := bool(GameState.mission_claimed.get(id, false))
+		var row := HBoxContainer.new()
+		var label := Label.new()
+		label.text = "%s (%d/%d)" % [str(m.get("name", id)), progress, target]
+		label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		row.add_child(label)
+		var btn := Button.new()
+		btn.text = "Claimed" if claimed else "Claim"
+		btn.disabled = claimed or progress < target
+		btn.pressed.connect(_on_claim_mission.bind(id))
+		row.add_child(btn)
+		missions_list.add_child(row)
+
+
+func _on_claim_mission(id: String) -> void:
+	MissionManager.claim(id)
+	_refresh_missions_list()
+
+
+func _on_event_changed(_event_data: Dictionary) -> void:
+	_update_event_banner()
+
+
+func _update_event_banner() -> void:
+	var ev := EventManager.active_event
+	if ev is Dictionary and not ev.is_empty():
+		event_banner.text = str(ev.get("name", "")) + " (+" + str(int(float(ev.get("income_bonus", 0.0)) * 100)) + "% income)"
+		event_banner.visible = true
+	else:
+		event_banner.visible = false

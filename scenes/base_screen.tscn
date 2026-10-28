@@ -28,6 +28,12 @@ theme_override_constants/margin_bottom = 16
 layout_mode = 2
 theme_override_constants/separation = 8
 
+[node name="EventBanner" type="Label" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = ""
+horizontal_alignment = 1
+visible = false
+
 [node name="HUD" parent="MarginContainer/VBoxContainer" instance=ExtResource("2")]
 layout_mode = 2
 custom_minimum_size = Vector2(0, 48)
@@ -57,6 +63,14 @@ text = "Raid"
 layout_mode = 2
 text = "Lock Base"
 
+[node name="RedeemButton" type="Button" parent="MarginContainer/VBoxContainer/ButtonRow"]
+layout_mode = 2
+text = "Redeem"
+
+[node name="MissionsButton" type="Button" parent="MarginContainer/VBoxContainer/ButtonRow"]
+layout_mode = 2
+text = "Missions"
+
 [node name="ShieldPanel" type="PanelContainer" parent="."]
 visible = false
 layout_mode = 1
@@ -77,9 +91,117 @@ layout_mode = 2
 text = "SHIELDED"
 horizontal_alignment = 1
 
-[node name="AutoSpawnTimer" type="Timer" parent="."]
-wait_time = 4.0
-autostart = true
+[node name="RedeemPopup" type="PanelContainer" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.3
+anchor_right = 0.5
+anchor_bottom = 0.3
+offset_left = -160.0
+offset_top = -80.0
+offset_right = 160.0
+offset_bottom = 80.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="RedeemPopup"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="TitleLabel" type="Label" parent="RedeemPopup/VBoxContainer"]
+layout_mode = 2
+text = "Redeem Code"
+horizontal_alignment = 1
+
+[node name="CodeInput" type="LineEdit" parent="RedeemPopup/VBoxContainer"]
+layout_mode = 2
+placeholder_text = "Enter code"
+
+[node name="RedeemSubmitButton" type="Button" parent="RedeemPopup/VBoxContainer"]
+layout_mode = 2
+text = "Submit"
+
+[node name="RedeemCloseButton" type="Button" parent="RedeemPopup/VBoxContainer"]
+layout_mode = 2
+text = "Close"
+
+[node name="RedeemResultLabel" type="Label" parent="RedeemPopup/VBoxContainer"]
+layout_mode = 2
+text = ""
+horizontal_alignment = 1
+
+[node name="DailyRewardPopup" type="PanelContainer" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -160.0
+offset_top = -80.0
+offset_right = 160.0
+offset_bottom = 80.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="DailyRewardPopup"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="TitleLabel" type="Label" parent="DailyRewardPopup/VBoxContainer"]
+layout_mode = 2
+text = "Daily Reward"
+horizontal_alignment = 1
+
+[node name="DayLabel" type="Label" parent="DailyRewardPopup/VBoxContainer"]
+layout_mode = 2
+text = "Day 1"
+horizontal_alignment = 1
+
+[node name="AmountLabel" type="Label" parent="DailyRewardPopup/VBoxContainer"]
+layout_mode = 2
+text = "+0"
+horizontal_alignment = 1
+
+[node name="ClaimDailyButton" type="Button" parent="DailyRewardPopup/VBoxContainer"]
+layout_mode = 2
+text = "Claim"
+
+[node name="MissionsPopup" type="PanelContainer" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -180.0
+offset_top = -160.0
+offset_right = 180.0
+offset_bottom = 160.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MissionsPopup"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="TitleLabel" type="Label" parent="MissionsPopup/VBoxContainer"]
+layout_mode = 2
+text = "Missions"
+horizontal_alignment = 1
+
+[node name="MissionsList" type="VBoxContainer" parent="MissionsPopup/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 6
+
+[node name="MissionsCloseButton" type="Button" parent="MissionsPopup/VBoxContainer"]
+layout_mode = 2
+text = "Close"
 
 [node name="WelcomePopup" type="PanelContainer" parent="."]
 visible = false
@@ -117,3 +239,7 @@ text = "Claim"
 [node name="ClaimX2Button" type="Button" parent="WelcomePopup/VBoxContainer"]
 layout_mode = 2
 text = "Claim x2"
+
+[node name="AutoSpawnTimer" type="Timer" parent="."]
+wait_time = 4.0
+autostart = true

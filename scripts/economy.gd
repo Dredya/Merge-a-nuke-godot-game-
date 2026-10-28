@@ -11,6 +11,7 @@ signal upgrades_loaded
 var upgrades: Array = []
 var upgrade_levels: Dictionary = {}
 var income_multiplier: float = 1.0
+var event_income_multiplier: float = 1.0
 var spawn_speed_level: int = 0
 var offline_cap_hours: float = 8.0
 
@@ -120,10 +121,13 @@ func _recompute_multipliers() -> void:
 
 
 func _on_income_tick() -> void:
-	var income := GameState.income_per_second_total() * income_multiplier
+	var income := GameState.income_per_second_total() * income_multiplier * event_income_multiplier
 	if income > 0.0:
 		GameState.add_cash(income)
 		income_granted.emit(income)
+		var mm = get_node_or_null("/root/MissionManager")
+		if mm != null:
+			mm.on_cash_earned(income)
 
 
 func format_number(value: float) -> String:
@@ -136,3 +140,7 @@ func format_number(value: float) -> String:
 	if idx == 0:
 		return str(int(v))
 	return "%.2f%s" % [v, suffixes[idx]]
+
+
+func set_event_multiplier(value: float) -> void:
+	event_income_multiplier = value

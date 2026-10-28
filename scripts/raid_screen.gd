@@ -141,6 +141,9 @@ func _on_raid_anim_finished() -> void:
 	_screen_shake()
 	# grant cash
 	GameState.add_cash(_pending_stolen)
+	var mm = get_node_or_null("/root/MissionManager")
+	if mm != null:
+		mm.on_raid()
 	# update target cooldown/cash
 	var now := Time.get_unix_time_from_system()
 	for t in RaidService.targets:

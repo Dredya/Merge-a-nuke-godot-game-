@@ -16,6 +16,14 @@ var slots: Array[int] = []
 var owned_nukes: Dictionary = {}
 var lock_until: float = 0.0
 var lock_cooldown_until: float = 0.0
+# Retention
+var redeemed_codes: Array[String] = []
+var daily_streak: int = 0
+var last_login_date: String = ""
+var daily_claimed_date: String = ""
+var mission_progress: Dictionary = {}
+var mission_claimed: Dictionary = {}
+var mission_last_reset_date: String = ""
 
 
 func _ready() -> void:

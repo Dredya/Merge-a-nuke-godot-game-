@@ -34,6 +34,13 @@ func save() -> void:
 		"upgrade_levels": Economy.upgrade_levels,
 		"lock_until": GameState.lock_until,
 		"lock_cooldown_until": GameState.lock_cooldown_until,
+		"redeemed_codes": GameState.redeemed_codes,
+		"daily_streak": GameState.daily_streak,
+		"last_login_date": GameState.last_login_date,
+		"daily_claimed_date": GameState.daily_claimed_date,
+		"mission_progress": GameState.mission_progress,
+		"mission_claimed": GameState.mission_claimed,
+		"mission_last_reset_date": GameState.mission_last_reset_date,
 		"last_save_time": Time.get_unix_time_from_system(),
 	}
 	var json_text := JSON.stringify(data)
@@ -94,6 +101,21 @@ func load_save() -> void:
 	Economy._recompute_multipliers()
 	GameState.lock_until = float(data.get("lock_until", 0.0))
 	GameState.lock_cooldown_until = float(data.get("lock_cooldown_until", 0.0))
+	var rc: Variant = data.get("redeemed_codes", [])
+	if rc is Array:
+		GameState.redeemed_codes.clear()
+		for c in rc:
+			GameState.redeemed_codes.append(str(c))
+	GameState.daily_streak = int(data.get("daily_streak", 0))
+	GameState.last_login_date = str(data.get("last_login_date", ""))
+	GameState.daily_claimed_date = str(data.get("daily_claimed_date", ""))
+	var mp: Variant = data.get("mission_progress", {})
+	if mp is Dictionary:
+		GameState.mission_progress = (mp as Dictionary).duplicate()
+	var mc: Variant = data.get("mission_claimed", {})
+	if mc is Dictionary:
+		GameState.mission_claimed = (mc as Dictionary).duplicate()
+	GameState.mission_last_reset_date = str(data.get("mission_last_reset_date", ""))
 	GameState.cash_changed.emit(GameState.cash)
 	GameState.slots_changed.emit()
 	Economy.upgrades_loaded.emit()
