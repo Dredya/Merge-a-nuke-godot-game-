@@ -1,7 +1,7 @@
 class_name RaidWorld
 extends Node3D
 
-## Tiny 3D raid diorama: player launch pad, dotted arc, 2x2 enemy base.
+## Tiny 3D raid diorama: player launch pad, dotted arc and a glass/steel enemy city.
 
 signal raid_complete
 
@@ -14,9 +14,21 @@ const ARC_END := Vector3(4.3, 1.6, -2.7)
 const C_PLAYER_TOP := Color("#4CAF50")
 const C_PLAYER_SIDE := Color("#2E7D32")
 const C_PAD := Color("#66C26A")
-const C_ENEMY_TOP := Color("#C0392B")
-const C_ENEMY_SIDE := Color("#7B241C")
-const C_ENEMY_PAD := Color("#E74C3C")
+# Modern glass/steel enemy city palette.
+const C_CITY_TOP := Color("#6B7280")
+const C_CITY_SIDE := Color("#4A4F5A")
+const C_ROAD := Color("#2B2F38")
+const C_LANE := Color("#D8DEE8")
+const C_PLAZA := Color("#8A92A0")
+const C_STEEL_A := Color("#8A92A0")
+const C_STEEL_B := Color("#9AA2B0")
+const C_STEEL_C := Color("#7A8290")
+const C_STEEL_D := Color("#5A5F6B")
+const C_GLASS_A := Color("#6FA8D8")
+const C_GLASS_B := Color("#4E7FB0")
+const C_WINDOW := Color("#7FD6FF")
+const C_ENEMY_RED := Color("#E74C3C")
+const C_ENEMY_CROWN := Color("#FF6A3D")
 
 var low_quality: bool = false
 var camera: Camera3D
@@ -68,27 +80,115 @@ func _build_enemy_base() -> void:
 	var root := Node3D.new()
 	root.position = ENEMY_POS
 	add_child(root)
-	LowPoly.add_mesh(root, LowPoly.box(Vector3(5.6, 1.6, 5.6)), LowPoly.material(C_ENEMY_SIDE), Vector3(0.0, -0.8, 0.0), Vector3.ZERO, Vector3.ONE, "EnemySlab")
-	LowPoly.add_mesh(root, LowPoly.box(Vector3(5.65, 0.1, 5.65)), LowPoly.material(C_ENEMY_TOP), Vector3(0.0, 0.05, 0.0), Vector3.ZERO, Vector3.ONE, "EnemyTop")
-	for row in range(2):
-		for col in range(2):
-			LowPoly.add_mesh(
-				root,
-				LowPoly.box(Vector3(2.05, 0.08, 2.05)),
-				LowPoly.material(C_ENEMY_PAD),
-				Vector3((float(col) - 0.5) * 2.35, 0.11, (float(row) - 0.5) * 2.35),
-				Vector3(0.0, 45.0, 0.0),
-				Vector3.ONE,
-				"EnemyPad_%d_%d" % [row, col]
-			)
-	# Blocky defenses.
-	var wall := LowPoly.material(Color("#2C3E50"))
-	var glow := LowPoly.material(Color("#FF6A3D"), 0.0, 0.2, Color("#FF6A3D"), 2.0, true)
-	LowPoly.add_mesh(root, LowPoly.box(Vector3(0.45, 1.2, 0.45)), wall, Vector3(-2.0, 0.7, -2.0), Vector3.ZERO, Vector3.ONE, "TowerA")
-	LowPoly.add_mesh(root, LowPoly.box(Vector3(0.45, 1.2, 0.45)), wall, Vector3(2.0, 0.7, -2.0), Vector3.ZERO, Vector3.ONE, "TowerB")
-	LowPoly.add_mesh(root, LowPoly.box(Vector3(0.45, 1.2, 0.45)), wall, Vector3(-2.0, 0.7, 2.0), Vector3.ZERO, Vector3.ONE, "TowerC")
-	LowPoly.add_mesh(root, LowPoly.box(Vector3(0.3, 0.3, 0.3)), glow, Vector3(-2.0, 1.45, -2.0), Vector3.ZERO, Vector3.ONE, "BeaconA")
-	LowPoly.add_mesh(root, LowPoly.box(Vector3(0.3, 0.3, 0.3)), glow, Vector3(2.0, 1.45, -2.0), Vector3.ZERO, Vector3.ONE, "BeaconB")
+
+	var slab_side := LowPoly.material(C_CITY_SIDE, 0.0, 0.9)
+	var slab_top := LowPoly.material(C_CITY_TOP, 0.0, 0.85)
+	var road_mat := LowPoly.material(C_ROAD, 0.0, 0.95)
+	var lane_mat := LowPoly.material(C_LANE, 0.0, 0.7, Color.WHITE, 0.0, true, 0.9)
+	var plaza_mat := LowPoly.material(C_PLAZA, 0.0, 0.8)
+	var steel_a := LowPoly.material(C_STEEL_A, 0.35, 0.4)
+	var steel_b := LowPoly.material(C_STEEL_B, 0.45, 0.35)
+	var steel_c := LowPoly.material(C_STEEL_C, 0.3, 0.45)
+	var steel_d := LowPoly.material(C_STEEL_D, 0.55, 0.3)
+	var glass_a := LowPoly.material(C_GLASS_A, 0.6, 0.12)
+	var glass_b := LowPoly.material(C_GLASS_B, 0.55, 0.16)
+	# Low quality keeps the windows readable but drops the emissive glow.
+	var window_energy := 1.8 if not low_quality else 0.0
+	var window_mat := LowPoly.material(C_WINDOW, 0.0, 0.2, C_WINDOW, window_energy)
+	var red_mat := LowPoly.material(C_ENEMY_RED, 0.0, 0.35, C_ENEMY_RED, 2.4, true)
+	var crown_mat := LowPoly.material(C_ENEMY_CROWN, 0.0, 0.3, C_ENEMY_CROWN, 2.8, true)
+
+	# Concrete foundation with a raised top plate.
+	LowPoly.add_mesh(root, LowPoly.box(Vector3(7.0, 0.6, 7.0)), slab_side, Vector3(0.0, -0.3, 0.0), Vector3.ZERO, Vector3.ONE, "CitySlab")
+	LowPoly.add_mesh(root, LowPoly.box(Vector3(7.05, 0.08, 7.05)), slab_top, Vector3(0.0, 0.04, 0.0), Vector3.ZERO, Vector3.ONE, "CityTop")
+
+	# Central plaza and four road spokes reaching the edges.
+	LowPoly.add_mesh(root, LowPoly.box(Vector3(1.9, 0.06, 1.9)), plaza_mat, Vector3(0.0, 0.11, 0.0), Vector3.ZERO, Vector3.ONE, "Plaza")
+	_add_road(root, Vector3(0.0, 0.11, -1.95), Vector3(1.2, 0.06, 2.1), road_mat, "RoadN")
+	_add_road(root, Vector3(0.0, 0.11, 1.95), Vector3(1.2, 0.06, 2.1), road_mat, "RoadS")
+	_add_road(root, Vector3(1.95, 0.11, 0.0), Vector3(2.1, 0.06, 1.2), road_mat, "RoadE")
+	_add_road(root, Vector3(-1.95, 0.11, 0.0), Vector3(2.1, 0.06, 1.2), road_mat, "RoadW")
+	# Dashed lane markings along both road axes.
+	for i in range(4):
+		var z: float = [-1.5, -2.2, 1.5, 2.2][i]
+		LowPoly.add_mesh(root, LowPoly.box(Vector3(0.08, 0.02, 0.5)), lane_mat, Vector3(0.0, 0.145, z), Vector3.ZERO, Vector3.ONE, "LaneZ%d" % i)
+		var x: float = [-1.5, -2.2, 1.5, 2.2][i]
+		LowPoly.add_mesh(root, LowPoly.box(Vector3(0.5, 0.02, 0.08)), lane_mat, Vector3(x, 0.145, 0.0), Vector3.ZERO, Vector3.ONE, "LaneX%d" % i)
+
+	# Steel-and-glass blocks ringing the plaza (two per quadrant).
+	var buildings: Array[Dictionary] = [
+		{"pos": Vector2(-1.4, -1.4), "size": Vector3(1.0, 2.0, 1.0), "wall": steel_a, "glass": glass_a},
+		{"pos": Vector2(1.4, -1.4), "size": Vector3(1.0, 2.6, 1.0), "wall": steel_b, "glass": glass_b},
+		{"pos": Vector2(-1.4, 1.4), "size": Vector3(1.0, 1.5, 1.0), "wall": steel_c, "glass": glass_a},
+		{"pos": Vector2(1.4, 1.4), "size": Vector3(1.0, 1.7, 1.0), "wall": steel_a, "glass": glass_b},
+		{"pos": Vector2(-2.6, -2.6), "size": Vector3(1.2, 2.7, 1.2), "wall": steel_d, "glass": glass_b},
+		{"pos": Vector2(2.6, -2.6), "size": Vector3(1.2, 3.4, 1.2), "wall": steel_b, "glass": glass_a},
+		{"pos": Vector2(-2.6, 2.6), "size": Vector3(1.2, 2.0, 1.2), "wall": steel_c, "glass": glass_a},
+		{"pos": Vector2(2.6, 2.6), "size": Vector3(1.2, 2.2, 1.2), "wall": steel_d, "glass": glass_b},
+	]
+	for i in range(buildings.size()):
+		var b: Dictionary = buildings[i]
+		var size: Vector3 = b["size"]
+		var p2: Vector2 = b["pos"]
+		var center := Vector3(p2.x, 0.08 + size.y * 0.5, p2.y)
+		_add_city_building(root, center, size, b["wall"] as Material, b["glass"] as Material, window_mat, red_mat, "Bldg%d" % i)
+
+	# Central landmark tower with a red enemy crown.
+	var landmark_size := Vector3(1.5, 4.6, 1.5)
+	var landmark_center := Vector3(0.0, 0.08 + landmark_size.y * 0.5, 0.0)
+	_add_city_building(root, landmark_center, landmark_size, steel_d, glass_a, window_mat, red_mat, "Landmark", false)
+	LowPoly.add_mesh(root, LowPoly.box(Vector3(1.2, 0.28, 1.2)), crown_mat, Vector3(0.0, 4.82, 0.0), Vector3.ZERO, Vector3.ONE, "LandmarkCrown")
+	LowPoly.add_mesh(root, LowPoly.box(Vector3(0.08, 0.7, 0.08)), steel_c, Vector3(0.0, 5.31, 0.0), Vector3.ZERO, Vector3.ONE, "LandmarkAntenna")
+	LowPoly.add_mesh(root, LowPoly.box(Vector3(0.16, 0.16, 0.16)), red_mat, Vector3(0.0, 5.72, 0.0), Vector3.ZERO, Vector3.ONE, "LandmarkTip")
+
+	# Corner warning beacons keep the city reading as hostile territory.
+	var corners: Array[Vector2] = [Vector2(-1, -1), Vector2(1, -1), Vector2(-1, 1), Vector2(1, 1)]
+	for i in range(corners.size()):
+		var cx := 3.35 * corners[i].x
+		var cz := 3.35 * corners[i].y
+		LowPoly.add_mesh(root, LowPoly.box(Vector3(0.09, 1.1, 0.09)), steel_c, Vector3(cx, 0.08 + 0.55, cz), Vector3.ZERO, Vector3.ONE, "LightPole%d" % i)
+		LowPoly.add_mesh(root, LowPoly.box(Vector3(0.22, 0.22, 0.22)), red_mat, Vector3(cx, 0.08 + 1.18, cz), Vector3.ZERO, Vector3.ONE, "LightOrb%d" % i)
+
+
+func _add_road(root: Node3D, pos: Vector3, size: Vector3, mat: Material, mesh_tag: String) -> void:
+	LowPoly.add_mesh(root, LowPoly.box(size), mat, pos, Vector3.ZERO, Vector3.ONE, mesh_tag)
+
+
+## One steel-framed, glass-fronted city block.
+func _add_city_building(
+	root: Node3D,
+	center: Vector3,
+	size: Vector3,
+	wall: Material,
+	glass: Material,
+	window_mat: Material,
+	trim_mat: Material,
+	tag: String,
+	roof_trim: bool = true
+) -> void:
+	LowPoly.add_mesh(root, LowPoly.box(size), wall, center, Vector3.ZERO, Vector3.ONE, tag + "_Body")
+
+	# Glass curtain panels on the two camera-facing facades (+X and +Z).
+	var panel_h := size.y * 0.74
+	var panel_y := center.y + size.y * 0.04
+	LowPoly.add_mesh(root, LowPoly.box(Vector3(size.x * 0.66, panel_h, 0.05)), glass, Vector3(center.x - size.x * 0.12, panel_y, center.z + size.z * 0.5 + 0.025), Vector3.ZERO, Vector3.ONE, tag + "_GlassZ")
+	LowPoly.add_mesh(root, LowPoly.box(Vector3(0.05, panel_h, size.z * 0.66)), glass, Vector3(center.x + size.x * 0.5 + 0.025, panel_y, center.z - size.z * 0.12), Vector3.ZERO, Vector3.ONE, tag + "_GlassX")
+
+	# Emissive window bands, two for short blocks and three for tall ones.
+	var floors := 2
+	if size.y >= 2.4:
+		floors = 3
+	for f in range(floors):
+		var t := (float(f) + 1.0) / float(floors + 1)
+		var y := center.y - size.y * 0.5 + size.y * t
+		LowPoly.add_mesh(root, LowPoly.box(Vector3(size.x * 0.82, 0.12, 0.05)), window_mat, Vector3(center.x, y, center.z + size.z * 0.5 + 0.05), Vector3.ZERO, Vector3.ONE, tag + "_WinZ%d" % f)
+		LowPoly.add_mesh(root, LowPoly.box(Vector3(0.05, 0.12, size.z * 0.82)), window_mat, Vector3(center.x + size.x * 0.5 + 0.05, y, center.z), Vector3.ZERO, Vector3.ONE, tag + "_WinX%d" % f)
+
+	if roof_trim:
+		# Thin red enemy accent line under the roofline (not a full roof plate).
+		var trim_y := center.y + size.y * 0.5 - 0.1
+		LowPoly.add_mesh(root, LowPoly.box(Vector3(size.x * 0.92, 0.06, 0.04)), trim_mat, Vector3(center.x, trim_y, center.z + size.z * 0.5 + 0.03), Vector3.ZERO, Vector3.ONE, tag + "_TrimZ")
+		LowPoly.add_mesh(root, LowPoly.box(Vector3(0.04, 0.06, size.z * 0.92)), trim_mat, Vector3(center.x + size.x * 0.5 + 0.03, trim_y, center.z), Vector3.ZERO, Vector3.ONE, tag + "_TrimX")
 
 
 func _build_dotted_arc() -> void:
