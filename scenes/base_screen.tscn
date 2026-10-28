@@ -36,6 +36,28 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 0
 
+[node name="ScreenGlow" type="ColorRect" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(1, 0.784314, 0.239216, 0.26)
+
+[node name="FlashOverlay" type="ColorRect" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(1, 1, 1, 0.3)
+
 [node name="TempHint" type="Label" parent="."]
 layout_mode = 1
 anchors_preset = 7
@@ -43,13 +65,15 @@ anchor_left = 0.5
 anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
-offset_left = -300.0
+offset_left = -420.0
 offset_top = -80.0
-offset_right = 300.0
+offset_right = 420.0
 offset_bottom = -24.0
 grow_horizontal = 2
 grow_vertical = 0
 theme_override_colors/font_color = Color(0.662745, 0.713725, 0.878431, 1)
-theme_override_font_sizes/font_size = 26
-text = "4x3 PLOT  •  ISOMETRIC 3D WORLD"
+theme_override_colors/font_outline_color = Color(0.0431373, 0.0627451, 0.12549, 1)
+theme_override_constants/outline_size = 8
+theme_override_font_sizes/font_size = 24
+text = "DRAG A BOMB ONTO A MATCH TO MERGE"
 horizontal_alignment = 1

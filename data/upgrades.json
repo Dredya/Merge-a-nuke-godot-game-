@@ -1,5 +1,4 @@
 [
-  {"id": "slot_count", "name": "Slot Count", "base_cost": 50, "cost_scale": 1.5, "max_level": 14, "effect_per_level": 1},
   {"id": "spawn_speed", "name": "Spawn Speed", "base_cost": 30, "cost_scale": 1.4, "max_level": 10, "effect_per_level": 0.1},
   {"id": "income_multiplier", "name": "Income Multiplier", "base_cost": 100, "cost_scale": 1.6, "max_level": 20, "effect_per_level": 0.1},
   {"id": "offline_cap", "name": "Offline Cap", "base_cost": 200, "cost_scale": 1.8, "max_level": 10, "effect_per_level": 2.0}

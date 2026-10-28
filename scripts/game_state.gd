@@ -8,10 +8,11 @@ signal cash_changed(new_cash: float)
 signal slots_changed
 
 const TIER_DATA_PATH := "res://data/nuke_tiers.json"
+const MAX_SLOTS := 12
 
 var tiers: Array[NukeTierScript] = []
 var cash: float = 0.0
-var slot_count: int = 6
+var slot_count: int = MAX_SLOTS
 var slots: Array[int] = []
 var owned_nukes: Dictionary = {}
 var lock_until: float = 0.0
@@ -81,29 +82,48 @@ func set_slot(index: int, tier_number: int) -> void:
 	slots_changed.emit()
 
 
-func try_buy_tier1() -> bool:
+func commit_slots(new_slots: Array[int]) -> void:
+	## Replace the whole board in one notification (drag / merge operations).
+	if new_slots.size() != slots.size():
+		return
+	for i in range(slots.size()):
+		slots[i] = new_slots[i]
+	slots_changed.emit()
+
+
+func empty_slot_count() -> int:
+	var count := 0
+	for t in slots:
+		if t <= 0:
+			count += 1
+	return count
+
+
+func try_buy_tier1() -> int:
 	var t: NukeTierScript = get_tier(1)
 	if t == null:
-		return false
+		return -1
 	if cash < float(t.buy_cost):
-		return false
+		return -1
 	for i in range(slots.size()):
 		if slots[i] == 0:
 			cash -= float(t.buy_cost)
 			cash_changed.emit(cash)
-			set_slot(i, 1)
+			slots[i] = 1
+			slots_changed.emit()
 			_track_owned(1)
-			return true
-	return false
+			return i
+	return -1
 
 
-func spawn_tier1_free() -> bool:
+func spawn_tier1_free() -> int:
 	for i in range(slots.size()):
 		if slots[i] == 0:
-			set_slot(i, 1)
+			slots[i] = 1
+			slots_changed.emit()
 			_track_owned(1)
-			return true
-	return false
+			return i
+	return -1
 
 
 func income_per_second_total() -> float:

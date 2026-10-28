@@ -115,8 +115,8 @@ All tier data (name, colors, income/sec, buy cost, build id) lives in
 - [x] Spec added to AGENTS.md.
 - [x] Step 1 — Environment, camera, baseplate, slots.
 - [x] Step 2 — Tier 1–6 bomb builders + debug gallery scene for all 15 tiers.
-- [ ] Step 3 — Tier 7–15 bomb builders.
-- [ ] Step 4 — 3D drag and drop, merge effects, bobbing/glow.
+- [x] Step 3 — Tier 7–15 bomb builders.
+- [x] Step 4 — 3D drag and drop, merge effects, bobbing/glow.
 - [ ] Step 5 — Shared theme, HUD, Buy Bomb button, nav bar.
 - [ ] Step 6 — Raid screen and 3D raid animation.
 - [ ] Step 7 — Offline earnings popup.

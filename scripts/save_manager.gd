@@ -87,15 +87,15 @@ func load_save() -> void:
 		# For now, still attempt load.
 		pass
 	GameState.cash = float(data.get("cash", 0.0))
-	GameState.slot_count = int(data.get("slot_count", 6))
+	GameState.slot_count = GameState.MAX_SLOTS
 	GameState.slots.resize(GameState.slot_count)
 	var saved_slots: Variant = data.get("slots", [])
-	if saved_slots is Array:
-		for i in range(min(saved_slots.size(), GameState.slots.size())):
-			GameState.slots[i] = int(saved_slots[i])
 	var saved_size := 0
 	if saved_slots is Array:
 		saved_size = (saved_slots as Array).size()
+		for i in range(min(saved_size, GameState.slots.size())):
+			GameState.slots[i] = int((saved_slots as Array)[i])
+	# Old six-slot saves are migrated into the fixed 4x3 board.
 	for i in range(GameState.slots.size()):
 		if i >= saved_size:
 			GameState.slots[i] = 0
