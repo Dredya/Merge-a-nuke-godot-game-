@@ -10,7 +10,7 @@ static var _font: Font
 static var _label_font: Font
 
 
-static func build(tier: int, low_quality: bool = false) -> Bomb:
+static func build(tier: int, low_quality: bool = false, tier_data: NukeTier = null) -> Bomb:
 	var bomb := Bomb.new()
 	bomb.name = "BombT%d" % tier
 	bomb.tier = tier
@@ -28,42 +28,133 @@ static func build(tier: int, low_quality: bool = false) -> Bomb:
 	shadow.position = Vector3(0.0, 0.035, 0.0)
 	bomb.add_child(shadow)
 
-	var label_height := 1.75
-	match tier:
-		1:
-			label_height = _build_classic(visual, bomb)
-		2:
-			label_height = _build_steel(visual, bomb)
-		3:
-			label_height = _build_tech(visual, bomb)
-		4:
-			label_height = _build_gold_missile(visual, bomb)
-		5:
-			label_height = _build_plasma(visual, bomb)
-		6:
-			label_height = _build_neon_warhead(visual, bomb)
-		7:
-			label_height = _build_ion(visual, bomb)
-		8:
-			label_height = _build_crystal(visual, bomb)
-		9:
-			label_height = _build_antimatter(visual, bomb)
-		10:
-			label_height = _build_solar_flare(visual, bomb)
-		11:
-			label_height = _build_void(visual, bomb)
-		12:
-			label_height = _build_quantum(visual, bomb)
-		13:
-			label_height = _build_star_core(visual, bomb)
-		14:
-			label_height = _build_galaxy(visual, bomb)
-		_:
-			label_height = _build_omega(visual, bomb)
+	var build_id := ""
+	if tier_data != null:
+		build_id = tier_data.build_id
+	if build_id.is_empty():
+		build_id = _default_build_id(tier)
 
+	var label_height := 1.75
+	match build_id:
+		"classic":
+			label_height = _build_classic(visual, bomb)
+		"steel":
+			label_height = _build_steel(visual, bomb)
+		"tech":
+			label_height = _build_tech(visual, bomb)
+		"gold_missile":
+			label_height = _build_gold_missile(visual, bomb)
+		"plasma_core":
+			label_height = _build_plasma(visual, bomb)
+		"neon_warhead":
+			label_height = _build_neon_warhead(visual, bomb)
+		"ion":
+			label_height = _build_ion(visual, bomb)
+		"crystal":
+			label_height = _build_crystal(visual, bomb)
+		"antimatter":
+			label_height = _build_antimatter(visual, bomb)
+		"solar_flare":
+			label_height = _build_solar_flare(visual, bomb)
+		"void":
+			label_height = _build_void(visual, bomb)
+		"quantum":
+			label_height = _build_quantum(visual, bomb)
+		"star_core":
+			label_height = _build_star_core(visual, bomb)
+		"galaxy":
+			label_height = _build_galaxy(visual, bomb)
+		"omega":
+			label_height = _build_omega(visual, bomb)
+		"procedural":
+			label_height = _build_procedural(visual, bomb, tier, tier_data)
+		"singularity":
+			label_height = _build_singularity(visual, bomb)
+		_:
+			label_height = _build_by_tier(visual, bomb, tier)
+
+	var shadow_radius := float(bomb.get_meta("shadow_radius", 0.55))
+	shadow.scale = Vector3.ONE * (shadow_radius / 0.55)
 	_add_label(bob, tier, label_height)
 	bomb.setup(tier, low_quality)
 	return bomb
+
+
+static func _default_build_id(tier: int) -> String:
+	match tier:
+		1:
+			return "classic"
+		2:
+			return "steel"
+		3:
+			return "tech"
+		4:
+			return "gold_missile"
+		5:
+			return "plasma_core"
+		6:
+			return "neon_warhead"
+		7:
+			return "ion"
+		8:
+			return "crystal"
+		9:
+			return "antimatter"
+		10:
+			return "solar_flare"
+		11:
+			return "void"
+		12:
+			return "quantum"
+		13:
+			return "star_core"
+		14:
+			return "galaxy"
+		15:
+			return "omega"
+		100:
+			return "singularity"
+		_:
+			return "procedural"
+
+
+static func _build_by_tier(visual: Node3D, bomb: Bomb, tier: int) -> float:
+	var build_id := _default_build_id(tier)
+	match build_id:
+		"classic":
+			return _build_classic(visual, bomb)
+		"steel":
+			return _build_steel(visual, bomb)
+		"tech":
+			return _build_tech(visual, bomb)
+		"gold_missile":
+			return _build_gold_missile(visual, bomb)
+		"plasma_core":
+			return _build_plasma(visual, bomb)
+		"neon_warhead":
+			return _build_neon_warhead(visual, bomb)
+		"ion":
+			return _build_ion(visual, bomb)
+		"crystal":
+			return _build_crystal(visual, bomb)
+		"antimatter":
+			return _build_antimatter(visual, bomb)
+		"solar_flare":
+			return _build_solar_flare(visual, bomb)
+		"void":
+			return _build_void(visual, bomb)
+		"quantum":
+			return _build_quantum(visual, bomb)
+		"star_core":
+			return _build_star_core(visual, bomb)
+		"galaxy":
+			return _build_galaxy(visual, bomb)
+		"omega":
+			return _build_omega(visual, bomb)
+		"singularity":
+			return _build_singularity(visual, bomb)
+		_:
+			return _build_procedural(visual, bomb, tier, null)
 
 
 # --- Tier 1: Classic --------------------------------------------------------
@@ -540,6 +631,143 @@ static func _build_omega(visual: Node3D, bomb: Bomb) -> float:
 	_add_spark_particles(visual, Vector3(0.0, 0.75, 0.0), Color("#FFC83D"), 12, 1.1, 0.9, 0.04)
 	_add_spark_particles(visual, Vector3(0.0, 0.55, 0.0), Color("#4FE0FF"), 8, 0.9, 0.85, 0.032)
 	return 2.25
+
+
+# --- Tiers 16-99: procedural escalation -------------------------------------
+
+static func _build_procedural(visual: Node3D, bomb: Bomb, tier: int, tier_data: NukeTier) -> float:
+	var t := clampf(float(tier - 16) / 83.0, 0.0, 1.0)
+	var primary: Color
+	var secondary: Color
+	var accent: Color
+	var glow: Color
+	if tier_data != null:
+		primary = tier_data.color
+		secondary = tier_data.color_secondary
+		accent = tier_data.color_accent
+		glow = tier_data.glow_color
+	else:
+		var hue := 0.50 + t * 0.35
+		primary = Color.from_hsv(hue, 0.78, 0.92)
+		secondary = Color.from_hsv(fmod(hue + 0.06, 1.0), 0.75, 0.55)
+		accent = Color.from_hsv(fmod(hue + 0.12, 1.0), 0.55, 1.0)
+		glow = Color.from_hsv(hue, 0.65, 1.0)
+
+	var body_mat := LowPoly.material(primary, 0.35, 0.3)
+	var secondary_mat := LowPoly.material(secondary, 0.4, 0.4)
+	var glow_mat := LowPoly.material(glow, 0.0, 0.2, glow, 2.4 + t * 2.2, true)
+	var accent_mat := LowPoly.material(accent, 0.0, 0.2, accent, 2.0 + t * 1.6, true)
+
+	var radius := 0.45 + t * 0.25
+	var center_y := radius + 0.10
+	LowPoly.add_mesh(visual, LowPoly.sphere(radius, 8, 4), body_mat, Vector3(0.0, center_y, 0.0), Vector3.ZERO, Vector3.ONE, "Body")
+
+	var core_radius := 0.13 + t * 0.09
+	var core := LowPoly.add_mesh(visual, LowPoly.sphere(core_radius, 6, 3), glow_mat, Vector3(0.0, center_y, 0.0), Vector3.ZERO, Vector3.ONE, "Core")
+	bomb.register_glow(core)
+
+	var ring_count := 2
+	if t >= 0.34:
+		ring_count = 3
+	if t >= 0.67:
+		ring_count = 4
+	for i in range(ring_count):
+		var pivot := Node3D.new()
+		pivot.name = "RingPivot%d" % i
+		pivot.position = Vector3(0.0, center_y, 0.0)
+		visual.add_child(pivot)
+		var ring_rot := Vector3.ZERO
+		var axis := Vector3(0.0, 1.0, 0.0)
+		var speed := 0.45 + t * 0.45
+		match i:
+			0:
+				ring_rot = Vector3.ZERO
+			1:
+				ring_rot = Vector3(90.0, 0.0, 0.0)
+				axis = Vector3(0.0, 1.0, 0.0)
+				speed = -0.38 - t * 0.25
+			2:
+				ring_rot = Vector3(0.0, 0.0, 90.0)
+				axis = Vector3(1.0, 0.0, 0.0)
+				speed = 0.32 + t * 0.3
+			3:
+				ring_rot = Vector3(45.0, 0.0, 45.0)
+				axis = Vector3(1.0, 0.3, 0.0)
+				speed = -0.26 - t * 0.2
+		var ring_mat := glow_mat if i % 2 == 0 else accent_mat
+		var ring := LowPoly.add_mesh(
+			pivot,
+			LowPoly.torus(radius + 0.12 + float(i) * 0.05, 0.024 + t * 0.004, 6, 3),
+			ring_mat,
+			Vector3.ZERO,
+			ring_rot,
+			Vector3.ONE,
+			"Ring%d" % i
+		)
+		bomb.register_glow(ring)
+		bomb.register_spinner(pivot, axis, speed)
+
+	for i in range(2):
+		var sign := -1.0 if i == 0 else 1.0
+		LowPoly.add_mesh(
+			visual,
+			LowPoly.box(Vector3(0.06, radius * 0.72, radius * 0.48)),
+			secondary_mat,
+			Vector3(sign * (radius + 0.10), center_y - radius * 0.3, 0.0),
+			Vector3(0.0, 0.0, sign * -10.0),
+			Vector3.ONE,
+			"Fin%d" % i
+		)
+
+	if t >= 0.5:
+		var orbit := Node3D.new()
+		orbit.name = "OrbitShards"
+		orbit.position = Vector3(0.0, center_y, 0.0)
+		visual.add_child(orbit)
+		for i in range(2):
+			var angle := float(i) * PI
+			LowPoly.add_mesh(
+				orbit,
+				LowPoly.box(Vector3(0.08, 0.22, 0.08)),
+				accent_mat,
+				Vector3(cos(angle) * (radius + 0.30), 0.0, sin(angle) * (radius + 0.30)),
+				Vector3(10.0, -rad_to_deg(angle), 15.0),
+				Vector3.ONE,
+				"Shard%d" % i
+			)
+		bomb.register_spinner(orbit, Vector3(0.0, 1.0, 0.0), 0.7 + t * 0.5)
+
+	bomb.set_meta("shadow_radius", radius + 0.12)
+	return center_y + radius + 0.55
+
+
+# --- Tier 100: Singularity ---------------------------------------------------
+
+static func _build_singularity(visual: Node3D, bomb: Bomb) -> float:
+	var height := _build_omega(visual, bomb)
+	visual.scale = Vector3.ONE * 1.30
+	var gold := LowPoly.material(Color("#FFC83D"), 0.0, 0.2, Color("#FFC83D"), 2.8, true)
+	var cyan := LowPoly.material(Color("#4FE0FF"), 0.0, 0.2, Color("#4FE0FF"), 2.6, true)
+	var orbit := Node3D.new()
+	orbit.name = "SingularityShards"
+	orbit.position = Vector3(0.0, 0.58, 0.0)
+	visual.add_child(orbit)
+	for i in range(4):
+		var angle := float(i) * TAU / 4.0
+		var shard_mat := gold if i % 2 == 0 else cyan
+		var shard := LowPoly.add_mesh(
+			orbit,
+			LowPoly.prism(Vector3(0.15, 0.32, 0.15)),
+			shard_mat,
+			Vector3(cos(angle) * 0.84, 0.0, sin(angle) * 0.84),
+			Vector3(12.0, -rad_to_deg(angle), 18.0),
+			Vector3.ONE,
+			"Shard%d" % i
+		)
+		bomb.register_glow(shard)
+	bomb.register_spinner(orbit, Vector3(0.0, 1.0, 0.0), -0.9)
+	bomb.set_meta("shadow_radius", 0.90)
+	return height + 0.20
 
 
 

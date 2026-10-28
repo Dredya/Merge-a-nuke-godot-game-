@@ -9,6 +9,7 @@ signal slots_changed
 
 const TIER_DATA_PATH := "res://data/nuke_tiers.json"
 const MAX_SLOTS := 12
+const MAX_TIER := 100
 
 var tiers: Array[NukeTierScript] = []
 var cash: float = 0.0
@@ -58,7 +59,6 @@ func _load_tiers() -> void:
 		t.color_accent = Color.html(str(entry.get("color_accent", entry.get("color", "#ffffff"))))
 		t.glow_color = Color.html(str(entry.get("glow_color", entry.get("color", "#ffffff"))))
 		t.income_per_sec = float(entry.get("income_per_sec", 0.0))
-		t.buy_cost = int(entry.get("buy_cost", 0))
 		t.build_id = str(entry.get("build_id", "classic"))
 		tiers.append(t)
 
@@ -78,7 +78,7 @@ func add_cash(amount: float) -> void:
 func set_slot(index: int, tier_number: int) -> void:
 	if index < 0 or index >= slots.size():
 		return
-	slots[index] = tier_number
+	slots[index] = clampi(tier_number, 0, MAX_TIER)
 	slots_changed.emit()
 
 
@@ -87,7 +87,7 @@ func commit_slots(new_slots: Array[int]) -> void:
 	if new_slots.size() != slots.size():
 		return
 	for i in range(slots.size()):
-		slots[i] = new_slots[i]
+		slots[i] = clampi(new_slots[i], 0, MAX_TIER)
 	slots_changed.emit()
 
 
@@ -97,23 +97,6 @@ func empty_slot_count() -> int:
 		if t <= 0:
 			count += 1
 	return count
-
-
-func try_buy_tier1() -> int:
-	var t: NukeTierScript = get_tier(1)
-	if t == null:
-		return -1
-	if cash < float(t.buy_cost):
-		return -1
-	for i in range(slots.size()):
-		if slots[i] == 0:
-			cash -= float(t.buy_cost)
-			cash_changed.emit(cash)
-			slots[i] = 1
-			slots_changed.emit()
-			_track_owned(1)
-			return i
-	return -1
 
 
 func spawn_tier1_free() -> int:

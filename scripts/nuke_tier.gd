@@ -11,5 +11,4 @@ extends Resource
 @export var color_accent: Color = Color.WHITE
 @export var glow_color: Color = Color.WHITE
 @export var income_per_sec: float = 0.0
-@export var buy_cost: int = 0
 @export var build_id: String = ""

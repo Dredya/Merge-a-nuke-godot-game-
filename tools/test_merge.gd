@@ -55,6 +55,7 @@ func _run() -> void:
 	_check(GameState.slots[3] == 0, "merge: slot 3 emptied")
 	var bombs: Array = _base.get("slot_bombs")
 	_check(bombs[2] != null, "merge: new bomb visual exists")
+	_check(GameState.tiers.size() == 100, "data: 100 tiers loaded")
 
 	# 3. Swap two different tiers.
 	GameState.slots[0] = 3
@@ -66,60 +67,71 @@ func _run() -> void:
 	_check(GameState.slots[0] == 2, "swap: slot 0 holds old slot 1 tier")
 	_check(GameState.slots[1] == 3, "swap: slot 1 holds old slot 0 tier")
 
-	# 4. Buy button spends cash and fills the first empty slot.
-	for i in range(GameState.MAX_SLOTS):
-		GameState.slots[i] = 0
+	# 4. High-tier merge: 99 + 99 -> 100.
+	GameState.slots[0] = 99
+	GameState.slots[1] = 99
+	GameState.slots[2] = 0
+	GameState.slots[3] = 0
+	_base.call("_refresh_all_slots")
+	await get_tree().create_timer(0.25).timeout
+	await _drag(0, 1)
+	_check(GameState.slots[1] == 100, "merge: tier 99 + 99 became tier 100")
+	_check(GameState.slots[0] == 0, "merge: source slot emptied")
+	var milestone_label := _base.get("milestone_label") as Label
+	_check(milestone_label != null and milestone_label.text.contains("SINGULARITY"), "milestone: Singularity toast shown")
+
+	# 5. Merging two max-tier bombs must not consume them.
+	GameState.slots[0] = 100
+	GameState.slots[1] = 100
+	_base.call("_refresh_all_slots")
+	await get_tree().create_timer(0.25).timeout
+	await _drag(0, 1)
+	_check(GameState.slots[0] == 100 and GameState.slots[1] == 100, "max tier: 100 + 100 stays 100")
+
+	# 6. Lock button spends cash and starts the shield countdown.
 	GameState.cash = 1000.0
 	GameState.cash_changed.emit(GameState.cash)
-	_base.call("_refresh_all_slots")
-	await get_tree().create_timer(0.2).timeout
-	var buy_button := _base.get("buy_button") as Button
-	buy_button.emit_signal("pressed")
-	await get_tree().process_frame
-	_check(GameState.cash == 880.0, "buy: cost $120 deducted")
-	_check(GameState.slots[0] == 1, "buy: tier 1 placed in first empty slot")
-
-	# 5. Lock button spends cash and starts the shield countdown.
 	GameState.lock_until = 0.0
 	GameState.lock_cooldown_until = 0.0
 	var lock_button := _base.get("lock_button") as Button
 	lock_button.emit_signal("pressed")
 	await get_tree().process_frame
 	_check(GameState.lock_until > Time.get_unix_time_from_system(), "lock: shield countdown started")
-	_check(GameState.cash == 380.0, "lock: $500 deducted")
+	_check(GameState.cash == 500.0, "lock: $500 deducted")
 
 	if DisplayServer.get_name() != "headless":
-		# Visual QA snapshot of a full board.
+		# Visual QA snapshot of a board spanning the new tier range.
 		(_base.get("tutorial_popup") as Control).visible = false
 		(_base.get("daily_popup") as Control).visible = false
 		(_base.get("offline_popup") as Control).visible = false
 		SaveManager.pending_offline = 0.0
 		GameState.cash = 28800.0
 		GameState.cash_changed.emit(GameState.cash)
+		var showcase := [1, 2, 3, 4, 5, 6, 7, 8, 9, 50, 0, 100]
 		for i in range(GameState.MAX_SLOTS):
-			GameState.slots[i] = i + 1
+			GameState.slots[i] = showcase[i]
 		_base.call("_refresh_all_slots")
 		await get_tree().create_timer(0.8).timeout
 		var board_image := get_viewport().get_texture().get_image()
 		if board_image != null:
-			board_image.save_png("user://step4_board.png")
-		# Snapshot mid merge effect.
+			board_image.save_png("user://step9_board.png")
+		# Snapshot the tier-100 Singularity merge.
 		for i in range(GameState.MAX_SLOTS):
 			GameState.slots[i] = 0
-		GameState.slots[0] = 1
-		GameState.slots[1] = 1
+		GameState.slots[0] = 99
+		GameState.slots[1] = 99
 		_base.call("_refresh_all_slots")
 		await get_tree().create_timer(0.3).timeout
 		_base.set("_drag_from", 0)
-		_base.set("_drag_tier", 1)
+		_base.set("_drag_tier", 99)
 		_base.set("_drag_bomb", (_base.get("slot_bombs") as Array)[0])
 		(_base.get("slot_bombs") as Array)[0] = null
 		_base.call("_merge_into", 1)
-		await get_tree().create_timer(0.18).timeout
+		await get_tree().create_timer(0.20).timeout
 		var fx_image := get_viewport().get_texture().get_image()
 		if fx_image != null:
-			fx_image.save_png("user://step4_merge.png")
-		await get_tree().create_timer(1.0).timeout
+			fx_image.save_png("user://step9_singularity_merge.png")
+		await get_tree().create_timer(1.2).timeout
 
 	if _had_save:
 		var f := FileAccess.open("user://save.json", FileAccess.WRITE)

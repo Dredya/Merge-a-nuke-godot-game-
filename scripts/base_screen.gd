@@ -23,7 +23,8 @@ const LOCK_COOLDOWN := 300.0
 @onready var event_banner: Label = $EventBannerPanel/EventBanner
 @onready var free_progress: ProgressBar = $BottomControls/BottomBox/FreePanel/FreeRow/FreeProgress
 @onready var free_seconds: Label = $BottomControls/BottomBox/FreePanel/FreeRow/FreeSeconds
-@onready var buy_button: Button = $BottomControls/BottomBox/BuyBombButton
+@onready var milestone_panel: PanelContainer = $MilestoneToastPanel
+@onready var milestone_label: Label = $MilestoneToastPanel/MilestoneToastLabel
 @onready var tutorial_popup: Control = $TutorialPopup
 @onready var tutorial_label: Label = $TutorialPopup/Center/Panel/Box/TutorialLabel
 @onready var tutorial_next_button: Button = $TutorialPopup/Center/Panel/Box/TutorialNextButton
@@ -59,9 +60,10 @@ var _rng := RandomNumberGenerator.new()
 var _tutorial_step: int = 0
 var _pending_daily: Dictionary = {}
 var _daily_popup_shown: bool = false
+var _milestone_tween: Tween
 
 const TUTORIAL_STEPS := [
-	"Tap BUY BOMB or wait for the free bomb every few seconds.",
+	"A free bomb arrives every few seconds. Wait for two of the same tier.",
 	"Drag a bomb onto another bomb of the same tier to merge them.",
 	"Higher tiers earn far more cash per second.",
 	"Lock your base to protect your cash from raids.",
@@ -90,7 +92,6 @@ func _ready() -> void:
 	_refresh_all_slots()
 
 	plot_input.gui_input.connect(_on_plot_input)
-	buy_button.pressed.connect(_on_buy_pressed)
 	lock_button.pressed.connect(_on_lock_pressed)
 	claim_daily_button.pressed.connect(_on_claim_daily)
 	tutorial_next_button.pressed.connect(_on_tutorial_next)
@@ -137,6 +138,8 @@ func _ensure_slot_capacity() -> void:
 		for i in range(BaseWorld.SLOT_COUNT):
 			if GameState.slots[i] < 0:
 				GameState.slots[i] = 0
+	for i in range(GameState.slots.size()):
+		GameState.slots[i] = clampi(GameState.slots[i], 0, GameState.MAX_TIER)
 	GameState.slot_count = BaseWorld.SLOT_COUNT
 
 
@@ -162,7 +165,8 @@ func _refresh_all_slots() -> void:
 
 
 func _create_bomb(index: int, tier: int, pop: bool) -> Bomb:
-	var bomb := BombFactory.build(tier, _low_quality)
+	var tier_data := GameState.get_tier(tier)
+	var bomb := BombFactory.build(tier, _low_quality, tier_data)
 	bomb.name = "Bomb_%d_T%d" % [index, tier]
 	bomb.position = world.slot_position(index)
 	world.add_child(bomb)
@@ -326,7 +330,7 @@ func _finish_drag(local_position: Vector2) -> void:
 	if target_tier <= 0:
 		_move_to_slot(target)
 	elif target_tier == _drag_tier:
-		if _drag_tier >= 15:
+		if _drag_tier >= GameState.MAX_TIER:
 			_return_drag()
 		else:
 			_merge_into(target)
@@ -435,7 +439,7 @@ func _merge_into(target: int) -> void:
 		tween.parallel().tween_property(other, "position", midpoint, 0.12).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 	await tween.finished
 
-	var new_tier := mini(_drag_tier + 1, 15)
+	var new_tier := mini(_drag_tier + 1, GameState.MAX_TIER)
 	bomb.scale = Vector3.ONE
 	if other != null:
 		other.scale = Vector3.ONE
@@ -454,6 +458,7 @@ func _merge_into(target: int) -> void:
 	GameState.commit_slots(new_slots)
 	var merged := _create_bomb(target, new_tier, true)
 	merged.position = target_pos
+	_show_milestone(new_tier)
 
 	var mission_manager := get_node_or_null("/root/MissionManager")
 	if mission_manager != null:
@@ -485,19 +490,35 @@ func _play_merge_fx(target: int, new_tier: int) -> void:
 	flash_tween.tween_property(flash_overlay, "color:a", 0.0, 0.28)
 	flash_tween.finished.connect(func(): flash_overlay.visible = false)
 
-	if new_tier >= 15 and not _low_quality:
+	if new_tier >= GameState.MAX_TIER and not _low_quality:
 		screen_glow.visible = true
 		screen_glow.color = Color(1.0, 1.0, 1.0, 0.26)
 		var glow_tween := create_tween()
-		glow_tween.tween_method(_set_omega_glow, 0.0, 1.0, 0.7)
+		glow_tween.tween_method(_set_singularity_glow, 0.0, 1.0, 0.7)
 		glow_tween.finished.connect(func(): screen_glow.visible = false)
 
 	AudioManager.play_sfx("merge")
 	AudioManager.vibrate(30)
 
 
-func _set_omega_glow(t: float) -> void:
-	screen_glow.color = Color.from_hsv(fmod(t * 0.55, 1.0), 0.65, 1.0, 0.28 * (1.0 - t))
+func _set_singularity_glow(t: float) -> void:
+	screen_glow.color = Color.from_hsv(fmod(t * 0.55, 1.0), 0.65, 1.0, 0.18 * (1.0 - t))
+
+
+func _show_milestone(tier: int) -> void:
+	var tier_data := GameState.get_tier(tier)
+	if tier_data == null or tier_data.name.begins_with("Tier "):
+		return
+	milestone_label.text = "MILESTONE  •  " + tier_data.name.to_upper()
+	milestone_panel.visible = true
+	milestone_panel.modulate = Color(1.0, 1.0, 1.0, 0.0)
+	if _milestone_tween != null and _milestone_tween.is_valid():
+		_milestone_tween.kill()
+	_milestone_tween = create_tween()
+	_milestone_tween.tween_property(milestone_panel, "modulate:a", 1.0, 0.15)
+	_milestone_tween.tween_interval(1.05)
+	_milestone_tween.tween_property(milestone_panel, "modulate:a", 0.0, 0.35)
+	_milestone_tween.finished.connect(func(): milestone_panel.visible = false)
 
 
 func _spawn_flash(pos: Vector3, color: Color) -> void:
@@ -610,19 +631,6 @@ func _get_income_label() -> Label3D:
 
 # --- HUD --------------------------------------------------------------------
 
-func _on_buy_pressed() -> void:
-	if _is_dragging or _is_animating:
-		return
-	_suppress_slot_refresh = true
-	var index := GameState.try_buy_tier1()
-	_suppress_slot_refresh = false
-	if index >= 0:
-		_create_bomb(index, 1, true)
-		SaveManager.save()
-		AudioManager.play_sfx("buy")
-		_update_hud()
-
-
 func _on_lock_pressed() -> void:
 	var now := Time.get_unix_time_from_system()
 	if now < GameState.lock_until or now < GameState.lock_cooldown_until:
@@ -666,11 +674,6 @@ func _update_hud() -> void:
 		lock_button.visible = true
 		lock_button.disabled = GameState.cash < LOCK_COST
 		lock_button.text = "LOCK $%d" % int(LOCK_COST)
-
-	var tier_one: NukeTier = GameState.get_tier(1)
-	var cost := float(tier_one.buy_cost) if tier_one != null else 120.0
-	buy_button.text = "Buy Bomb  $%s" % Economy.format_number(cost)
-	buy_button.disabled = GameState.cash < cost or GameState.empty_slot_count() <= 0 or _is_dragging or _is_animating
 
 	if GameState.empty_slot_count() <= 0:
 		free_progress.value = 100.0

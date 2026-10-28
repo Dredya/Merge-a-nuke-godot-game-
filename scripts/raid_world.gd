@@ -101,7 +101,7 @@ func _build_dotted_arc() -> void:
 
 
 func _build_missile() -> void:
-	missile = BombFactory.build(6, low_quality)
+	missile = BombFactory.build(6, low_quality, GameState.get_tier(6))
 	missile.name = "RaidMissile"
 	missile.position = ARC_START
 	missile.scale = Vector3.ONE * 2.0

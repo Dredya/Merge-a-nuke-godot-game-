@@ -96,7 +96,7 @@ func load_save() -> void:
 	if saved_slots is Array:
 		saved_size = (saved_slots as Array).size()
 		for i in range(min(saved_size, GameState.slots.size())):
-			GameState.slots[i] = int((saved_slots as Array)[i])
+			GameState.slots[i] = clampi(int((saved_slots as Array)[i]), 0, GameState.MAX_TIER)
 	# Old six-slot saves are migrated into the fixed 4x3 board.
 	for i in range(GameState.slots.size()):
 		if i >= saved_size:

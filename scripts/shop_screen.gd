@@ -1,13 +1,9 @@
 extends Control
 
-## Shop: bomb purchases plus daily reward, redeem codes and missions.
-
-const CARD_AVATAR := 82.0
+## Shop: daily reward, redeem codes and missions. Bombs now arrive for free on the base.
 
 var _content: VBoxContainer
 var _cash_label: Label
-var _buy_buttons: Array[Button] = []
-var _buy_tiers: Array[int] = []
 var _daily_day_label: Label
 var _daily_amount_label: Label
 var _daily_button: Button
@@ -61,7 +57,6 @@ func _build_ui() -> void:
 
 	_build_rewards()
 	_build_missions()
-	_build_bombs()
 
 
 func _section(title_text: String) -> void:
@@ -144,77 +139,6 @@ func _build_missions() -> void:
 	_content.add_child(_missions_box)
 
 
-func _build_bombs() -> void:
-	_section("BOMBS")
-	for tier_data in GameState.tiers:
-		var tier := int(tier_data.tier)
-		if tier <= 1:
-			continue
-		var card := _card()
-		_content.add_child(card)
-		var row := HBoxContainer.new()
-		row.add_theme_constant_override("separation", 14)
-		card.add_child(row)
-
-		var avatar := PanelContainer.new()
-		avatar.custom_minimum_size = Vector2(CARD_AVATAR, CARD_AVATAR)
-		avatar.add_theme_stylebox_override("panel", _avatar_style(tier_data.color))
-		row.add_child(avatar)
-		var avatar_label := Label.new()
-		avatar_label.text = str(tier)
-		avatar_label.theme_type_variation = &"TitleLabel"
-		avatar_label.add_theme_font_size_override("font_size", 40)
-		avatar_label.add_theme_color_override("font_color", _readable_text(tier_data.color))
-		avatar_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		avatar_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-		avatar.add_child(avatar_label)
-
-		var info := VBoxContainer.new()
-		info.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		info.add_theme_constant_override("separation", 0)
-		row.add_child(info)
-		var name_label := Label.new()
-		name_label.text = str(tier_data.name)
-		name_label.theme_type_variation = &"WhiteLabel"
-		info.add_child(name_label)
-		var tier_label := Label.new()
-		tier_label.text = "TIER %d" % tier
-		tier_label.theme_type_variation = &"MutedLabel"
-		info.add_child(tier_label)
-		var income := Label.new()
-		income.text = "+$%s / sec" % Economy.format_number(tier_data.income_per_sec)
-		income.theme_type_variation = &"IncomeLabel"
-		info.add_child(income)
-
-		var buy := Button.new()
-		buy.theme_type_variation = &"OrangeButton"
-		buy.custom_minimum_size = Vector2(210, 72)
-		buy.add_theme_font_size_override("font_size", 25)
-		buy.text = "BUY  $%s" % Economy.format_number(float(tier_data.buy_cost))
-		buy.pressed.connect(_on_buy_tier.bind(tier))
-		row.add_child(buy)
-		_buy_buttons.append(buy)
-		_buy_tiers.append(tier)
-
-
-func _avatar_style(color: Color) -> StyleBoxFlat:
-	var style := StyleBoxFlat.new()
-	style.bg_color = color
-	style.border_color = Color("#0B1020")
-	style.set_border_width_all(3)
-	style.set_corner_radius_all(12)
-	style.content_margin_left = 4
-	style.content_margin_right = 4
-	style.content_margin_top = 4
-	style.content_margin_bottom = 4
-	return style
-
-
-func _readable_text(color: Color) -> Color:
-	var luminance := 0.299 * color.r + 0.587 * color.g + 0.114 * color.b
-	return Color("#0B1020") if luminance > 0.55 else Color.WHITE
-
-
 func _refresh_all() -> void:
 	_update_states()
 	_refresh_daily()
@@ -223,11 +147,6 @@ func _refresh_all() -> void:
 
 func _update_states() -> void:
 	_cash_label.text = "$" + Economy.format_number(GameState.cash)
-	for i in range(_buy_buttons.size()):
-		var tier_data := GameState.get_tier(_buy_tiers[i])
-		if tier_data == null:
-			continue
-		_buy_buttons[i].disabled = GameState.cash < float(tier_data.buy_cost) or GameState.empty_slot_count() <= 0
 	_daily_button.disabled = GameState.daily_claimed_date == Time.get_date_string_from_system()
 
 
@@ -285,21 +204,6 @@ func _refresh_missions() -> void:
 		claim.disabled = claimed or progress < target
 		claim.pressed.connect(_on_claim_mission.bind(id))
 		row.add_child(claim)
-
-
-func _on_buy_tier(tier: int) -> void:
-	var tier_data := GameState.get_tier(tier)
-	if tier_data == null or GameState.cash < float(tier_data.buy_cost):
-		return
-	for i in range(GameState.slots.size()):
-		if GameState.slots[i] == 0:
-			GameState.cash -= float(tier_data.buy_cost)
-			GameState.cash_changed.emit(GameState.cash)
-			GameState.set_slot(i, tier)
-			SaveManager.save()
-			AudioManager.play_sfx("buy")
-			_update_states()
-			return
 
 
 func _on_claim_daily() -> void:

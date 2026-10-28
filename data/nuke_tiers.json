@@ -1,17 +1,1002 @@
 [
-  {"tier": 1, "name": "Classic", "build_id": "classic", "color": "#151A30", "color_secondary": "#5A6694", "color_accent": "#FFC83D", "glow_color": "#FFC83D", "income_per_sec": 1, "buy_cost": 120},
-  {"tier": 2, "name": "Steel", "build_id": "steel", "color": "#F2F6FF", "color_secondary": "#6C7BA8", "color_accent": "#BFC8E0", "glow_color": "#CFE0FF", "income_per_sec": 2, "buy_cost": 360},
-  {"tier": 3, "name": "Tech", "build_id": "tech", "color": "#3CD8C8", "color_secondary": "#0E3A4A", "color_accent": "#B6F23C", "glow_color": "#B6F23C", "income_per_sec": 4, "buy_cost": 1080},
-  {"tier": 4, "name": "Gold Missile", "build_id": "gold_missile", "color": "#FFE58A", "color_secondary": "#A86A10", "color_accent": "#FF9A3D", "glow_color": "#FFC83D", "income_per_sec": 8, "buy_cost": 3240},
-  {"tier": 5, "name": "Plasma Core", "build_id": "plasma_core", "color": "#14070F", "color_secondary": "#FF9A3D", "color_accent": "#FFC83D", "glow_color": "#FF6A3D", "income_per_sec": 16, "buy_cost": 9720},
-  {"tier": 6, "name": "Neon Warhead", "build_id": "neon_warhead", "color": "#FF7A9A", "color_secondary": "#5A1FA0", "color_accent": "#4FE0FF", "glow_color": "#4FE0FF", "income_per_sec": 32, "buy_cost": 29160},
-  {"tier": 7, "name": "Ion", "build_id": "ion", "color": "#D7E3FF", "color_secondary": "#6C7BA8", "color_accent": "#5AE0FF", "glow_color": "#5AE0FF", "income_per_sec": 64, "buy_cost": 87480},
-  {"tier": 8, "name": "Crystal", "build_id": "crystal", "color": "#4FC3F7", "color_secondary": "#1565C0", "color_accent": "#B3E5FC", "glow_color": "#4FE0FF", "income_per_sec": 128, "buy_cost": 262440},
-  {"tier": 9, "name": "Antimatter", "build_id": "antimatter", "color": "#111111", "color_secondary": "#F5F5F5", "color_accent": "#C77DFF", "glow_color": "#C77DFF", "income_per_sec": 256, "buy_cost": 787320},
-  {"tier": 10, "name": "Solar Flare", "build_id": "solar_flare", "color": "#FFB300", "color_secondary": "#FF6A3D", "color_accent": "#FFF3B0", "glow_color": "#FF9A3D", "income_per_sec": 512, "buy_cost": 2361960},
-  {"tier": 11, "name": "Void", "build_id": "void", "color": "#050008", "color_secondary": "#6A1B9A", "color_accent": "#C77DFF", "glow_color": "#C77DFF", "income_per_sec": 1024, "buy_cost": 7085880},
-  {"tier": 12, "name": "Quantum Nuke", "build_id": "quantum", "color": "#8A2BE2", "color_secondary": "#4FE0FF", "color_accent": "#FFFFFF", "glow_color": "#4FE0FF", "income_per_sec": 2048, "buy_cost": 21257640},
-  {"tier": 13, "name": "Star Core", "build_id": "star_core", "color": "#FFE082", "color_secondary": "#FFB300", "color_accent": "#FFFDE7", "glow_color": "#FFF176", "income_per_sec": 4096, "buy_cost": 63772920},
-  {"tier": 14, "name": "Galaxy", "build_id": "galaxy", "color": "#0B0B1E", "color_secondary": "#6A5ACD", "color_accent": "#FF7AD9", "glow_color": "#8F7CFF", "income_per_sec": 8192, "buy_cost": 191318760},
-  {"tier": 15, "name": "Omega Nuke", "build_id": "omega", "color": "#FFFFFF", "color_secondary": "#FFC83D", "color_accent": "#4FE0FF", "glow_color": "#FFFFFF", "income_per_sec": 16384, "buy_cost": 573956280}
+  {
+    "tier": 1,
+    "name": "Classic",
+    "build_id": "classic",
+    "color": "#151A30",
+    "color_secondary": "#5A6694",
+    "color_accent": "#FFC83D",
+    "glow_color": "#FFC83D",
+    "income_per_sec": 1.0
+  },
+  {
+    "tier": 2,
+    "name": "Steel",
+    "build_id": "steel",
+    "color": "#F2F6FF",
+    "color_secondary": "#6C7BA8",
+    "color_accent": "#BFC8E0",
+    "glow_color": "#CFE0FF",
+    "income_per_sec": 2.0
+  },
+  {
+    "tier": 3,
+    "name": "Tech",
+    "build_id": "tech",
+    "color": "#3CD8C8",
+    "color_secondary": "#0E3A4A",
+    "color_accent": "#B6F23C",
+    "glow_color": "#B6F23C",
+    "income_per_sec": 4.0
+  },
+  {
+    "tier": 4,
+    "name": "Gold Missile",
+    "build_id": "gold_missile",
+    "color": "#FFE58A",
+    "color_secondary": "#A86A10",
+    "color_accent": "#FF9A3D",
+    "glow_color": "#FFC83D",
+    "income_per_sec": 8.0
+  },
+  {
+    "tier": 5,
+    "name": "Plasma Core",
+    "build_id": "plasma_core",
+    "color": "#14070F",
+    "color_secondary": "#FF9A3D",
+    "color_accent": "#FFC83D",
+    "glow_color": "#FF6A3D",
+    "income_per_sec": 16.0
+  },
+  {
+    "tier": 6,
+    "name": "Neon Warhead",
+    "build_id": "neon_warhead",
+    "color": "#FF7A9A",
+    "color_secondary": "#5A1FA0",
+    "color_accent": "#4FE0FF",
+    "glow_color": "#4FE0FF",
+    "income_per_sec": 32.0
+  },
+  {
+    "tier": 7,
+    "name": "Ion",
+    "build_id": "ion",
+    "color": "#D7E3FF",
+    "color_secondary": "#6C7BA8",
+    "color_accent": "#5AE0FF",
+    "glow_color": "#5AE0FF",
+    "income_per_sec": 64.0
+  },
+  {
+    "tier": 8,
+    "name": "Crystal",
+    "build_id": "crystal",
+    "color": "#4FC3F7",
+    "color_secondary": "#1565C0",
+    "color_accent": "#B3E5FC",
+    "glow_color": "#4FE0FF",
+    "income_per_sec": 128.0
+  },
+  {
+    "tier": 9,
+    "name": "Antimatter",
+    "build_id": "antimatter",
+    "color": "#111111",
+    "color_secondary": "#F5F5F5",
+    "color_accent": "#C77DFF",
+    "glow_color": "#C77DFF",
+    "income_per_sec": 256.0
+  },
+  {
+    "tier": 10,
+    "name": "Solar Flare",
+    "build_id": "solar_flare",
+    "color": "#FFB300",
+    "color_secondary": "#FF6A3D",
+    "color_accent": "#FFF3B0",
+    "glow_color": "#FF9A3D",
+    "income_per_sec": 512.0
+  },
+  {
+    "tier": 11,
+    "name": "Void",
+    "build_id": "void",
+    "color": "#050008",
+    "color_secondary": "#6A1B9A",
+    "color_accent": "#C77DFF",
+    "glow_color": "#C77DFF",
+    "income_per_sec": 1024.0
+  },
+  {
+    "tier": 12,
+    "name": "Quantum Nuke",
+    "build_id": "quantum",
+    "color": "#8A2BE2",
+    "color_secondary": "#4FE0FF",
+    "color_accent": "#FFFFFF",
+    "glow_color": "#4FE0FF",
+    "income_per_sec": 2048.0
+  },
+  {
+    "tier": 13,
+    "name": "Star Core",
+    "build_id": "star_core",
+    "color": "#FFE082",
+    "color_secondary": "#FFB300",
+    "color_accent": "#FFFDE7",
+    "glow_color": "#FFF176",
+    "income_per_sec": 4096.0
+  },
+  {
+    "tier": 14,
+    "name": "Galaxy",
+    "build_id": "galaxy",
+    "color": "#0B0B1E",
+    "color_secondary": "#6A5ACD",
+    "color_accent": "#FF7AD9",
+    "glow_color": "#8F7CFF",
+    "income_per_sec": 8192.0
+  },
+  {
+    "tier": 15,
+    "name": "Omega Nuke",
+    "build_id": "omega",
+    "color": "#FFFFFF",
+    "color_secondary": "#FFC83D",
+    "color_accent": "#4FE0FF",
+    "glow_color": "#FFFFFF",
+    "income_per_sec": 16384.0
+  },
+  {
+    "tier": 16,
+    "name": "Tier 16",
+    "build_id": "procedural",
+    "color": "#34ebeb",
+    "color_secondary": "#23668c",
+    "color_accent": "#739aff",
+    "glow_color": "#59ffff",
+    "income_per_sec": 32768.0
+  },
+  {
+    "tier": 17,
+    "name": "Tier 17",
+    "build_id": "procedural",
+    "color": "#34e6eb",
+    "color_secondary": "#23648c",
+    "color_accent": "#7396ff",
+    "glow_color": "#59fbff",
+    "income_per_sec": 65536.0
+  },
+  {
+    "tier": 18,
+    "name": "Tier 18",
+    "build_id": "procedural",
+    "color": "#34e1eb",
+    "color_secondary": "#23618c",
+    "color_accent": "#7393ff",
+    "glow_color": "#59f7ff",
+    "income_per_sec": 131072.0
+  },
+  {
+    "tier": 19,
+    "name": "Tier 19",
+    "build_id": "procedural",
+    "color": "#34ddeb",
+    "color_secondary": "#235e8c",
+    "color_accent": "#738fff",
+    "glow_color": "#59f2ff",
+    "income_per_sec": 262144.0
+  },
+  {
+    "tier": 20,
+    "name": "Tier 20",
+    "build_id": "procedural",
+    "color": "#34d8eb",
+    "color_secondary": "#235c8c",
+    "color_accent": "#738cff",
+    "glow_color": "#59eeff",
+    "income_per_sec": 524288.0
+  },
+  {
+    "tier": 21,
+    "name": "Tier 21",
+    "build_id": "procedural",
+    "color": "#34d3eb",
+    "color_secondary": "#23598c",
+    "color_accent": "#7388ff",
+    "glow_color": "#59eaff",
+    "income_per_sec": 1048576.0
+  },
+  {
+    "tier": 22,
+    "name": "Tier 22",
+    "build_id": "procedural",
+    "color": "#34cfeb",
+    "color_secondary": "#23568c",
+    "color_accent": "#7385ff",
+    "glow_color": "#59e6ff",
+    "income_per_sec": 2097152.0
+  },
+  {
+    "tier": 23,
+    "name": "Tier 23",
+    "build_id": "procedural",
+    "color": "#34caeb",
+    "color_secondary": "#23548c",
+    "color_accent": "#7381ff",
+    "glow_color": "#59e2ff",
+    "income_per_sec": 4194304.0
+  },
+  {
+    "tier": 24,
+    "name": "Tier 24",
+    "build_id": "procedural",
+    "color": "#34c6eb",
+    "color_secondary": "#23518c",
+    "color_accent": "#737eff",
+    "glow_color": "#59ddff",
+    "income_per_sec": 8388608.0
+  },
+  {
+    "tier": 25,
+    "name": "Hyper",
+    "build_id": "procedural",
+    "color": "#34c1eb",
+    "color_secondary": "#234e8c",
+    "color_accent": "#737aff",
+    "glow_color": "#59d9ff",
+    "income_per_sec": 16777216.0
+  },
+  {
+    "tier": 26,
+    "name": "Tier 26",
+    "build_id": "procedural",
+    "color": "#34bceb",
+    "color_secondary": "#234c8c",
+    "color_accent": "#7377ff",
+    "glow_color": "#59d5ff",
+    "income_per_sec": 33554432.0
+  },
+  {
+    "tier": 27,
+    "name": "Tier 27",
+    "build_id": "procedural",
+    "color": "#34b8eb",
+    "color_secondary": "#23498c",
+    "color_accent": "#7373ff",
+    "glow_color": "#59d1ff",
+    "income_per_sec": 67108864.0
+  },
+  {
+    "tier": 28,
+    "name": "Tier 28",
+    "build_id": "procedural",
+    "color": "#34b3eb",
+    "color_secondary": "#23468c",
+    "color_accent": "#7673ff",
+    "glow_color": "#59cdff",
+    "income_per_sec": 134217728.0
+  },
+  {
+    "tier": 29,
+    "name": "Tier 29",
+    "build_id": "procedural",
+    "color": "#34aeeb",
+    "color_secondary": "#23448c",
+    "color_accent": "#7a73ff",
+    "glow_color": "#59c8ff",
+    "income_per_sec": 268435456.0
+  },
+  {
+    "tier": 30,
+    "name": "Tier 30",
+    "build_id": "procedural",
+    "color": "#34aaeb",
+    "color_secondary": "#23418c",
+    "color_accent": "#7d73ff",
+    "glow_color": "#59c4ff",
+    "income_per_sec": 536870912.0
+  },
+  {
+    "tier": 31,
+    "name": "Tier 31",
+    "build_id": "procedural",
+    "color": "#34a5eb",
+    "color_secondary": "#233e8c",
+    "color_accent": "#8173ff",
+    "glow_color": "#59c0ff",
+    "income_per_sec": 1073741824.0
+  },
+  {
+    "tier": 32,
+    "name": "Tier 32",
+    "build_id": "procedural",
+    "color": "#34a1eb",
+    "color_secondary": "#233c8c",
+    "color_accent": "#8473ff",
+    "glow_color": "#59bcff",
+    "income_per_sec": 2147483648.0
+  },
+  {
+    "tier": 33,
+    "name": "Tier 33",
+    "build_id": "procedural",
+    "color": "#349ceb",
+    "color_secondary": "#23398c",
+    "color_accent": "#8873ff",
+    "glow_color": "#59b8ff",
+    "income_per_sec": 4294967296.0
+  },
+  {
+    "tier": 34,
+    "name": "Tier 34",
+    "build_id": "procedural",
+    "color": "#3497eb",
+    "color_secondary": "#23368c",
+    "color_accent": "#8b73ff",
+    "glow_color": "#59b4ff",
+    "income_per_sec": 8589934592.0
+  },
+  {
+    "tier": 35,
+    "name": "Tier 35",
+    "build_id": "procedural",
+    "color": "#3493eb",
+    "color_secondary": "#23348c",
+    "color_accent": "#8f73ff",
+    "glow_color": "#59afff",
+    "income_per_sec": 17179869184.0
+  },
+  {
+    "tier": 36,
+    "name": "Tier 36",
+    "build_id": "procedural",
+    "color": "#348eeb",
+    "color_secondary": "#23318c",
+    "color_accent": "#9273ff",
+    "glow_color": "#59abff",
+    "income_per_sec": 34359738368.0
+  },
+  {
+    "tier": 37,
+    "name": "Tier 37",
+    "build_id": "procedural",
+    "color": "#3489eb",
+    "color_secondary": "#232e8c",
+    "color_accent": "#9673ff",
+    "glow_color": "#59a7ff",
+    "income_per_sec": 68719476736.0
+  },
+  {
+    "tier": 38,
+    "name": "Tier 38",
+    "build_id": "procedural",
+    "color": "#3485eb",
+    "color_secondary": "#232c8c",
+    "color_accent": "#9a73ff",
+    "glow_color": "#59a3ff",
+    "income_per_sec": 137438953472.0
+  },
+  {
+    "tier": 39,
+    "name": "Tier 39",
+    "build_id": "procedural",
+    "color": "#3480eb",
+    "color_secondary": "#23298c",
+    "color_accent": "#9d73ff",
+    "glow_color": "#599fff",
+    "income_per_sec": 274877906944.0
+  },
+  {
+    "tier": 40,
+    "name": "Tier 40",
+    "build_id": "procedural",
+    "color": "#347beb",
+    "color_secondary": "#23278c",
+    "color_accent": "#a173ff",
+    "glow_color": "#599aff",
+    "income_per_sec": 549755813888.0
+  },
+  {
+    "tier": 41,
+    "name": "Tier 41",
+    "build_id": "procedural",
+    "color": "#3477eb",
+    "color_secondary": "#23248c",
+    "color_accent": "#a473ff",
+    "glow_color": "#5996ff",
+    "income_per_sec": 1099511627776.0
+  },
+  {
+    "tier": 42,
+    "name": "Tier 42",
+    "build_id": "procedural",
+    "color": "#3472eb",
+    "color_secondary": "#25238c",
+    "color_accent": "#a873ff",
+    "glow_color": "#5992ff",
+    "income_per_sec": 2199023255552.0
+  },
+  {
+    "tier": 43,
+    "name": "Tier 43",
+    "build_id": "procedural",
+    "color": "#346eeb",
+    "color_secondary": "#28238c",
+    "color_accent": "#ab73ff",
+    "glow_color": "#598eff",
+    "income_per_sec": 4398046511104.0
+  },
+  {
+    "tier": 44,
+    "name": "Tier 44",
+    "build_id": "procedural",
+    "color": "#3469eb",
+    "color_secondary": "#2a238c",
+    "color_accent": "#af73ff",
+    "glow_color": "#598aff",
+    "income_per_sec": 8796093022208.0
+  },
+  {
+    "tier": 45,
+    "name": "Tier 45",
+    "build_id": "procedural",
+    "color": "#3464eb",
+    "color_secondary": "#2d238c",
+    "color_accent": "#b273ff",
+    "glow_color": "#5985ff",
+    "income_per_sec": 17592186044416.0
+  },
+  {
+    "tier": 46,
+    "name": "Tier 46",
+    "build_id": "procedural",
+    "color": "#3460eb",
+    "color_secondary": "#30238c",
+    "color_accent": "#b673ff",
+    "glow_color": "#5981ff",
+    "income_per_sec": 35184372088832.0
+  },
+  {
+    "tier": 47,
+    "name": "Tier 47",
+    "build_id": "procedural",
+    "color": "#345beb",
+    "color_secondary": "#32238c",
+    "color_accent": "#b973ff",
+    "glow_color": "#597dff",
+    "income_per_sec": 70368744177664.0
+  },
+  {
+    "tier": 48,
+    "name": "Tier 48",
+    "build_id": "procedural",
+    "color": "#3456eb",
+    "color_secondary": "#35238c",
+    "color_accent": "#bd73ff",
+    "glow_color": "#5979ff",
+    "income_per_sec": 140737488355328.0
+  },
+  {
+    "tier": 49,
+    "name": "Tier 49",
+    "build_id": "procedural",
+    "color": "#3452eb",
+    "color_secondary": "#38238c",
+    "color_accent": "#c173ff",
+    "glow_color": "#5975ff",
+    "income_per_sec": 281474976710656.0
+  },
+  {
+    "tier": 50,
+    "name": "Apex",
+    "build_id": "procedural",
+    "color": "#344deb",
+    "color_secondary": "#3a238c",
+    "color_accent": "#c473ff",
+    "glow_color": "#5970ff",
+    "income_per_sec": 562949953421312.0
+  },
+  {
+    "tier": 51,
+    "name": "Tier 51",
+    "build_id": "procedural",
+    "color": "#3449eb",
+    "color_secondary": "#3d238c",
+    "color_accent": "#c873ff",
+    "glow_color": "#596cff",
+    "income_per_sec": 1.125899906842624e+15
+  },
+  {
+    "tier": 52,
+    "name": "Tier 52",
+    "build_id": "procedural",
+    "color": "#3444eb",
+    "color_secondary": "#40238c",
+    "color_accent": "#cb73ff",
+    "glow_color": "#5968ff",
+    "income_per_sec": 2.251799813685248e+15
+  },
+  {
+    "tier": 53,
+    "name": "Tier 53",
+    "build_id": "procedural",
+    "color": "#343feb",
+    "color_secondary": "#42238c",
+    "color_accent": "#cf73ff",
+    "glow_color": "#5964ff",
+    "income_per_sec": 4.503599627370496e+15
+  },
+  {
+    "tier": 54,
+    "name": "Tier 54",
+    "build_id": "procedural",
+    "color": "#343beb",
+    "color_secondary": "#45238c",
+    "color_accent": "#d273ff",
+    "glow_color": "#5960ff",
+    "income_per_sec": 9.007199254740992e+15
+  },
+  {
+    "tier": 55,
+    "name": "Tier 55",
+    "build_id": "procedural",
+    "color": "#3436eb",
+    "color_secondary": "#48238c",
+    "color_accent": "#d673ff",
+    "glow_color": "#595bff",
+    "income_per_sec": 1.8014398509481984e+16
+  },
+  {
+    "tier": 56,
+    "name": "Tier 56",
+    "build_id": "procedural",
+    "color": "#3634eb",
+    "color_secondary": "#4a238c",
+    "color_accent": "#d973ff",
+    "glow_color": "#5b59ff",
+    "income_per_sec": 3.602879701896397e+16
+  },
+  {
+    "tier": 57,
+    "name": "Tier 57",
+    "build_id": "procedural",
+    "color": "#3a34eb",
+    "color_secondary": "#4d238c",
+    "color_accent": "#dd73ff",
+    "glow_color": "#5f59ff",
+    "income_per_sec": 7.205759403792794e+16
+  },
+  {
+    "tier": 58,
+    "name": "Tier 58",
+    "build_id": "procedural",
+    "color": "#3f34eb",
+    "color_secondary": "#50238c",
+    "color_accent": "#e173ff",
+    "glow_color": "#6459ff",
+    "income_per_sec": 1.4411518807585587e+17
+  },
+  {
+    "tier": 59,
+    "name": "Tier 59",
+    "build_id": "procedural",
+    "color": "#4434eb",
+    "color_secondary": "#52238c",
+    "color_accent": "#e473ff",
+    "glow_color": "#6859ff",
+    "income_per_sec": 2.8823037615171174e+17
+  },
+  {
+    "tier": 60,
+    "name": "Tier 60",
+    "build_id": "procedural",
+    "color": "#4834eb",
+    "color_secondary": "#55238c",
+    "color_accent": "#e873ff",
+    "glow_color": "#6c59ff",
+    "income_per_sec": 5.764607523034235e+17
+  },
+  {
+    "tier": 61,
+    "name": "Tier 61",
+    "build_id": "procedural",
+    "color": "#4d34eb",
+    "color_secondary": "#58238c",
+    "color_accent": "#eb73ff",
+    "glow_color": "#7059ff",
+    "income_per_sec": 1.152921504606847e+18
+  },
+  {
+    "tier": 62,
+    "name": "Tier 62",
+    "build_id": "procedural",
+    "color": "#5234eb",
+    "color_secondary": "#5a238c",
+    "color_accent": "#ef73ff",
+    "glow_color": "#7459ff",
+    "income_per_sec": 2.305843009213694e+18
+  },
+  {
+    "tier": 63,
+    "name": "Tier 63",
+    "build_id": "procedural",
+    "color": "#5634eb",
+    "color_secondary": "#5d238c",
+    "color_accent": "#f273ff",
+    "glow_color": "#7959ff",
+    "income_per_sec": 4.611686018427388e+18
+  },
+  {
+    "tier": 64,
+    "name": "Tier 64",
+    "build_id": "procedural",
+    "color": "#5b34eb",
+    "color_secondary": "#5f238c",
+    "color_accent": "#f673ff",
+    "glow_color": "#7d59ff",
+    "income_per_sec": 9.223372036854776e+18
+  },
+  {
+    "tier": 65,
+    "name": "Tier 65",
+    "build_id": "procedural",
+    "color": "#5f34eb",
+    "color_secondary": "#62238c",
+    "color_accent": "#f973ff",
+    "glow_color": "#8159ff",
+    "income_per_sec": 1.8446744073709552e+19
+  },
+  {
+    "tier": 66,
+    "name": "Tier 66",
+    "build_id": "procedural",
+    "color": "#6434eb",
+    "color_secondary": "#65238c",
+    "color_accent": "#fd73ff",
+    "glow_color": "#8559ff",
+    "income_per_sec": 3.6893488147419103e+19
+  },
+  {
+    "tier": 67,
+    "name": "Tier 67",
+    "build_id": "procedural",
+    "color": "#6934eb",
+    "color_secondary": "#67238c",
+    "color_accent": "#ff73fe",
+    "glow_color": "#8959ff",
+    "income_per_sec": 7.378697629483821e+19
+  },
+  {
+    "tier": 68,
+    "name": "Tier 68",
+    "build_id": "procedural",
+    "color": "#6d34eb",
+    "color_secondary": "#6a238c",
+    "color_accent": "#ff73fa",
+    "glow_color": "#8e59ff",
+    "income_per_sec": 1.4757395258967641e+20
+  },
+  {
+    "tier": 69,
+    "name": "Tier 69",
+    "build_id": "procedural",
+    "color": "#7234eb",
+    "color_secondary": "#6d238c",
+    "color_accent": "#ff73f6",
+    "glow_color": "#9259ff",
+    "income_per_sec": 2.9514790517935283e+20
+  },
+  {
+    "tier": 70,
+    "name": "Tier 70",
+    "build_id": "procedural",
+    "color": "#7734eb",
+    "color_secondary": "#6f238c",
+    "color_accent": "#ff73f3",
+    "glow_color": "#9659ff",
+    "income_per_sec": 5.902958103587057e+20
+  },
+  {
+    "tier": 71,
+    "name": "Tier 71",
+    "build_id": "procedural",
+    "color": "#7b34eb",
+    "color_secondary": "#72238c",
+    "color_accent": "#ff73ef",
+    "glow_color": "#9a59ff",
+    "income_per_sec": 1.1805916207174113e+21
+  },
+  {
+    "tier": 72,
+    "name": "Tier 72",
+    "build_id": "procedural",
+    "color": "#8034eb",
+    "color_secondary": "#75238c",
+    "color_accent": "#ff73ec",
+    "glow_color": "#9e59ff",
+    "income_per_sec": 2.3611832414348226e+21
+  },
+  {
+    "tier": 73,
+    "name": "Tier 73",
+    "build_id": "procedural",
+    "color": "#8534eb",
+    "color_secondary": "#77238c",
+    "color_accent": "#ff73e8",
+    "glow_color": "#a359ff",
+    "income_per_sec": 4.722366482869645e+21
+  },
+  {
+    "tier": 74,
+    "name": "Tier 74",
+    "build_id": "procedural",
+    "color": "#8934eb",
+    "color_secondary": "#7a238c",
+    "color_accent": "#ff73e5",
+    "glow_color": "#a759ff",
+    "income_per_sec": 9.44473296573929e+21
+  },
+  {
+    "tier": 75,
+    "name": "Transcendent",
+    "build_id": "procedural",
+    "color": "#8e34eb",
+    "color_secondary": "#7d238c",
+    "color_accent": "#ff73e1",
+    "glow_color": "#ab59ff",
+    "income_per_sec": 1.888946593147858e+22
+  },
+  {
+    "tier": 76,
+    "name": "Tier 76",
+    "build_id": "procedural",
+    "color": "#9234eb",
+    "color_secondary": "#7f238c",
+    "color_accent": "#ff73de",
+    "glow_color": "#af59ff",
+    "income_per_sec": 3.777893186295716e+22
+  },
+  {
+    "tier": 77,
+    "name": "Tier 77",
+    "build_id": "procedural",
+    "color": "#9734eb",
+    "color_secondary": "#82238c",
+    "color_accent": "#ff73da",
+    "glow_color": "#b359ff",
+    "income_per_sec": 7.555786372591432e+22
+  },
+  {
+    "tier": 78,
+    "name": "Tier 78",
+    "build_id": "procedural",
+    "color": "#9c34eb",
+    "color_secondary": "#85238c",
+    "color_accent": "#ff73d7",
+    "glow_color": "#b859ff",
+    "income_per_sec": 1.5111572745182865e+23
+  },
+  {
+    "tier": 79,
+    "name": "Tier 79",
+    "build_id": "procedural",
+    "color": "#a034eb",
+    "color_secondary": "#87238c",
+    "color_accent": "#ff73d3",
+    "glow_color": "#bc59ff",
+    "income_per_sec": 3.022314549036573e+23
+  },
+  {
+    "tier": 80,
+    "name": "Tier 80",
+    "build_id": "procedural",
+    "color": "#a534eb",
+    "color_secondary": "#8a238c",
+    "color_accent": "#ff73cf",
+    "glow_color": "#c059ff",
+    "income_per_sec": 6.044629098073146e+23
+  },
+  {
+    "tier": 81,
+    "name": "Tier 81",
+    "build_id": "procedural",
+    "color": "#aa34eb",
+    "color_secondary": "#8c238c",
+    "color_accent": "#ff73cc",
+    "glow_color": "#c459ff",
+    "income_per_sec": 1.2089258196146292e+24
+  },
+  {
+    "tier": 82,
+    "name": "Tier 82",
+    "build_id": "procedural",
+    "color": "#ae34eb",
+    "color_secondary": "#8c2389",
+    "color_accent": "#ff73c8",
+    "glow_color": "#c859ff",
+    "income_per_sec": 2.4178516392292583e+24
+  },
+  {
+    "tier": 83,
+    "name": "Tier 83",
+    "build_id": "procedural",
+    "color": "#b334eb",
+    "color_secondary": "#8c2386",
+    "color_accent": "#ff73c5",
+    "glow_color": "#cc59ff",
+    "income_per_sec": 4.835703278458517e+24
+  },
+  {
+    "tier": 84,
+    "name": "Tier 84",
+    "build_id": "procedural",
+    "color": "#b734eb",
+    "color_secondary": "#8c2384",
+    "color_accent": "#ff73c1",
+    "glow_color": "#d159ff",
+    "income_per_sec": 9.671406556917033e+24
+  },
+  {
+    "tier": 85,
+    "name": "Tier 85",
+    "build_id": "procedural",
+    "color": "#bc34eb",
+    "color_secondary": "#8c2381",
+    "color_accent": "#ff73be",
+    "glow_color": "#d559ff",
+    "income_per_sec": 1.9342813113834067e+25
+  },
+  {
+    "tier": 86,
+    "name": "Tier 86",
+    "build_id": "procedural",
+    "color": "#c134eb",
+    "color_secondary": "#8c237e",
+    "color_accent": "#ff73ba",
+    "glow_color": "#d959ff",
+    "income_per_sec": 3.8685626227668134e+25
+  },
+  {
+    "tier": 87,
+    "name": "Tier 87",
+    "build_id": "procedural",
+    "color": "#c534eb",
+    "color_secondary": "#8c237c",
+    "color_accent": "#ff73b7",
+    "glow_color": "#dd59ff",
+    "income_per_sec": 7.737125245533627e+25
+  },
+  {
+    "tier": 88,
+    "name": "Tier 88",
+    "build_id": "procedural",
+    "color": "#ca34eb",
+    "color_secondary": "#8c2379",
+    "color_accent": "#ff73b3",
+    "glow_color": "#e159ff",
+    "income_per_sec": 1.5474250491067253e+26
+  },
+  {
+    "tier": 89,
+    "name": "Tier 89",
+    "build_id": "procedural",
+    "color": "#cf34eb",
+    "color_secondary": "#8c2376",
+    "color_accent": "#ff73af",
+    "glow_color": "#e659ff",
+    "income_per_sec": 3.094850098213451e+26
+  },
+  {
+    "tier": 90,
+    "name": "Tier 90",
+    "build_id": "procedural",
+    "color": "#d334eb",
+    "color_secondary": "#8c2374",
+    "color_accent": "#ff73ac",
+    "glow_color": "#ea59ff",
+    "income_per_sec": 6.189700196426902e+26
+  },
+  {
+    "tier": 91,
+    "name": "Tier 91",
+    "build_id": "procedural",
+    "color": "#d834eb",
+    "color_secondary": "#8c2371",
+    "color_accent": "#ff73a8",
+    "glow_color": "#ee59ff",
+    "income_per_sec": 1.2379400392853803e+27
+  },
+  {
+    "tier": 92,
+    "name": "Tier 92",
+    "build_id": "procedural",
+    "color": "#dc34eb",
+    "color_secondary": "#8c236e",
+    "color_accent": "#ff73a5",
+    "glow_color": "#f259ff",
+    "income_per_sec": 2.4758800785707606e+27
+  },
+  {
+    "tier": 93,
+    "name": "Tier 93",
+    "build_id": "procedural",
+    "color": "#e134eb",
+    "color_secondary": "#8c236c",
+    "color_accent": "#ff73a1",
+    "glow_color": "#f659ff",
+    "income_per_sec": 4.951760157141521e+27
+  },
+  {
+    "tier": 94,
+    "name": "Tier 94",
+    "build_id": "procedural",
+    "color": "#e634eb",
+    "color_secondary": "#8c2369",
+    "color_accent": "#ff739e",
+    "glow_color": "#fb59ff",
+    "income_per_sec": 9.903520314283042e+27
+  },
+  {
+    "tier": 95,
+    "name": "Tier 95",
+    "build_id": "procedural",
+    "color": "#ea34eb",
+    "color_secondary": "#8c2367",
+    "color_accent": "#ff739a",
+    "glow_color": "#ff59ff",
+    "income_per_sec": 1.9807040628566084e+28
+  },
+  {
+    "tier": 96,
+    "name": "Tier 96",
+    "build_id": "procedural",
+    "color": "#eb34e6",
+    "color_secondary": "#8c2364",
+    "color_accent": "#ff7397",
+    "glow_color": "#ff59fb",
+    "income_per_sec": 3.961408125713217e+28
+  },
+  {
+    "tier": 97,
+    "name": "Tier 97",
+    "build_id": "procedural",
+    "color": "#eb34e2",
+    "color_secondary": "#8c2361",
+    "color_accent": "#ff7393",
+    "glow_color": "#ff59f7",
+    "income_per_sec": 7.922816251426434e+28
+  },
+  {
+    "tier": 98,
+    "name": "Tier 98",
+    "build_id": "procedural",
+    "color": "#eb34dd",
+    "color_secondary": "#8c235f",
+    "color_accent": "#ff7390",
+    "glow_color": "#ff59f3",
+    "income_per_sec": 1.5845632502852868e+29
+  },
+  {
+    "tier": 99,
+    "name": "Tier 99",
+    "build_id": "procedural",
+    "color": "#eb34d8",
+    "color_secondary": "#8c235c",
+    "color_accent": "#ff738c",
+    "glow_color": "#ff59ee",
+    "income_per_sec": 3.1691265005705735e+29
+  },
+  {
+    "tier": 100,
+    "name": "Singularity",
+    "build_id": "singularity",
+    "color": "#ffffff",
+    "color_secondary": "#ffc83d",
+    "color_accent": "#4fe0ff",
+    "glow_color": "#ffffff",
+    "income_per_sec": 6.338253001141147e+29
+  }
 ]

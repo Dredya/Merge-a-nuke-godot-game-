@@ -3,8 +3,9 @@
 ## Game Concept
 Android idle merge-and-raid game (Godot 4.7, GDScript, Mobile renderer, 3D, Roblox-style).
 
-- Merge bombs on a board into **15 tiers** of increasingly powerful bombs.
-- The top tier (Omega nuke) generates **cash per second**, including while the game is closed.
+- Merge bombs on a board into **100 tiers** of increasingly powerful bombs.
+- The top tier (Singularity) generates **cash per second**, including while the game is closed.
+- Bombs arrive from a free spawn timer; there is no bomb purchasing system.
 - **Raid** AI bases to steal their cash.
 - **Lock** your base with a **timed shield** to protect it from raids.
 - **Redeem codes** for rewards.
@@ -46,10 +47,11 @@ Each bomb is built in code from primitives (`SphereMesh`, `CylinderMesh`, `Capsu
 Each bomb has a billboard `Label3D` tier number (white, dark outline). All bombs gently bob
 and glow-pulse (looping Tweens). Budget: ≤ ~300 triangles per bomb.
 
+**Tiers 1–15 (hand-tuned showcase):**
 1. **Classic** — dark round body `#151A30`→`#5A6694`, gray cap, curved fuse, sparking yellow tip `#FFC83D` (CPUParticles3D).
 2. **Steel** — silver-blue sphere `#F2F6FF`→`#6C7BA8`, metal band (Torus), two side fins, dark cap.
 3. **Tech** — teal sphere `#3CD8C8`→`#0E3A4A`, emissive lime ring `#B6F23C`, antenna with glowing tip.
-4. **Gold Missile** — upright gold capsule `#FFE58A`→`#A86A10`, cone nose, two fins, orange stripe `#FF9A3D`, white gloss highlight.
+4. **Gold Missile** — upright gold capsule `#FFE58A`→`#A86A10`, cone nose, two fins, orange stripe `#FF9A3D`, gloss highlight.
 5. **Plasma Core** — dark sphere `#14070F`, crossed orbiting orange/gold rings, glowing core `#FFF3B0`→`#FF6A3D`.
 6. **Neon Warhead** — pink/purple rocket (`#FF7A9A`, `#C03A9A`, `#5A1FA0`), emissive cyan stripes, glowing cockpit, purple fins, cyan glow disc, two orbiting cyan lights.
 7. **Ion** — chrome sphere inside a floating cage of three thin glowing rings.
@@ -60,10 +62,24 @@ and glow-pulse (looping Tweens). Budget: ≤ ~300 triangles per bomb.
 12. **Quantum Nuke** — transparent shell, rotating inner geometric core, color-shifting emission.
 13. **Star Core** — bright star, four rotating light beams, orbiting mini planets.
 14. **Galaxy** — dark sphere with spiral galaxy swirl, drifting star particles.
-15. **Omega Nuke** — biggest/brightest: rainbow-shifting core, crown of floating rings, trailing sparkles, subtle screen glow when merged.
+15. **Omega Nuke** — rainbow-shifting core, crown of floating rings, trailing sparkles.
 
-All tier data (name, colors, income/sec, buy cost, build id) lives in
-`resources`/`data/nuke_tiers.json` and the `NukeTier` resource.
+**Tiers 16–99 (procedural escalation):**
+- One procedural builder scales with tier: body radius `0.45 → 0.70`, 2–4 rotating rings,
+  growing emissive core, two fins, and orbiting shards from tier 50 upward.
+- Body/glow colors progress cyan → blue → indigo → purple → magenta via HSV.
+- Tier names are `Tier N` except milestones: **25 Hyper**, **50 Apex**, **75 Transcendent**.
+- Reaching a milestone shows a temporary gold `MILESTONE` toast on the base.
+- Still ≤ ~300 triangles per bomb.
+
+**Tier 100 — Singularity:**
+- Biggest and brightest: rainbow-shifting core, three crown rings, four orbiting shards,
+  trailing sparkles, scale 1.3×, and a subtle rainbow **screen glow when merged**.
+- Only tier 100 triggers the screen glow; tier 15 does not.
+
+All tier data (name, colors, income/sec, build id) lives in `data/nuke_tiers.json`
+and the `NukeTier` resource. `tools/generate_tiers.gd` rebuilds the full 100-tier file.
+Bomb purchasing is removed; `buy_cost` is no longer part of the tier data.
 
 ### 3. Merge and gameplay feel
 - 3D drag and drop: raycast from camera, lift bomb, follow the ground plane under the finger, snap to nearest slot.
@@ -78,7 +94,8 @@ All tier data (name, colors, income/sec, buy cost, build id) lives in
   income `+$8.4K / sec` `#B6F23C`; right blue-outlined lock box (`#3A7BFF` border on `#0B1020`)
   with countdown and `BASE LOCKED`.
 - Under plot: `Next free bomb` panel + progress bar (`#B6F23C` on `#0B1020`) + seconds left.
-- Big green `Buy Bomb  $120` button (`#3DDC5A`, 64px tall, white text, dark shadow, thick darker bottom edge, press animation).
+- Below it a muted merge hint: `MERGE TWO IDENTICAL BOMBS TO LEVEL UP`.
+- Bombs arrive free on a timer; there is no Buy Bomb button or bomb shop.
 - Bottom nav, 5 icon buttons: Base, Shop, Raid, Upgrades, Settings (active lime `#B6F23C`, inactive `#A9B6E0`, ≥48px tall).
 
 ### 5. Screen 2 — Raid
@@ -117,21 +134,27 @@ All tier data (name, colors, income/sec, buy cost, build id) lives in
 - [x] Step 2 — Tier 1–6 bomb builders + debug gallery scene for all 15 tiers.
 - [x] Step 3 — Tier 7–15 bomb builders.
 - [x] Step 4 — 3D drag and drop, merge effects, bobbing/glow.
-- [x] Step 5 — Shared theme, HUD, Buy Bomb button, nav bar.
+- [x] Step 5 — Shared theme, HUD, nav bar.
 - [x] Step 6 — Raid screen and 3D raid animation.
 - [x] Step 7 — Offline earnings popup.
 - [x] Step 8 — Performance pass, final validation.
+- [x] Phase 9 — 100-tier expansion: generated data, procedural tiers 16–99, tier-100 Singularity, milestones, buying system removed.
 
 ## Implementation Notes
 - `scenes/main.tscn` holds the safe-area shell and five-button nav. Each screen
   owns its own `SubViewport` with `own_world_3d` so 3D and Control UI compose cleanly.
 - `scripts/low_poly.gd` caches primitive meshes/materials and caps tessellation for mobile.
-- `scripts/bomb_factory.gd` builds all 15 tiers from primitives; `scripts/bomb.gd` runs
-  the bob, glow pulse, ring spinners, hue-shifting cores and vortex animation.
+- `scripts/bomb_factory.gd` builds all 100 tiers: bespoke 1–15, procedural 16–99, and the
+  tier-100 Singularity. `scripts/bomb.gd` runs the bob, glow pulse, ring spinners,
+  hue-shifting cores and vortex animation.
+- `data/nuke_tiers.json` is generated by `tools/generate_tiers.gd`; edit the existing
+  tiers or the generator, then rerun it to rebuild all 100 entries.
+- Shop now contains daily reward, redeem codes and missions only. Bombs spawn free on the
+  base timer; the Buy Bomb button and bomb purchases were removed.
 - `resources/ui_theme.tres` is generated by `tools/build_theme.gd`; edit the builder and
   rerun it rather than hand-editing the serialized theme.
-- Triangle budget (measured with `tools/count_tris.gd`): 4,186 triangles for all 15 tiers;
-  worst tiers are Neon Warhead (~354), Classic (~324) and Omega (~312). Only 12 bombs are on the board.
+- Triangle budget is measured with `tools/count_tris.gd`; current total is 30,366 triangles
+  across all 100 tiers, with the worst bomb at 356 triangles. Only 12 bombs are on the board.
 - Graphics quality Low disables environment glow, bomb/merge/raid particles and blob shadows.
   Settings are persisted in `user://settings.cfg`, separately from game progress.
 - Offline earnings require at least 60 seconds away and are capped by the offline-cap upgrade.
@@ -147,11 +170,13 @@ godot --headless --path . tools/test_low_quality.tscn
 godot --headless --path . tools/test_tutorial.tscn
 godot --headless --path . --script tools/count_tris.gd
 godot --headless --path . --script tools/build_theme.gd
+godot --headless --path . --script tools/generate_tiers.gd
 ```
-Debug/visual scenes: `scenes/bomb_gallery.tscn` (all tiers) and
+Debug/visual scenes: `scenes/bomb_gallery.tscn` (1–15 plus milestone samples through 100) and
 `godot --path . --resolution 540x960 --script tools/capture.gd -- res://scenes/main.tscn user://shot.png base`
 (capture also accepts `shop`, `raid`, `upgrades`, `settings` as the third user argument).
 
 ## Notes
 - Original names, art, and audio only. Fonts are SIL OFL licensed (license texts included in `assets/fonts/`).
+- The 100-tier pass removes bomb purchasing; only free spawns, merging, raids and upgrades remain.
 - Android export and real-device testing remain.

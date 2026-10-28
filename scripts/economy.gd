@@ -131,6 +131,8 @@ func _on_income_tick() -> void:
 
 
 func format_number(value: float) -> String:
+	if value >= 1.0e36:
+		return ("%.2e" % value).replace("+", "")
 	var suffixes := ["", "K", "M", "B", "T", "Qa", "Qi", "Sx", "Sp", "Oc", "No", "Dc"]
 	var v := value
 	var idx := 0

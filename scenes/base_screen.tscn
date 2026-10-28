@@ -143,13 +143,33 @@ theme_type_variation = &"GoldLabel"
 text = ""
 horizontal_alignment = 1
 
+[node name="MilestoneToastPanel" type="PanelContainer" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 10
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -270.0
+offset_top = 266.0
+offset_right = 270.0
+offset_bottom = 318.0
+grow_horizontal = 2
+theme_type_variation = &"PanelToast"
+
+[node name="MilestoneToastLabel" type="Label" parent="MilestoneToastPanel"]
+layout_mode = 2
+theme_type_variation = &"H2"
+theme_override_colors/font_color = Color(1, 0.784314, 0.239216, 1)
+text = "MILESTONE"
+horizontal_alignment = 1
+
 [node name="BottomControls" type="MarginContainer" parent="."]
 layout_mode = 1
 anchors_preset = 12
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_top = -236.0
+offset_top = -128.0
 grow_horizontal = 2
 grow_vertical = 0
 theme_override_constants/margin_left = 20
@@ -159,7 +179,7 @@ theme_override_constants/margin_bottom = 18
 
 [node name="BottomBox" type="VBoxContainer" parent="BottomControls"]
 layout_mode = 2
-theme_override_constants/separation = 10
+theme_override_constants/separation = 8
 
 [node name="FreePanel" type="PanelContainer" parent="BottomControls/BottomBox"]
 custom_minimum_size = Vector2(0, 64)
@@ -190,11 +210,14 @@ theme_type_variation = &"IncomeLabel"
 text = "4s"
 horizontal_alignment = 2
 
-[node name="BuyBombButton" type="Button" parent="BottomControls/BottomBox"]
-custom_minimum_size = Vector2(0, 100)
+[node name="MergeHint" type="Label" parent="BottomControls/BottomBox"]
 layout_mode = 2
-theme_type_variation = &"GreenButton"
-text = "Buy Bomb  $120"
+theme_type_variation = &"WhiteLabel"
+theme_override_colors/font_color = Color(0.662745, 0.713725, 0.878431, 1)
+theme_override_colors/font_outline_color = Color(0.0431373, 0.0627451, 0.12549, 1)
+theme_override_constants/outline_size = 6
+text = "MERGE TWO IDENTICAL BOMBS TO LEVEL UP"
+horizontal_alignment = 1
 
 [node name="TutorialPopup" type="Control" parent="."]
 visible = false
