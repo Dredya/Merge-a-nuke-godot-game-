@@ -263,7 +263,7 @@ horizontal_alignment = 1
 [node name="TutorialLabel" type="Label" parent="TutorialPopup/Center/Panel/Box"]
 layout_mode = 2
 theme_type_variation = &"WhiteLabel"
-text = "Buy a bomb, then drag it onto another bomb of the same tier to merge."
+text = "A free bomb arrives every few seconds. Wait for two of the same tier."
 horizontal_alignment = 1
 autowrap_mode = 3
 

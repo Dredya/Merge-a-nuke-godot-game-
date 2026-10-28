@@ -168,6 +168,7 @@ godot --headless --path . tools/test_raid.tscn
 godot --headless --path . tools/test_offline.tscn
 godot --headless --path . tools/test_low_quality.tscn
 godot --headless --path . tools/test_tutorial.tscn
+godot --headless --path . tools/test_phase9.tscn
 godot --headless --path . --script tools/count_tris.gd
 godot --headless --path . --script tools/build_theme.gd
 godot --headless --path . --script tools/generate_tiers.gd
@@ -179,4 +180,5 @@ Debug/visual scenes: `scenes/bomb_gallery.tscn` (1–15 plus milestone samples t
 ## Notes
 - Original names, art, and audio only. Fonts are SIL OFL licensed (license texts included in `assets/fonts/`).
 - The 100-tier pass removes bomb purchasing; only free spawns, merging, raids and upgrades remain.
+- Current QA findings (including the unreachable high-tier progression risk) live in `QA_REVIEW.md`.
 - Android export and real-device testing remain.
