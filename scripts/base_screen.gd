@@ -4,12 +4,16 @@ extends Control
 
 const NukeTierScript = preload("res://scripts/nuke_tier.gd")
 const SLOT_SIZE := Vector2(100, 100)
+const POOL_SIZE := 12
 
-@onready var cash_label: Label = $MarginContainer/VBoxContainer/CashLabel
 @onready var slot_grid: GridContainer = $MarginContainer/VBoxContainer/SlotGrid
-@onready var buy_button: Button = $MarginContainer/VBoxContainer/BuyBombButton
+@onready var buy_button: Button = $MarginContainer/VBoxContainer/ButtonRow/BuyBombButton
+@onready var upgrades_button: Button = $MarginContainer/VBoxContainer/ButtonRow/UpgradesButton
 @onready var auto_timer: Timer = $AutoSpawnTimer
-@onready var income_timer: Timer = $IncomeTimer
+@onready var welcome_popup: PanelContainer = $WelcomePopup
+@onready var welcome_amount_label: Label = $WelcomePopup/VBoxContainer/AmountLabel
+@onready var claim_button: Button = $WelcomePopup/VBoxContainer/ClaimButton
+@onready var claim_x2_button: Button = $WelcomePopup/VBoxContainer/ClaimX2Button
 
 var slot_nodes: Array[Control] = []
 var slot_nuke: Array[Control] = []
@@ -20,16 +24,26 @@ var dragged_from: int = -1
 var drag_visual: Control = null
 var is_dragging: bool = false
 
+# Floating label object pool
+var _floating_pool: Array[Label] = []
+var _floating_active: Array[Label] = []
+
+var _pending_offline: float = 0.0
+
 
 func _ready() -> void:
 	_build_slots()
+	_build_floating_pool()
 	buy_button.pressed.connect(_on_buy_pressed)
+	upgrades_button.pressed.connect(_on_upgrades_pressed)
 	auto_timer.timeout.connect(_on_auto_spawn)
-	income_timer.timeout.connect(_on_income_tick)
-	GameState.cash_changed.connect(_on_cash_changed)
+	claim_button.pressed.connect(_on_claim_offline.bind(1))
+	claim_x2_button.pressed.connect(_on_claim_x2)
 	GameState.slots_changed.connect(_on_slots_changed)
-	_on_cash_changed(GameState.cash)
+	Economy.income_granted.connect(_on_income_granted)
+	SaveManager.offline_earnings_ready.connect(_on_offline_ready)
 	_refresh_all_slots()
+	_update_auto_timer_wait()
 
 
 func _build_slots() -> void:
@@ -52,6 +66,19 @@ func _build_slots() -> void:
 		slot_nodes.append(slot)
 		slot_nuke.append(null)
 		slot_tier.append(0)
+
+
+func _rebuild_slots_preserve() -> void:
+	# Preserve existing tier layout into new slot count.
+	var old_tiers := slot_tier.duplicate()
+	_build_slots()
+	for i in range(min(old_tiers.size(), slot_tier.size())):
+		if old_tiers[i] > 0:
+			slot_tier[i] = old_tiers[i]
+			GameState.set_slot(i, old_tiers[i])
+			_place_nuke(i, old_tiers[i])
+	# fill remaining from GameState
+	_refresh_all_slots()
 
 
 func _on_slot_gui_input(event: InputEvent, index: int) -> void:
@@ -84,6 +111,7 @@ func _start_drag(index: int) -> void:
 func _process(_delta: float) -> void:
 	if is_dragging and drag_visual != null:
 		drag_visual.global_position = get_global_mouse_position() - SLOT_SIZE * 0.5
+	_update_auto_timer_wait()
 
 
 func _end_drag() -> void:
@@ -205,7 +233,6 @@ func _play_merge_feedback(slot_index: int) -> void:
 
 
 func _on_merge_sound() -> void:
-	# Silent hook for sound playback.
 	pass
 
 
@@ -223,19 +250,18 @@ func _on_auto_spawn() -> void:
 		_refresh_all_slots()
 
 
-func _on_income_tick() -> void:
-	var income := GameState.income_per_second_total()
-	if income > 0.0:
-		GameState.add_cash(income)
-	_refresh_cash()
+func _on_upgrades_pressed() -> void:
+	get_tree().change_scene_to_file("res://scenes/upgrades_screen.tscn")
 
 
-func _on_cash_changed(new_cash: float) -> void:
-	cash_label.text = "Cash: %d" % int(new_cash)
+func _on_income_granted(amount: float) -> void:
+	_spawn_floating_text("+$" + Economy.format_number(amount), Vector2(size.x * 0.5, size.y * 0.4))
 
 
 func _on_slots_changed() -> void:
 	_refresh_all_slots()
+	if GameState.slot_count > slot_nodes.size():
+		_rebuild_slots_preserve()
 
 
 func _refresh_all_slots() -> void:
@@ -249,5 +275,66 @@ func _refresh_all_slots() -> void:
 			_place_nuke(i, tier_val)
 
 
-func _refresh_cash() -> void:
-	cash_label.text = "Cash: %d" % int(GameState.cash)
+func _update_auto_timer_wait() -> void:
+	var level := Economy.spawn_speed_level
+	var wait := 4.0 / (1.0 + float(level) * 0.2)
+	if wait < 0.5:
+		wait = 0.5
+	auto_timer.wait_time = wait
+
+
+# Object pool for floating labels
+func _build_floating_pool() -> void:
+	for i in range(POOL_SIZE):
+		var lbl := Label.new()
+		lbl.visible = false
+		lbl.modulate.a = 1.0
+		add_child(lbl)
+		_floating_pool.append(lbl)
+
+
+func _get_pooled_label() -> Label:
+	for lbl in _floating_pool:
+		if not lbl.visible:
+			return lbl
+	# expand pool
+	var lbl := Label.new()
+	lbl.visible = false
+	add_child(lbl)
+	_floating_pool.append(lbl)
+	return lbl
+
+
+func _spawn_floating_text(text: String, pos: Vector2) -> void:
+	var lbl := _get_pooled_label()
+	lbl.text = text
+	lbl.global_position = pos
+	lbl.visible = true
+	lbl.modulate.a = 1.0
+	var tween := create_tween()
+	tween.tween_property(lbl, "position:y", lbl.position.y - 60.0, 0.8)
+	tween.parallel().tween_property(lbl, "modulate:a", 0.0, 0.8)
+	tween.finished.connect(_return_floating_label.bind(lbl))
+
+
+func _return_floating_label(lbl: Label) -> void:
+	lbl.visible = false
+
+
+func _on_offline_ready(amount: float) -> void:
+	_pending_offline = amount
+	welcome_amount_label.text = "+" + Economy.format_number(amount)
+	welcome_popup.visible = true
+
+
+func _on_claim_offline(multiplier: int) -> void:
+	GameState.add_cash(_pending_offline * float(multiplier))
+	_pending_offline = 0.0
+	welcome_popup.visible = false
+	SaveManager.pending_offline = 0.0
+
+
+func _on_claim_x2() -> void:
+	AdService.show_rewarded_ad()
+	# Stub grants immediately; grant x2.
+	_on_claim_offline(2)

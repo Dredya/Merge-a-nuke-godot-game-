@@ -29,6 +29,9 @@ pointing/emulate_mouse_from_touch=true
 [autoload]
 
 GameState="*res://scripts/game_state.gd"
+Economy="*res://scripts/economy.gd"
+AdService="*res://scripts/ad_service.gd"
+SaveManager="*res://scripts/save_manager.gd"
 
 [editor_plugins]
 
