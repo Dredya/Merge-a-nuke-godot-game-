@@ -92,6 +92,8 @@ func _run() -> void:
 		# Visual QA snapshot of a full board.
 		(_base.get("tutorial_popup") as Control).visible = false
 		(_base.get("daily_popup") as Control).visible = false
+		(_base.get("offline_popup") as Control).visible = false
+		SaveManager.pending_offline = 0.0
 		GameState.cash = 28800.0
 		GameState.cash_changed.emit(GameState.cash)
 		for i in range(GameState.MAX_SLOTS):

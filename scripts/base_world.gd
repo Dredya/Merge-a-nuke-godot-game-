@@ -10,7 +10,7 @@ const SLOT_COUNT := ROWS * COLS
 const SLOT_SPACING := 2.55
 const PAD_SIZE := 1.72
 const PAD_TOP_Y := 0.16
-const SLAB_THICKNESS := 1.8
+const SLAB_THICKNESS := 1.8  # 18 design units at 0.1 world scale.
 
 const C_TOP := Color("#4CAF50")
 const C_LEFT := Color("#2E7D32")
@@ -60,7 +60,7 @@ func _build_ground() -> void:
 	ground.name = "Ground"
 	# A finite blocky grass island: orthographic cameras never see a true horizon,
 	# so the island edge reads as the sky/ground divide.
-	ground.mesh = LowPoly.cylinder(20.0, 19.2, 1.8, 28)
+	ground.mesh = LowPoly.cylinder(20.0, 19.2, 1.8, 28, false)
 	ground.material_override = ground_mat
 	ground.position = Vector3(0.0, -2.8, 0.0)
 	ground.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF

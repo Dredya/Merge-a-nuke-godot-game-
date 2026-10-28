@@ -74,6 +74,13 @@ func _on_reset_confirmed() -> void:
 	GameState.tutorial_completed = false
 	GameState.mission_progress.clear()
 	GameState.mission_claimed.clear()
+	GameState.redeemed_codes.clear()
+	GameState.daily_streak = 0
+	GameState.last_login_date = ""
+	GameState.daily_claimed_date = ""
+	GameState.mission_last_reset_date = ""
+	SaveManager.pending_offline = 0.0
+	SaveManager.pending_offline_seconds = 0.0
 	Economy.upgrade_levels.clear()
 	for upgrade in Economy.upgrades:
 		if upgrade is Dictionary:

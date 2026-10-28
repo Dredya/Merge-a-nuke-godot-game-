@@ -480,22 +480,24 @@ func _play_merge_fx(target: int, new_tier: int) -> void:
 		_spawn_particles(fx_pos, fx_color)
 
 	flash_overlay.visible = true
-	flash_overlay.color = Color(1.0, 1.0, 1.0, 0.30)
+	flash_overlay.color = Color(1.0, 1.0, 1.0, 0.42)
 	var flash_tween := create_tween()
-	flash_tween.tween_property(flash_overlay, "color:a", 0.0, 0.20)
+	flash_tween.tween_property(flash_overlay, "color:a", 0.0, 0.28)
 	flash_tween.finished.connect(func(): flash_overlay.visible = false)
 
 	if new_tier >= 15 and not _low_quality:
 		screen_glow.visible = true
-		var glow_color := fx_color
-		glow_color.a = 0.26
-		screen_glow.color = glow_color
+		screen_glow.color = Color(1.0, 1.0, 1.0, 0.26)
 		var glow_tween := create_tween()
-		glow_tween.tween_property(screen_glow, "color:a", 0.0, 0.65)
+		glow_tween.tween_method(_set_omega_glow, 0.0, 1.0, 0.7)
 		glow_tween.finished.connect(func(): screen_glow.visible = false)
 
 	AudioManager.play_sfx("merge")
 	AudioManager.vibrate(30)
+
+
+func _set_omega_glow(t: float) -> void:
+	screen_glow.color = Color.from_hsv(fmod(t * 0.55, 1.0), 0.65, 1.0, 0.28 * (1.0 - t))
 
 
 func _spawn_flash(pos: Vector3, color: Color) -> void:
@@ -508,8 +510,8 @@ func _spawn_flash(pos: Vector3, color: Color) -> void:
 	flash.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	world.add_child(flash)
 	var tween := create_tween()
-	tween.tween_property(flash, "scale", Vector3.ONE * 1.7, 0.16).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-	tween.parallel().tween_property(mat, "albedo_color:a", 0.0, 0.22)
+	tween.tween_property(flash, "scale", Vector3.ONE * 2.1, 0.24).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	tween.parallel().tween_property(mat, "albedo_color:a", 0.0, 0.30)
 	tween.finished.connect(func(): flash.queue_free())
 
 
@@ -523,8 +525,8 @@ func _spawn_shockwave(pos: Vector3, color: Color) -> void:
 	ring.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	world.add_child(ring)
 	var tween := create_tween()
-	tween.tween_property(ring, "scale", Vector3.ONE * 2.7, 0.40).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-	tween.parallel().tween_property(mat, "albedo_color:a", 0.0, 0.42)
+	tween.tween_property(ring, "scale", Vector3.ONE * 2.9, 0.52).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	tween.parallel().tween_property(mat, "albedo_color:a", 0.0, 0.55)
 	tween.finished.connect(func(): ring.queue_free())
 
 
@@ -532,7 +534,7 @@ func _spawn_particles(pos: Vector3, color: Color) -> void:
 	var particles := CPUParticles3D.new()
 	particles.position = pos
 	particles.amount = 24
-	particles.lifetime = 0.62
+	particles.lifetime = 0.75
 	particles.one_shot = true
 	particles.explosiveness = 1.0
 	particles.emission_shape = CPUParticles3D.EMISSION_SHAPE_SPHERE
@@ -659,7 +661,7 @@ func _update_hud() -> void:
 	else:
 		locked_label.text = "BASE OPEN"
 		locked_label.add_theme_color_override("font_color", Color("#A9B6E0"))
-		lock_timer_label.text = "SHIELD 2:00"
+		lock_timer_label.text = "NO SHIELD"
 		lock_timer_label.add_theme_color_override("font_color", Color("#A9B6E0"))
 		lock_button.visible = true
 		lock_button.disabled = GameState.cash < LOCK_COST
@@ -819,10 +821,11 @@ func _on_claim_daily() -> void:
 func _on_auto_spawn() -> void:
 	if _is_dragging or _is_animating:
 		return
+	if tutorial_popup.visible or daily_popup.visible or offline_popup.visible:
+		return
 	_suppress_slot_refresh = true
 	var index := GameState.spawn_tier1_free()
 	_suppress_slot_refresh = false
 	if index >= 0:
 		_create_bomb(index, 1, true)
-		SaveManager.save()
 		_update_hud()

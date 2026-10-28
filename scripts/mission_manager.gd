@@ -72,7 +72,9 @@ func _increment_type(mtype: String, amount: int) -> void:
 		current = min(current + amount, target)
 		GameState.mission_progress[id] = current
 		mission_progress_changed.emit(id, current)
-		SaveManager.save()
+		# Autosave covers partial progress; only force a write on completion.
+		if current >= target:
+			SaveManager.save()
 
 
 func claim(mission_id: String) -> bool:

@@ -75,16 +75,15 @@ static func _build_classic(visual: Node3D, bomb: Bomb) -> float:
 	LowPoly.add_mesh(visual, LowPoly.sphere(0.505, 12, 4, true), body_light, Vector3(0.0, 0.5, 0.0), Vector3.ZERO, Vector3.ONE, "BodyTop")
 
 	var metal := LowPoly.material(Color("#8A93A8"), 0.65, 0.35)
-	LowPoly.add_mesh(visual, LowPoly.cylinder(0.15, 0.17, 0.10, 10), metal, Vector3(0.0, 1.02, 0.0), Vector3.ZERO, Vector3.ONE, "Cap")
-	LowPoly.add_mesh(visual, LowPoly.torus(0.165, 0.018, 12, 4), LowPoly.material(Color("#3A4058"), 0.2, 0.6), Vector3(0.0, 0.99, 0.0), Vector3.ZERO, Vector3.ONE, "CapRing")
+	LowPoly.add_mesh(visual, LowPoly.cylinder(0.15, 0.17, 0.10, 8), metal, Vector3(0.0, 1.02, 0.0), Vector3.ZERO, Vector3.ONE, "Cap")
 
 	var fuse_mat := LowPoly.material(Color("#3A4058"), 0.2, 0.7)
-	LowPoly.add_mesh(visual, LowPoly.cylinder(0.028, 0.028, 0.18, 6), fuse_mat, Vector3(0.03, 1.10, 0.0), Vector3(0.0, 0.0, -25.0), Vector3.ONE, "Fuse1")
-	LowPoly.add_mesh(visual, LowPoly.cylinder(0.028, 0.028, 0.18, 6), fuse_mat, Vector3(0.12, 1.21, 0.0), Vector3(0.0, 0.0, -55.0), Vector3.ONE, "Fuse2")
-	LowPoly.add_mesh(visual, LowPoly.cylinder(0.026, 0.026, 0.15, 6), fuse_mat, Vector3(0.23, 1.29, 0.0), Vector3(0.0, 0.0, -82.0), Vector3.ONE, "Fuse3")
+	LowPoly.add_mesh(visual, LowPoly.cylinder(0.028, 0.028, 0.18, 4), fuse_mat, Vector3(0.03, 1.10, 0.0), Vector3(0.0, 0.0, -25.0), Vector3.ONE, "Fuse1")
+	LowPoly.add_mesh(visual, LowPoly.cylinder(0.028, 0.028, 0.18, 4), fuse_mat, Vector3(0.12, 1.21, 0.0), Vector3(0.0, 0.0, -55.0), Vector3.ONE, "Fuse2")
+	LowPoly.add_mesh(visual, LowPoly.cylinder(0.026, 0.026, 0.15, 4), fuse_mat, Vector3(0.23, 1.29, 0.0), Vector3(0.0, 0.0, -82.0), Vector3.ONE, "Fuse3")
 
 	var spark_mat := LowPoly.material(Color("#FFC83D"), 0.0, 0.3, Color("#FFC83D"), 3.2, true)
-	var spark := LowPoly.add_mesh(visual, LowPoly.sphere(0.06, 6, 4), spark_mat, Vector3(0.31, 1.36, 0.0), Vector3.ZERO, Vector3.ONE, "Spark")
+	var spark := LowPoly.add_mesh(visual, LowPoly.sphere(0.06, 4, 2), spark_mat, Vector3(0.31, 1.36, 0.0), Vector3.ZERO, Vector3.ONE, "Spark")
 	bomb.register_glow(spark)
 	_add_spark_particles(visual, Vector3(0.31, 1.38, 0.0), Color("#FFC83D"), 6, 0.55, 0.4, 0.035)
 	return 1.82
@@ -100,11 +99,7 @@ static func _build_steel(visual: Node3D, bomb: Bomb) -> float:
 	LowPoly.add_mesh(visual, LowPoly.torus(0.47, 0.065, 14, 5), blue_steel, Vector3(0.0, 0.46, 0.0), Vector3.ZERO, Vector3.ONE, "Band")
 	LowPoly.add_mesh(visual, LowPoly.box(Vector3(0.08, 0.30, 0.24)), blue_steel, Vector3(-0.50, 0.44, 0.0), Vector3(0.0, 0.0, -12.0), Vector3.ONE, "FinL")
 	LowPoly.add_mesh(visual, LowPoly.box(Vector3(0.08, 0.30, 0.24)), blue_steel, Vector3(0.50, 0.44, 0.0), Vector3(0.0, 0.0, 12.0), Vector3.ONE, "FinR")
-	LowPoly.add_mesh(visual, LowPoly.cylinder(0.17, 0.19, 0.12, 10), dark, Vector3(0.0, 1.04, 0.0), Vector3.ZERO, Vector3.ONE, "Cap")
-	LowPoly.add_mesh(visual, LowPoly.cylinder(0.20, 0.20, 0.035, 10), blue_steel, Vector3(0.0, 0.98, 0.0), Vector3.ZERO, Vector3.ONE, "CapRing")
-	# Soft glossy highlight on the upper-left, cheap fake specular.
-	var gloss := LowPoly.material(Color("#FFFFFF"), 0.0, 0.1, Color("#FFFFFF"), 0.35, true, 0.75)
-	LowPoly.add_mesh(visual, LowPoly.sphere(0.10, 8, 4), gloss, Vector3(-0.22, 0.82, 0.18), Vector3.ZERO, Vector3(1.0, 0.7, 1.0), "Gloss")
+	LowPoly.add_mesh(visual, LowPoly.cylinder(0.17, 0.19, 0.12, 8), dark, Vector3(0.0, 1.04, 0.0), Vector3.ZERO, Vector3.ONE, "Cap")
 	return 1.70
 
 
@@ -119,12 +114,8 @@ static func _build_tech(visual: Node3D, bomb: Bomb) -> float:
 	var ring := LowPoly.add_mesh(visual, LowPoly.torus(0.51, 0.042, 16, 5), lime, Vector3(0.0, 0.5, 0.0), Vector3.ZERO, Vector3.ONE, "EnergyRing")
 	bomb.register_glow(ring)
 	LowPoly.add_mesh(visual, LowPoly.cylinder(0.018, 0.026, 0.44, 6), deep, Vector3(0.13, 1.02, -0.06), Vector3(0.0, 0.0, -7.0), Vector3.ONE, "Antenna")
-	var tip := LowPoly.add_mesh(visual, LowPoly.sphere(0.065, 6, 4), lime, Vector3(0.16, 1.25, -0.08), Vector3.ZERO, Vector3.ONE, "AntennaTip")
+	var tip := LowPoly.add_mesh(visual, LowPoly.sphere(0.065, 4, 2), lime, Vector3(0.16, 1.25, -0.08), Vector3.ZERO, Vector3.ONE, "AntennaTip")
 	bomb.register_glow(tip)
-	# Little side tech pods.
-	var pod_mat := LowPoly.material(Color("#1E6E76"), 0.3, 0.4)
-	LowPoly.add_mesh(visual, LowPoly.box(Vector3(0.16, 0.12, 0.22)), pod_mat, Vector3(-0.44, 0.42, 0.0), Vector3(0.0, 0.0, -20.0), Vector3.ONE, "PodL")
-	LowPoly.add_mesh(visual, LowPoly.box(Vector3(0.16, 0.12, 0.22)), pod_mat, Vector3(0.44, 0.42, 0.0), Vector3(0.0, 0.0, 20.0), Vector3.ONE, "PodR")
 	return 1.70
 
 
@@ -136,15 +127,14 @@ static func _build_gold_missile(visual: Node3D, bomb: Bomb) -> float:
 	var dark_gold := LowPoly.material(Color("#A86A10"), 0.65, 0.35)
 	var orange := LowPoly.material(Color("#FF9A3D"), 0.2, 0.35, Color("#FF9A3D"), 1.1)
 	LowPoly.add_mesh(visual, LowPoly.capsule(0.27, 0.94, 12, 5), gold, Vector3(0.0, 0.55, 0.0), Vector3.ZERO, Vector3.ONE, "Body")
-	LowPoly.add_mesh(visual, LowPoly.cylinder(0.0, 0.28, 0.36, 12), bright_gold, Vector3(0.0, 1.18, 0.0), Vector3.ZERO, Vector3.ONE, "Nose")
+	LowPoly.add_mesh(visual, LowPoly.cylinder(0.0, 0.28, 0.36, 6), bright_gold, Vector3(0.0, 1.18, 0.0), Vector3.ZERO, Vector3.ONE, "Nose")
 	LowPoly.add_mesh(visual, LowPoly.torus(0.275, 0.043, 14, 5), orange, Vector3(0.0, 0.60, 0.0), Vector3.ZERO, Vector3.ONE, "Stripe")
-	LowPoly.add_mesh(visual, LowPoly.torus(0.275, 0.030, 14, 5), orange, Vector3(0.0, 0.43, 0.0), Vector3.ZERO, Vector3.ONE, "Stripe2")
 	LowPoly.add_mesh(visual, LowPoly.box(Vector3(0.06, 0.28, 0.24)), dark_gold, Vector3(-0.31, 0.18, 0.0), Vector3(0.0, 0.0, -12.0), Vector3.ONE, "FinL")
 	LowPoly.add_mesh(visual, LowPoly.box(Vector3(0.06, 0.28, 0.24)), dark_gold, Vector3(0.31, 0.18, 0.0), Vector3(0.0, 0.0, 12.0), Vector3.ONE, "FinR")
 	# White glossy nose highlight.
 	var gloss := LowPoly.material(Color("#FFFFFF"), 0.0, 0.05, Color("#FFFFFF"), 0.6, true, 0.9)
-	LowPoly.add_mesh(visual, LowPoly.sphere(0.085, 8, 4), gloss, Vector3(-0.10, 1.20, 0.11), Vector3.ZERO, Vector3(0.75, 1.0, 0.75), "Gloss")
-	var tip := LowPoly.add_mesh(visual, LowPoly.sphere(0.045, 6, 4), bright_gold, Vector3(0.0, 1.38, 0.0), Vector3.ZERO, Vector3.ONE, "Tip")
+	LowPoly.add_mesh(visual, LowPoly.sphere(0.085, 4, 2), gloss, Vector3(-0.10, 1.20, 0.11), Vector3.ZERO, Vector3(0.75, 1.0, 0.75), "Gloss")
+	var tip := LowPoly.add_mesh(visual, LowPoly.box(Vector3(0.07, 0.07, 0.07)), bright_gold, Vector3(0.0, 1.38, 0.0), Vector3.ZERO, Vector3.ONE, "Tip")
 	bomb.register_glow(tip)
 	return 1.82
 
@@ -181,18 +171,18 @@ static func _build_neon_warhead(visual: Node3D, bomb: Bomb) -> float:
 	var magenta := LowPoly.material(Color("#C03A9A"), 0.25, 0.32)
 	var purple := LowPoly.material(Color("#5A1FA0"), 0.3, 0.4)
 	var cyan := LowPoly.material(Color("#4FE0FF"), 0.0, 0.25, Color("#4FE0FF"), 2.6, true)
-	var glow_disc_mat := LowPoly.material_unique(Color("#4FE0FF"), Color("#4FE0FF"), 1.4, true, 0.32)
+	var glow_disc_mat := LowPoly.material(Color("#4FE0FF"), 0.0, 0.25, Color("#4FE0FF"), 1.4, true, 0.32)
 
 	LowPoly.add_mesh(visual, LowPoly.capsule(0.29, 0.90, 12, 5), pink, Vector3(0.0, 0.52, 0.0), Vector3.ZERO, Vector3.ONE, "Body")
-	LowPoly.add_mesh(visual, LowPoly.cylinder(0.0, 0.30, 0.36, 12), magenta, Vector3(0.0, 1.15, 0.0), Vector3.ZERO, Vector3.ONE, "Nose")
-	var stripe_a := LowPoly.add_mesh(visual, LowPoly.torus(0.295, 0.028, 16, 5), cyan, Vector3(0.0, 0.43, 0.0), Vector3.ZERO, Vector3.ONE, "StripeA")
+	LowPoly.add_mesh(visual, LowPoly.cylinder(0.0, 0.30, 0.36, 6), magenta, Vector3(0.0, 1.15, 0.0), Vector3.ZERO, Vector3.ONE, "Nose")
+	var stripe_a := LowPoly.add_mesh(visual, LowPoly.torus(0.295, 0.028, 6, 3), cyan, Vector3(0.0, 0.43, 0.0), Vector3.ZERO, Vector3.ONE, "StripeA")
 	bomb.register_glow(stripe_a)
-	var stripe_b := LowPoly.add_mesh(visual, LowPoly.torus(0.282, 0.024, 16, 5), cyan, Vector3(0.0, 0.63, 0.0), Vector3.ZERO, Vector3.ONE, "StripeB")
+	var stripe_b := LowPoly.add_mesh(visual, LowPoly.torus(0.282, 0.024, 6, 3), cyan, Vector3(0.0, 0.63, 0.0), Vector3.ZERO, Vector3.ONE, "StripeB")
 	bomb.register_glow(stripe_b)
-	var cockpit := LowPoly.add_mesh(visual, LowPoly.sphere(0.085, 8, 5), cyan, Vector3(0.20, 0.80, 0.20), Vector3.ZERO, Vector3(1.0, 0.8, 1.0), "Cockpit")
+	var cockpit := LowPoly.add_mesh(visual, LowPoly.sphere(0.085, 4, 2), cyan, Vector3(0.20, 0.80, 0.20), Vector3.ZERO, Vector3(1.0, 0.8, 1.0), "Cockpit")
 	bomb.register_glow(cockpit)
-	for i in range(4):
-		var angle := float(i) * 90.0 + 45.0
+	for i in range(2):
+		var angle := float(i) * 180.0
 		var rad := deg_to_rad(angle)
 		LowPoly.add_mesh(
 			visual,
@@ -203,14 +193,14 @@ static func _build_neon_warhead(visual: Node3D, bomb: Bomb) -> float:
 			Vector3.ONE,
 			"Fin%d" % i
 		)
-	LowPoly.add_mesh(visual, LowPoly.cylinder(0.56, 0.56, 0.025, 20), glow_disc_mat, Vector3(0.0, 0.03, 0.0), Vector3.ZERO, Vector3.ONE, "GlowDisc")
+	LowPoly.add_mesh(visual, LowPoly.cylinder(0.56, 0.56, 0.025, 6), glow_disc_mat, Vector3(0.0, 0.03, 0.0), Vector3.ZERO, Vector3.ONE, "GlowDisc")
 
 	var orbit := Node3D.new()
 	orbit.name = "OrbitLights"
 	orbit.position = Vector3(0.0, 0.58, 0.0)
 	visual.add_child(orbit)
-	LowPoly.add_mesh(orbit, LowPoly.sphere(0.055, 6, 4), cyan, Vector3(0.54, 0.0, 0.0), Vector3.ZERO, Vector3.ONE, "LightA")
-	LowPoly.add_mesh(orbit, LowPoly.sphere(0.055, 6, 4), cyan, Vector3(-0.54, 0.0, 0.0), Vector3.ZERO, Vector3.ONE, "LightB")
+	LowPoly.add_mesh(orbit, LowPoly.box(Vector3(0.09, 0.09, 0.09)), cyan, Vector3(0.54, 0.0, 0.0), Vector3.ZERO, Vector3.ONE, "LightA")
+	LowPoly.add_mesh(orbit, LowPoly.box(Vector3(0.09, 0.09, 0.09)), cyan, Vector3(-0.54, 0.0, 0.0), Vector3.ZERO, Vector3.ONE, "LightB")
 	bomb.register_spinner(orbit, Vector3(0.0, 1.0, 0.0), 1.15)
 	return 1.82
 
@@ -222,7 +212,7 @@ static func _build_ion(visual: Node3D, bomb: Bomb) -> float:
 	var ring_mat := LowPoly.material(Color("#5AE0FF"), 0.0, 0.2, Color("#5AE0FF"), 2.7, true)
 	var core_mat := LowPoly.material(Color("#EAFBFF"), 0.0, 0.15, Color("#5AE0FF"), 3.2, true)
 	LowPoly.add_mesh(visual, LowPoly.sphere(0.36, 12, 6), chrome, Vector3(0.0, 0.55, 0.0), Vector3.ZERO, Vector3.ONE, "ChromeCore")
-	var core := LowPoly.add_mesh(visual, LowPoly.sphere(0.13, 8, 4), core_mat, Vector3(0.0, 0.55, 0.0), Vector3.ZERO, Vector3.ONE, "IonCore")
+	var core := LowPoly.add_mesh(visual, LowPoly.sphere(0.13, 4, 2), core_mat, Vector3(0.0, 0.55, 0.0), Vector3.ZERO, Vector3.ONE, "IonCore")
 	bomb.register_glow(core)
 
 	for i in range(3):
@@ -302,8 +292,8 @@ static func _build_antimatter(visual: Node3D, bomb: Bomb) -> float:
 	swirl.name = "Swirl"
 	swirl.position = Vector3(0.0, 0.55, 0.0)
 	visual.add_child(swirl)
-	for i in range(8):
-		var angle := float(i) * TAU / 8.0
+	for i in range(6):
+		var angle := float(i) * TAU / 6.0
 		LowPoly.add_mesh(
 			swirl,
 			LowPoly.box(Vector3(0.055, 0.055, 0.055)),
@@ -324,14 +314,14 @@ static func _build_solar_flare(visual: Node3D, bomb: Bomb) -> float:
 	var flame_mat := LowPoly.material(Color("#FF6A3D"), 0.0, 0.3, Color("#FF6A3D"), 2.2, true)
 	var bright := LowPoly.material(Color("#FFF3B0"), 0.0, 0.2, Color("#FFF3B0"), 3.0, true)
 	LowPoly.add_mesh(visual, LowPoly.sphere(0.45, 12, 6), sun_mat, Vector3(0.0, 0.55, 0.0), Vector3.ZERO, Vector3.ONE, "Sun")
-	var core := LowPoly.add_mesh(visual, LowPoly.sphere(0.18, 8, 4), bright, Vector3(0.0, 0.55, 0.0), Vector3.ZERO, Vector3.ONE, "SolarCore")
+	var core := LowPoly.add_mesh(visual, LowPoly.sphere(0.18, 4, 2), bright, Vector3(0.0, 0.55, 0.0), Vector3.ZERO, Vector3.ONE, "SolarCore")
 	bomb.register_glow(core)
 	var corona := Node3D.new()
 	corona.name = "Corona"
 	corona.position = Vector3(0.0, 0.55, 0.0)
 	visual.add_child(corona)
-	for i in range(8):
-		var angle := float(i) * TAU / 8.0
+	for i in range(6):
+		var angle := float(i) * TAU / 6.0
 		var height := 0.38 if i % 2 == 0 else 0.26
 		LowPoly.add_mesh(
 			corona,
@@ -430,7 +420,7 @@ static func _build_star_core(visual: Node3D, bomb: Bomb) -> float:
 		)
 		bomb.register_glow(beam)
 	bomb.register_spinner(beams, Vector3(0.0, 1.0, 0.0), 0.45)
-	var core := LowPoly.add_mesh(visual, LowPoly.sphere(0.15, 8, 4), star_mat, Vector3(0.0, 0.55, 0.0), Vector3.ZERO, Vector3.ONE, "StarCore")
+	var core := LowPoly.add_mesh(visual, LowPoly.sphere(0.15, 4, 2), star_mat, Vector3(0.0, 0.55, 0.0), Vector3.ZERO, Vector3.ONE, "StarCore")
 	bomb.register_glow(core)
 
 	var orbit := Node3D.new()
@@ -444,7 +434,7 @@ static func _build_star_core(visual: Node3D, bomb: Bomb) -> float:
 		var planet_mat := LowPoly.material(pcol, 0.15, 0.35, pcol, 0.6)
 		LowPoly.add_mesh(
 			orbit,
-			LowPoly.sphere(0.075, 6, 3),
+			LowPoly.sphere(0.075, 4, 2),
 			planet_mat,
 			Vector3(radii[i], 0.05 * float(i - 1), 0.0),
 			Vector3.ZERO,
@@ -472,8 +462,8 @@ static func _build_galaxy(visual: Node3D, bomb: Bomb) -> float:
 		LowPoly.material(Color("#FF7AD9"), 0.0, 0.2, Color("#FF7AD9"), 2.2, true),
 		LowPoly.material(Color("#6AD7FF"), 0.0, 0.2, Color("#6AD7FF"), 2.2, true),
 	]
-	for i in range(12):
-		var t := float(i) / 11.0
+	for i in range(10):
+		var t := float(i) / 9.0
 		var radius := 0.06 + t * 0.40
 		var angle := t * 2.15 * TAU
 		var surface_y := sqrt(maxf(0.2304 - radius * radius, 0.0))
@@ -502,8 +492,8 @@ static func _build_omega(visual: Node3D, bomb: Bomb) -> float:
 	var gold := LowPoly.material(Color("#FFC83D"), 0.0, 0.2, Color("#FFC83D"), 2.6, true)
 	var cyan := LowPoly.material(Color("#4FE0FF"), 0.0, 0.2, Color("#4FE0FF"), 2.4, true)
 	var core_mat := LowPoly.material_unique(Color("#FFFFFF"), Color("#FFC83D"), 3.8, true)
-	LowPoly.add_mesh(visual, LowPoly.sphere(0.62, 10, 5), haze, Vector3(0.0, 0.58, 0.0), Vector3.ZERO, Vector3.ONE, "OmegaHaze")
-	var core := LowPoly.add_mesh(visual, LowPoly.sphere(0.40, 12, 6), core_mat, Vector3(0.0, 0.58, 0.0), Vector3.ZERO, Vector3.ONE, "OmegaCore")
+	LowPoly.add_mesh(visual, LowPoly.sphere(0.62, 6, 3), haze, Vector3(0.0, 0.58, 0.0), Vector3.ZERO, Vector3.ONE, "OmegaHaze")
+	var core := LowPoly.add_mesh(visual, LowPoly.sphere(0.40, 6, 3), core_mat, Vector3(0.0, 0.58, 0.0), Vector3.ZERO, Vector3.ONE, "OmegaCore")
 	bomb.register_hue_material(core_mat)
 	bomb.register_glow(core)
 
@@ -520,7 +510,7 @@ static func _build_omega(visual: Node3D, bomb: Bomb) -> float:
 		visual.add_child(pivot)
 		var ring := LowPoly.add_mesh(
 			pivot,
-			LowPoly.torus(float(def["radius"]), 0.024, 12, 4),
+			LowPoly.torus(float(def["radius"]), 0.024, 6, 3),
 			def["mat"] as Material,
 			Vector3.ZERO,
 			def["rot"] as Vector3,
@@ -534,8 +524,8 @@ static func _build_omega(visual: Node3D, bomb: Bomb) -> float:
 	crown.name = "CrownBlocks"
 	crown.position = Vector3(0.0, 1.22, 0.0)
 	visual.add_child(crown)
-	for i in range(8):
-		var angle := float(i) * TAU / 8.0
+	for i in range(6):
+		var angle := float(i) * TAU / 6.0
 		var block := LowPoly.add_mesh(
 			crown,
 			LowPoly.box(Vector3(0.10, 0.16, 0.10)),

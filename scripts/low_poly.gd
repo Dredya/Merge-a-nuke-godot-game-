@@ -19,6 +19,9 @@ static func clear_cache() -> void:
 # --- Meshes -----------------------------------------------------------------
 
 static func sphere(radius: float, segments: int = 10, rings: int = 6, hemisphere: bool = false) -> SphereMesh:
+	# Cap tessellation for the mobile triangle budget; the chunky look is intentional.
+	segments = mini(segments, 8)
+	rings = mini(rings, 3 if hemisphere else 4)
 	var key := "sph_%.4f_%d_%d_%s" % [radius, segments, rings, str(hemisphere)]
 	if _mesh_cache.has(key):
 		return _mesh_cache[key] as SphereMesh
@@ -32,7 +35,9 @@ static func sphere(radius: float, segments: int = 10, rings: int = 6, hemisphere
 	return mesh
 
 
-static func cylinder(top_radius: float, bottom_radius: float, height: float, segments: int = 10) -> CylinderMesh:
+static func cylinder(top_radius: float, bottom_radius: float, height: float, segments: int = 10, cap_tessellation: bool = true) -> CylinderMesh:
+	if cap_tessellation:
+		segments = mini(segments, 8)
 	var key := "cyl_%.4f_%.4f_%.4f_%d" % [top_radius, bottom_radius, height, segments]
 	if _mesh_cache.has(key):
 		return _mesh_cache[key] as CylinderMesh
@@ -47,6 +52,8 @@ static func cylinder(top_radius: float, bottom_radius: float, height: float, seg
 
 
 static func capsule(radius: float, height: float, segments: int = 10, rings: int = 5) -> CapsuleMesh:
+	segments = mini(segments, 6)
+	rings = mini(rings, 2)
 	var key := "cap_%.4f_%.4f_%d_%d" % [radius, height, segments, rings]
 	if _mesh_cache.has(key):
 		return _mesh_cache[key] as CapsuleMesh
@@ -80,6 +87,8 @@ static func prism(size: Vector3) -> PrismMesh:
 
 
 static func torus(ring_radius: float, tube_radius: float, rings: int = 10, ring_segments: int = 6) -> TorusMesh:
+	rings = mini(rings, 8)
+	ring_segments = mini(ring_segments, 3)
 	var key := "tor_%.4f_%.4f_%d_%d" % [ring_radius, tube_radius, rings, ring_segments]
 	if _mesh_cache.has(key):
 		return _mesh_cache[key] as TorusMesh
@@ -180,7 +189,7 @@ static func blob_shadow(radius: float = 0.5) -> MeshInstance3D:
 	var mat := material(Color(0.01, 0.02, 0.04, 0.26), 0.0, 1.0, Color.BLACK, 0.0, true, 0.26)
 	var disc := MeshInstance3D.new()
 	disc.name = "BlobShadow"
-	disc.mesh = cylinder(radius, radius, 0.012, 12)
+	disc.mesh = cylinder(radius, radius, 0.012, 6)
 	disc.material_override = mat
 	disc.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	return disc
@@ -206,7 +215,7 @@ static func create_environment(glow_enabled: bool = true) -> WorldEnvironment:
 	env.sky = sky
 	env.ambient_light_source = Environment.AMBIENT_SOURCE_SKY
 	env.ambient_light_energy = 0.55
-	env.reflected_light_source = Environment.REFLECTION_SOURCE_SKY
+	env.reflected_light_source = Environment.REFLECTION_SOURCE_SKY if glow_enabled else Environment.REFLECTION_SOURCE_DISABLED
 	env.tonemap_mode = Environment.TONE_MAPPER_FILMIC
 	env.tonemap_white = 2.4
 	env.glow_enabled = glow_enabled

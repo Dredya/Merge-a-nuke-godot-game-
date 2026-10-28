@@ -45,7 +45,7 @@ func setup(quality_low: bool = false) -> void:
 
 func _build_ground() -> void:
 	var ground := MeshInstance3D.new()
-	ground.mesh = LowPoly.cylinder(11.0, 10.4, 1.8, 28)
+	ground.mesh = LowPoly.cylinder(11.0, 10.4, 1.8, 28, false)
 	ground.material_override = LowPoly.material(Color("#9BE08A"), 0.0, 0.95)
 	ground.position = Vector3(0.0, -2.4, 0.0)
 	ground.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF

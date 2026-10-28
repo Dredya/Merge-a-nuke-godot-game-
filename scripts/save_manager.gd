@@ -4,6 +4,7 @@ extends Node
 
 const SAVE_PATH := "user://save.json"
 const SAVE_VERSION := 1
+const MIN_OFFLINE_SECONDS := 60.0
 
 signal offline_earnings_ready(amount: float)
 
@@ -139,7 +140,7 @@ func load_save() -> void:
 			elapsed = 0.0
 		var income := GameState.income_per_second_total() * Economy.income_multiplier
 		var amount := elapsed * income
-		if amount > 0.0:
+		if elapsed >= MIN_OFFLINE_SECONDS and amount > 0.0:
 			pending_offline = amount
 			pending_offline_seconds = elapsed
 			offline_earnings_ready.emit(amount)
@@ -158,7 +159,7 @@ func _handle_resume() -> void:
 		elapsed = 0.0
 	var income := GameState.income_per_second_total() * Economy.income_multiplier
 	var amount := elapsed * income
-	if amount > 0.0:
+	if elapsed >= MIN_OFFLINE_SECONDS and amount > 0.0:
 		pending_offline = amount
 		pending_offline_seconds = elapsed
 		offline_earnings_ready.emit(amount)

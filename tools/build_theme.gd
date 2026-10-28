@@ -70,16 +70,16 @@ func _apply_panels(theme: Theme) -> void:
 	theme.set_stylebox("panel", "PanelContainer", base)
 
 	theme.set_type_variation("PanelHud", "PanelContainer")
-	theme.set_stylebox("panel", "PanelHud", _panel(Color(C_NAVY.r, C_NAVY.g, C_NAVY.b, 0.92), 3, C_NAVY_DEEP, 16, 18))
+	theme.set_stylebox("panel", "PanelHud", _panel(Color(C_NAVY.r, C_NAVY.g, C_NAVY.b, 0.92), 3, C_NAVY_DEEP, 14, 18))
 
 	theme.set_type_variation("PanelCard", "PanelContainer")
-	theme.set_stylebox("panel", "PanelCard", _panel(Color(C_NAVY_LIGHT.r, C_NAVY_LIGHT.g, C_NAVY_LIGHT.b, 0.92), 3, C_NAVY_DEEP, 12, 14))
+	theme.set_stylebox("panel", "PanelCard", _panel(Color(C_NAVY_LIGHT.r, C_NAVY_LIGHT.g, C_NAVY_LIGHT.b, 0.92), 3, C_NAVY_DEEP, 14, 14))
 
 	theme.set_type_variation("PanelPopup", "PanelContainer")
-	theme.set_stylebox("panel", "PanelPopup", _panel(Color(C_NAVY.r, C_NAVY.g, C_NAVY.b, 0.98), 3, C_NAVY_DEEP, 20, 26))
+	theme.set_stylebox("panel", "PanelPopup", _panel(Color(C_NAVY.r, C_NAVY.g, C_NAVY.b, 0.96), 3, C_NAVY_DEEP, 14, 26))
 
 	theme.set_type_variation("PanelLock", "PanelContainer")
-	theme.set_stylebox("panel", "PanelLock", _panel(C_NAVY_DEEP, 3, C_BLUE_BRIGHT, 12, 12))
+	theme.set_stylebox("panel", "PanelLock", _panel(C_NAVY_DEEP, 3, C_BLUE_BRIGHT, 14, 12))
 
 	theme.set_type_variation("PanelNav", "PanelContainer")
 	var nav := _panel(Color(C_NAVY_DEEP.r, C_NAVY_DEEP.g, C_NAVY_DEEP.b, 0.98), 0, Color.TRANSPARENT, 0, 4)
