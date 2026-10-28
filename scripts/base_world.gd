@@ -178,10 +178,10 @@ func _build_highlight() -> void:
 func _build_clouds() -> void:
 	var cloud_mat := LowPoly.material(Color(1.0, 1.0, 1.0, 0.92), 0.0, 1.0, Color.WHITE, 0.15, true, 0.92)
 	var cloud_defs: Array[Dictionary] = [
-		{"pos": Vector3(-7.0, 6.4, -2.5), "scale": 1.35, "speed": 0.20},
-		{"pos": Vector3(2.5, 7.2, 4.0), "scale": 1.0, "speed": 0.14},
-		{"pos": Vector3(8.0, 5.8, -7.5), "scale": 0.85, "speed": 0.10},
-		{"pos": Vector3(-10.0, 8.0, 6.0), "scale": 1.2, "speed": 0.16},
+		{"pos": Vector3(-10.0, 15.5, -6.0), "scale": 1.35, "speed": 0.20},
+		{"pos": Vector3(3.0, 17.0, 2.0), "scale": 1.0, "speed": 0.14},
+		{"pos": Vector3(9.0, 14.5, -9.0), "scale": 0.85, "speed": 0.10},
+		{"pos": Vector3(-12.0, 16.5, 5.0), "scale": 1.2, "speed": 0.16},
 	]
 	for def in cloud_defs:
 		var cloud := Node3D.new()

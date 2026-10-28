@@ -11,22 +11,10 @@ config_version=5
 [application]
 
 config/name="Merge a nuke"
-config/features=PackedStringArray("4.7", "Mobile")
-config/icon="res://assets/icon.png"
 run/main_scene="res://scenes/main.tscn"
-boot_splash/show_image=true
+config/features=PackedStringArray("4.7", "Mobile")
 boot_splash/image="res://assets/splash.png"
-
-[display]
-
-window/size/viewport_width=1080
-window/size/viewport_height=1920
-window/stretch/mode="canvas_items"
-window/stretch/aspect="expand"
-
-[input_devices]
-
-pointing/emulate_mouse_from_touch=true
+config/icon="res://assets/icon.png"
 
 [autoload]
 
@@ -41,6 +29,18 @@ CodeManager="*res://scripts/code_manager.gd"
 DailyRewardManager="*res://scripts/daily_reward_manager.gd"
 MissionManager="*res://scripts/mission_manager.gd"
 EventManager="*res://scripts/event_manager.gd"
+
+[display]
+
+window/size/viewport_width=1080
+window/size/viewport_height=1920
+window/stretch/mode="canvas_items"
+window/stretch/aspect="expand"
+window/handheld/orientation=1
+
+[input_devices]
+
+pointing/emulate_mouse_from_touch=true
 
 [editor_plugins]
 

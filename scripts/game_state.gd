@@ -53,8 +53,12 @@ func _load_tiers() -> void:
 		t.tier = int(entry.get("tier", 0))
 		t.name = str(entry.get("name", ""))
 		t.color = Color.html(str(entry.get("color", "#ffffff")))
+		t.color_secondary = Color.html(str(entry.get("color_secondary", entry.get("color", "#ffffff"))))
+		t.color_accent = Color.html(str(entry.get("color_accent", entry.get("color", "#ffffff"))))
+		t.glow_color = Color.html(str(entry.get("glow_color", entry.get("color", "#ffffff"))))
 		t.income_per_sec = float(entry.get("income_per_sec", 0.0))
 		t.buy_cost = int(entry.get("buy_cost", 0))
+		t.build_id = str(entry.get("build_id", "classic"))
 		tiers.append(t)
 
 
