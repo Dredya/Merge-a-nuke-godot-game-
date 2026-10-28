@@ -39,5 +39,5 @@ Update this list after every phase (mark `[x]` when complete).
 - [x] Phase 9 - Polish and performance: tutorial overlay, null/edge-case review, pooled nodes, pause/resume handling, icon/splash/app name. (Android export pending real device)
 
 ## Notes
-- Gameplay is intentionally **not** implemented yet; only setup is complete.
+- All planned phases (0-9) are implemented; Android export and real-device testing remain.
 - Use original names, art, and audio only.
