@@ -308,3 +308,69 @@ custom_minimum_size = Vector2(0, 82)
 layout_mode = 2
 theme_type_variation = &"GreenButton"
 text = "CLAIM"
+
+[node name="OfflinePopup" type="Control" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Dim" type="ColorRect" parent="OfflinePopup"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.0156863, 0.0235294, 0.0588235, 0.78)
+
+[node name="Center" type="CenterContainer" parent="OfflinePopup"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="PanelContainer" parent="OfflinePopup/Center"]
+custom_minimum_size = Vector2(780, 0)
+layout_mode = 2
+theme_type_variation = &"PanelPopup"
+
+[node name="Box" type="VBoxContainer" parent="OfflinePopup/Center/Panel"]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="Title" type="Label" parent="OfflinePopup/Center/Panel/Box"]
+layout_mode = 2
+theme_type_variation = &"TitleLabel"
+text = "WELCOME BACK!"
+horizontal_alignment = 1
+
+[node name="OfflineTime" type="Label" parent="OfflinePopup/Center/Panel/Box"]
+layout_mode = 2
+theme_type_variation = &"WhiteLabel"
+text = "Your nukes worked for 5h 12m"
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="OfflineAmount" type="Label" parent="OfflinePopup/Center/Panel/Box"]
+layout_mode = 2
+theme_type_variation = &"BigGold"
+text = "+$2.4M"
+horizontal_alignment = 1
+
+[node name="ClaimX2Button" type="Button" parent="OfflinePopup/Center/Panel/Box"]
+custom_minimum_size = Vector2(0, 92)
+layout_mode = 2
+theme_type_variation = &"GreenButton"
+text = "Claim x2  (watch ad)"
+
+[node name="ClaimButton" type="Button" parent="OfflinePopup/Center/Panel/Box"]
+custom_minimum_size = Vector2(0, 76)
+layout_mode = 2
+theme_type_variation = &"BlueButton"
+text = "Claim"

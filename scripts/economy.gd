@@ -140,10 +140,24 @@ func format_number(value: float) -> String:
 	if idx == 0:
 		return str(int(v))
 	if v < 10.0:
-		return "%.2f%s" % [v, suffixes[idx]]
+		return _trim_decimal("%.2f%s" % [v, suffixes[idx]])
 	if v < 100.0:
-		return "%.1f%s" % [v, suffixes[idx]]
+		return _trim_decimal("%.1f%s" % [v, suffixes[idx]])
 	return "%.0f%s" % [v, suffixes[idx]]
+
+
+func _trim_decimal(text: String) -> String:
+	var suffix := ""
+	for i in range(text.length()):
+		var ch := text.substr(i, 1)
+		if ch < "0" or ch > "9":
+			if ch == ".":
+				continue
+			suffix = text.substr(i)
+			text = text.substr(0, i)
+			break
+	text = text.rstrip("0").rstrip(".")
+	return text + suffix
 
 
 func set_event_multiplier(value: float) -> void:

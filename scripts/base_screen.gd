@@ -31,6 +31,11 @@ const LOCK_COOLDOWN := 300.0
 @onready var daily_day_label: Label = $DailyPopup/Center/Panel/Box/DayLabel
 @onready var daily_amount_label: Label = $DailyPopup/Center/Panel/Box/AmountLabel
 @onready var claim_daily_button: Button = $DailyPopup/Center/Panel/Box/ClaimDailyButton
+@onready var offline_popup: Control = $OfflinePopup
+@onready var offline_time_label: Label = $OfflinePopup/Center/Panel/Box/OfflineTime
+@onready var offline_amount_label: Label = $OfflinePopup/Center/Panel/Box/OfflineAmount
+@onready var claim_x2_button: Button = $OfflinePopup/Center/Panel/Box/ClaimX2Button
+@onready var claim_button: Button = $OfflinePopup/Center/Panel/Box/ClaimButton
 
 var world: BaseWorld
 var slot_bombs: Array[Bomb] = []
@@ -89,10 +94,13 @@ func _ready() -> void:
 	lock_button.pressed.connect(_on_lock_pressed)
 	claim_daily_button.pressed.connect(_on_claim_daily)
 	tutorial_next_button.pressed.connect(_on_tutorial_next)
+	claim_x2_button.pressed.connect(_on_claim_offline_x2)
+	claim_button.pressed.connect(func(): _claim_offline(1))
 	GameState.slots_changed.connect(_on_slots_changed)
 	GameState.cash_changed.connect(func(_cash): _update_hud())
 	Economy.income_granted.connect(_on_income_granted)
 	DailyRewardManager.daily_reward_available.connect(_on_daily_reward_available)
+	SaveManager.offline_earnings_ready.connect(_on_offline_ready)
 	EventManager.event_changed.connect(func(_event): _update_event_banner())
 
 	_auto_timer = Timer.new()
@@ -110,11 +118,11 @@ func _ready() -> void:
 	_update_hud()
 	_update_event_banner()
 	if GameState.tutorial_completed:
-		_check_pending_daily()
+		_check_pending_popups()
 	else:
 		_tutorial_step = 0
 		_show_tutorial_step()
-	get_tree().create_timer(0.6).timeout.connect(_check_pending_daily)
+	get_tree().create_timer(0.6).timeout.connect(_check_pending_popups)
 
 
 func _sync_viewport_size() -> void:
@@ -697,7 +705,7 @@ func _show_tutorial_step() -> void:
 		tutorial_popup.visible = false
 		GameState.tutorial_completed = true
 		SaveManager.save()
-		_check_pending_daily()
+		_check_pending_popups()
 
 
 func _on_tutorial_next() -> void:
@@ -707,13 +715,74 @@ func _on_tutorial_next() -> void:
 
 func _on_daily_reward_available(day: int, amount: float) -> void:
 	_pending_daily = {"day": day, "amount": amount}
-	if tutorial_popup.visible or _daily_popup_shown:
+	if tutorial_popup.visible or offline_popup.visible or _daily_popup_shown:
 		return
 	_show_daily(day, amount)
 
 
+func _check_pending_popups() -> void:
+	if not GameState.tutorial_completed:
+		return
+	if SaveManager.pending_offline > 0.0 and not offline_popup.visible:
+		_show_offline()
+		return
+	if offline_popup.visible:
+		return
+	_check_pending_daily()
+
+
+func _on_offline_ready(amount: float) -> void:
+	if amount <= 0.0:
+		return
+	if not GameState.tutorial_completed:
+		return
+	_show_offline()
+
+
+func _show_offline() -> void:
+	if SaveManager.pending_offline <= 0.0:
+		return
+	offline_amount_label.text = "+$" + Economy.format_number(SaveManager.pending_offline)
+	var duration := _format_duration(SaveManager.pending_offline_seconds)
+	offline_time_label.text = "Your nukes worked for %s" % duration
+	offline_popup.visible = true
+	if daily_popup.visible:
+		daily_popup.visible = false
+		_daily_popup_shown = false
+
+
+func _on_claim_offline_x2() -> void:
+	AdService.show_rewarded_ad()
+	_claim_offline(2)
+
+
+func _claim_offline(multiplier: int) -> void:
+	var amount := SaveManager.pending_offline
+	offline_popup.visible = false
+	if amount <= 0.0:
+		_check_pending_popups()
+		return
+	GameState.add_cash(amount * float(multiplier))
+	SaveManager.pending_offline = 0.0
+	SaveManager.pending_offline_seconds = 0.0
+	SaveManager.save()
+	GameState.cash_changed.emit(GameState.cash)
+	_update_hud()
+	AudioManager.play_sfx("claim")
+	_check_pending_popups()
+
+
+func _format_duration(seconds: float) -> String:
+	var total := int(maxf(seconds, 0.0))
+	if total >= 3600:
+		return "%dh %dm" % [total / 3600, (total % 3600) / 60]
+	if total >= 60:
+		return "%dm" % [total / 60]
+	return "%ds" % total
+
+
 func _check_pending_daily() -> void:
-	if _daily_popup_shown or daily_popup.visible or tutorial_popup.visible:
+	if _daily_popup_shown or daily_popup.visible or tutorial_popup.visible or offline_popup.visible:
 		return
 	if not GameState.tutorial_completed:
 		return

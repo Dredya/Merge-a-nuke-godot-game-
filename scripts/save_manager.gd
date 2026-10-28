@@ -8,6 +8,7 @@ const SAVE_VERSION := 1
 signal offline_earnings_ready(amount: float)
 
 var pending_offline: float = 0.0
+var pending_offline_seconds: float = 0.0
 var _last_save_time: float = 0.0
 var _autosave_timer: Timer
 
@@ -140,6 +141,7 @@ func load_save() -> void:
 		var amount := elapsed * income
 		if amount > 0.0:
 			pending_offline = amount
+			pending_offline_seconds = elapsed
 			offline_earnings_ready.emit(amount)
 
 
@@ -158,5 +160,6 @@ func _handle_resume() -> void:
 	var amount := elapsed * income
 	if amount > 0.0:
 		pending_offline = amount
+		pending_offline_seconds = elapsed
 		offline_earnings_ready.emit(amount)
 	_last_save_time = now
