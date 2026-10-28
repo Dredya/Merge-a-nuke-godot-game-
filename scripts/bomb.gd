@@ -10,6 +10,7 @@ var low_quality: bool = false
 var _bob: Node3D
 var _glow_nodes: Array[Dictionary] = []
 var _spinners: Array[Dictionary] = []
+var _vortexes: Array[Dictionary] = []
 var _hue_materials: Array[StandardMaterial3D] = []
 var _shadow: Node3D
 var _time: float = 0.0
@@ -49,6 +50,24 @@ func register_hue_material(mat: StandardMaterial3D) -> void:
 		_hue_materials.append(mat)
 
 
+func register_vortex(node: Node3D, radius: float, height: float, speed: float) -> void:
+	if node == null:
+		return
+	var dots: Array[Node3D] = []
+	var count := node.get_child_count()
+	for i in range(count):
+		var child := node.get_child(i) as Node3D
+		if child != null:
+			dots.append(child)
+	_vortexes.append({
+		"node": node,
+		"radius": radius,
+		"height": height,
+		"speed": speed,
+		"dots": dots,
+	})
+
+
 func _ready() -> void:
 	_bob = get_node_or_null("Bob") as Node3D
 	_start_idle()
@@ -84,6 +103,22 @@ func _process(delta: float) -> void:
 		var node := item["node"] as Node3D
 		if node != null:
 			node.rotate(item["axis"] as Vector3, float(item["speed"]) * delta)
+	for item in _vortexes:
+		var dots: Array = item["dots"]
+		var base_radius := float(item["radius"])
+		var height := float(item["height"])
+		var speed := float(item["speed"])
+		var count := dots.size()
+		for i in range(count):
+			var dot := dots[i] as Node3D
+			if dot == null:
+				continue
+			var phase := float(i) / float(max(count, 1))
+			var local_t := fmod(_time * speed + phase, 1.0)
+			var angle := _time * speed * 3.0 + phase * TAU
+			var radius := base_radius * (1.0 - local_t * 0.86)
+			dot.position = Vector3(cos(angle) * radius, height * (1.0 - local_t) - height * 0.4, sin(angle) * radius)
+			dot.scale = Vector3.ONE * (0.35 + 0.65 * (1.0 - local_t))
 	if not _hue_materials.is_empty():
 		var hue := fmod(_time * 0.07, 1.0)
 		for mat in _hue_materials:

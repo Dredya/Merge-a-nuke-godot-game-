@@ -42,8 +42,24 @@ static func build(tier: int, low_quality: bool = false) -> Bomb:
 			label_height = _build_plasma(visual, bomb)
 		6:
 			label_height = _build_neon_warhead(visual, bomb)
+		7:
+			label_height = _build_ion(visual, bomb)
+		8:
+			label_height = _build_crystal(visual, bomb)
+		9:
+			label_height = _build_antimatter(visual, bomb)
+		10:
+			label_height = _build_solar_flare(visual, bomb)
+		11:
+			label_height = _build_void(visual, bomb)
+		12:
+			label_height = _build_quantum(visual, bomb)
+		13:
+			label_height = _build_star_core(visual, bomb)
+		14:
+			label_height = _build_galaxy(visual, bomb)
 		_:
-			label_height = _build_placeholder(visual, bomb, tier)
+			label_height = _build_omega(visual, bomb)
 
 	_add_label(bob, tier, label_height)
 	bomb.setup(tier, low_quality)
@@ -199,21 +215,342 @@ static func _build_neon_warhead(visual: Node3D, bomb: Bomb) -> float:
 	return 1.82
 
 
-# --- Placeholders for tiers 7-15 (replaced in step 3) -----------------------
+# --- Tier 7: Ion ------------------------------------------------------------
 
-static func _build_placeholder(visual: Node3D, bomb: Bomb, tier: int) -> float:
-	var colors := [
-		Color("#D7E3FF"), Color("#4FC3F7"), Color("#C77DFF"), Color("#FFB300"),
-		Color("#7A4BFF"), Color("#8A2BE2"), Color("#FFE082"), Color("#8F7CFF"), Color("#FFFFFF"),
-	]
-	var col: Color = colors[clampi(tier - 7, 0, colors.size() - 1)]
-	var body_mat := LowPoly.material(col, 0.5, 0.3)
-	var glow_mat := LowPoly.material(col, 0.0, 0.2, col, 2.5, true)
-	var radius := 0.46 + float(tier - 7) * 0.025
-	LowPoly.add_mesh(visual, LowPoly.sphere(radius, 12, 7), body_mat, Vector3(0.0, 0.52, 0.0), Vector3.ZERO, Vector3.ONE, "Body")
-	var ring := LowPoly.add_mesh(visual, LowPoly.torus(radius + 0.09, 0.035, 16, 5), glow_mat, Vector3(0.0, 0.52, 0.0), Vector3(20.0, 0.0, 30.0), Vector3.ONE, "Ring")
+static func _build_ion(visual: Node3D, bomb: Bomb) -> float:
+	var chrome := LowPoly.material(Color("#D7E3FF"), 1.0, 0.08)
+	var ring_mat := LowPoly.material(Color("#5AE0FF"), 0.0, 0.2, Color("#5AE0FF"), 2.7, true)
+	var core_mat := LowPoly.material(Color("#EAFBFF"), 0.0, 0.15, Color("#5AE0FF"), 3.2, true)
+	LowPoly.add_mesh(visual, LowPoly.sphere(0.36, 12, 6), chrome, Vector3(0.0, 0.55, 0.0), Vector3.ZERO, Vector3.ONE, "ChromeCore")
+	var core := LowPoly.add_mesh(visual, LowPoly.sphere(0.13, 8, 4), core_mat, Vector3(0.0, 0.55, 0.0), Vector3.ZERO, Vector3.ONE, "IonCore")
+	bomb.register_glow(core)
+
+	for i in range(3):
+		var spinner := Node3D.new()
+		spinner.name = "CageRing%d" % i
+		spinner.position = Vector3(0.0, 0.55, 0.0)
+		visual.add_child(spinner)
+		var ring_rot := Vector3.ZERO
+		var axis := Vector3.UP
+		var speed := 0.6
+		match i:
+			0:
+				ring_rot = Vector3.ZERO
+				axis = Vector3(0.0, 1.0, 0.0)
+				speed = 0.6
+			1:
+				ring_rot = Vector3(90.0, 0.0, 0.0)
+				axis = Vector3(0.0, 1.0, 0.0)
+				speed = -0.42
+			2:
+				ring_rot = Vector3(0.0, 0.0, 90.0)
+				axis = Vector3(1.0, 0.0, 0.0)
+				speed = 0.34
+		var ring := LowPoly.add_mesh(spinner, LowPoly.torus(0.62, 0.023, 14, 4), ring_mat, Vector3.ZERO, ring_rot, Vector3.ONE, "CageRing")
+		bomb.register_glow(ring)
+		bomb.register_spinner(spinner, axis, speed)
+	return 1.68
+
+
+# --- Tier 8: Crystal --------------------------------------------------------
+
+static func _build_crystal(visual: Node3D, bomb: Bomb) -> float:
+	var crystal := LowPoly.material(Color("#4FC3F7"), 0.2, 0.12, Color("#4FE0FF"), 0.55, false, 0.78, true)
+	var crystal_dark := LowPoly.material(Color("#1565C0"), 0.25, 0.15, Color("#1565C0"), 0.25, false, 0.8, true)
+	var core_mat := LowPoly.material(Color("#EAFBFF"), 0.0, 0.1, Color("#B3E5FC"), 3.5, true)
+	LowPoly.add_mesh(visual, LowPoly.cylinder(0.0, 0.22, 0.80, 6), crystal, Vector3(0.0, 0.68, 0.0), Vector3.ZERO, Vector3.ONE, "CrystalTip")
+	LowPoly.add_mesh(visual, LowPoly.cylinder(0.22, 0.22, 0.42, 6), crystal_dark, Vector3(0.0, 0.18, 0.0), Vector3.ZERO, Vector3.ONE, "CrystalBase")
+	var core := LowPoly.add_mesh(visual, LowPoly.sphere(0.15, 8, 4), core_mat, Vector3(0.0, 0.58, 0.0), Vector3.ZERO, Vector3.ONE, "CrystalCore")
+	bomb.register_glow(core)
+	# Side shards lean outward; the low-poly facets catch the light.
+	LowPoly.add_mesh(visual, LowPoly.prism(Vector3(0.28, 0.62, 0.28)), crystal, Vector3(-0.30, 0.34, -0.02), Vector3(12.0, 18.0, -28.0), Vector3.ONE, "ShardL")
+	LowPoly.add_mesh(visual, LowPoly.prism(Vector3(0.22, 0.46, 0.22)), crystal_dark, Vector3(0.31, 0.27, 0.08), Vector3(-10.0, -22.0, 24.0), Vector3.ONE, "ShardR")
+	LowPoly.add_mesh(visual, LowPoly.prism(Vector3(0.18, 0.38, 0.18)), crystal, Vector3(0.02, 0.24, -0.31), Vector3(24.0, 8.0, 12.0), Vector3.ONE, "ShardB")
+
+	var orbit := Node3D.new()
+	orbit.name = "FloatingShards"
+	orbit.position = Vector3(0.0, 0.62, 0.0)
+	visual.add_child(orbit)
+	for i in range(3):
+		var angle := float(i) * TAU / 3.0
+		var shard := LowPoly.add_mesh(
+			orbit,
+			LowPoly.prism(Vector3(0.12, 0.30, 0.12)),
+			crystal,
+			Vector3(cos(angle) * 0.64, 0.0, sin(angle) * 0.64),
+			Vector3(15.0, -rad_to_deg(angle), 20.0),
+			Vector3.ONE,
+			"FloatShard%d" % i
+		)
+		bomb.register_glow(shard)
+	bomb.register_spinner(orbit, Vector3(0.0, 1.0, 0.0), 0.5)
+	return 1.88
+
+
+# --- Tier 9: Antimatter -----------------------------------------------------
+
+static func _build_antimatter(visual: Node3D, bomb: Bomb) -> float:
+	var black := LowPoly.material(Color("#111111"), 0.15, 0.55)
+	var white := LowPoly.material(Color("#F5F5F5"), 0.15, 0.4)
+	var seam_mat := LowPoly.material(Color("#C77DFF"), 0.0, 0.2, Color("#C77DFF"), 3.0, true)
+	LowPoly.add_mesh(visual, LowPoly.sphere(0.45, 12, 4, true), white, Vector3(0.0, 0.595, 0.0), Vector3.ZERO, Vector3.ONE, "WhiteHalf")
+	LowPoly.add_mesh(visual, LowPoly.sphere(0.45, 12, 4, true), black, Vector3(0.0, 0.505, 0.0), Vector3(180.0, 0.0, 0.0), Vector3.ONE, "BlackHalf")
+	var seam := LowPoly.add_mesh(visual, LowPoly.torus(0.455, 0.032, 14, 4), seam_mat, Vector3(0.0, 0.55, 0.0), Vector3.ZERO, Vector3.ONE, "EnergySeam")
+	bomb.register_glow(seam)
+
+	var swirl := Node3D.new()
+	swirl.name = "Swirl"
+	swirl.position = Vector3(0.0, 0.55, 0.0)
+	visual.add_child(swirl)
+	for i in range(8):
+		var angle := float(i) * TAU / 8.0
+		LowPoly.add_mesh(
+			swirl,
+			LowPoly.box(Vector3(0.055, 0.055, 0.055)),
+			seam_mat,
+			Vector3(cos(angle) * 0.67, sin(angle * 2.0) * 0.16, sin(angle) * 0.67),
+			Vector3(0.0, -rad_to_deg(angle), 0.0),
+			Vector3.ONE,
+			"SwirlDot%d" % i
+		)
+	bomb.register_spinner(swirl, Vector3(0.0, 1.0, 0.0), 1.8)
+	return 1.70
+
+
+# --- Tier 10: Solar flare ---------------------------------------------------
+
+static func _build_solar_flare(visual: Node3D, bomb: Bomb) -> float:
+	var sun_mat := LowPoly.material(Color("#FFB300"), 0.1, 0.3, Color("#FF9A3D"), 1.4, false)
+	var flame_mat := LowPoly.material(Color("#FF6A3D"), 0.0, 0.3, Color("#FF6A3D"), 2.2, true)
+	var bright := LowPoly.material(Color("#FFF3B0"), 0.0, 0.2, Color("#FFF3B0"), 3.0, true)
+	LowPoly.add_mesh(visual, LowPoly.sphere(0.45, 12, 6), sun_mat, Vector3(0.0, 0.55, 0.0), Vector3.ZERO, Vector3.ONE, "Sun")
+	var core := LowPoly.add_mesh(visual, LowPoly.sphere(0.18, 8, 4), bright, Vector3(0.0, 0.55, 0.0), Vector3.ZERO, Vector3.ONE, "SolarCore")
+	bomb.register_glow(core)
+	var corona := Node3D.new()
+	corona.name = "Corona"
+	corona.position = Vector3(0.0, 0.55, 0.0)
+	visual.add_child(corona)
+	for i in range(8):
+		var angle := float(i) * TAU / 8.0
+		var height := 0.38 if i % 2 == 0 else 0.26
+		LowPoly.add_mesh(
+			corona,
+			LowPoly.cylinder(0.0, 0.085, height, 4),
+			flame_mat,
+			Vector3(cos(angle) * 0.45, 0.05, sin(angle) * 0.45),
+			Vector3(0.0, -rad_to_deg(angle), 18.0),
+			Vector3.ONE,
+			"Flame%d" % i
+		)
+	bomb.register_spinner(corona, Vector3(0.0, 1.0, 0.0), 0.35)
+	_add_spark_particles(visual, Vector3(0.0, 0.75, 0.0), Color("#FF9A3D"), 9, 0.8, 0.7, 0.045)
+	return 1.68
+
+
+# --- Tier 11: Void ----------------------------------------------------------
+
+static func _build_void(visual: Node3D, bomb: Bomb) -> float:
+	var void_mat := LowPoly.material(Color("#050008"), 0.05, 0.8)
+	var purple := LowPoly.material(Color("#C77DFF"), 0.0, 0.25, Color("#C77DFF"), 2.8, true)
+	LowPoly.add_mesh(visual, LowPoly.sphere(0.44, 12, 6), void_mat, Vector3(0.0, 0.55, 0.0), Vector3.ZERO, Vector3.ONE, "VoidSphere")
+	var ring_pivot := Node3D.new()
+	ring_pivot.name = "HorizonPivot"
+	ring_pivot.position = Vector3(0.0, 0.55, 0.0)
+	visual.add_child(ring_pivot)
+	var ring := LowPoly.add_mesh(ring_pivot, LowPoly.torus(0.57, 0.032, 16, 4), purple, Vector3.ZERO, Vector3(8.0, 0.0, 10.0), Vector3.ONE, "EventHorizon")
 	bomb.register_glow(ring)
-	return 1.55 + radius
+	bomb.register_spinner(ring_pivot, Vector3(0.2, 1.0, 0.15), 0.4)
+
+	var vortex := Node3D.new()
+	vortex.name = "Vortex"
+	vortex.position = Vector3(0.0, 0.55, 0.0)
+	visual.add_child(vortex)
+	for i in range(8):
+		var angle := float(i) * TAU / 8.0
+		LowPoly.add_mesh(
+			vortex,
+			LowPoly.box(Vector3(0.06, 0.06, 0.06)),
+			purple,
+			Vector3(cos(angle) * 0.78, 0.0, sin(angle) * 0.78),
+			Vector3.ZERO,
+			Vector3.ONE,
+			"VortexDot%d" % i
+		)
+	bomb.register_vortex(vortex, 0.82, 0.55, 0.30)
+	return 1.68
+
+
+# --- Tier 12: Quantum nuke --------------------------------------------------
+
+static func _build_quantum(visual: Node3D, bomb: Bomb) -> float:
+	var shell_mat := LowPoly.material(Color("#8A2BE2"), 0.0, 0.1, Color("#4FE0FF"), 0.5, true, 0.20, true)
+	var ring_mat := LowPoly.material(Color("#4FE0FF"), 0.0, 0.2, Color("#4FE0FF"), 2.4, true)
+	LowPoly.add_mesh(visual, LowPoly.sphere(0.58, 12, 6), shell_mat, Vector3(0.0, 0.55, 0.0), Vector3.ZERO, Vector3.ONE, "QuantumShell")
+	var core_mat := LowPoly.material_unique(Color("#8A2BE2"), Color("#4FE0FF"), 3.0, true)
+	var core_pivot := Node3D.new()
+	core_pivot.name = "QuantumCore"
+	core_pivot.position = Vector3(0.0, 0.55, 0.0)
+	visual.add_child(core_pivot)
+	LowPoly.add_mesh(core_pivot, LowPoly.cylinder(0.0, 0.24, 0.32, 4), core_mat, Vector3(0.0, 0.16, 0.0), Vector3.ZERO, Vector3.ONE, "PyramidUp")
+	LowPoly.add_mesh(core_pivot, LowPoly.cylinder(0.0, 0.24, 0.32, 4), core_mat, Vector3(0.0, -0.16, 0.0), Vector3(180.0, 0.0, 0.0), Vector3.ONE, "PyramidDown")
+	bomb.register_hue_material(core_mat)
+	bomb.register_spinner(core_pivot, Vector3(0.25, 1.0, 0.4), 1.1)
+	for i in range(2):
+		var ring_pivot := Node3D.new()
+		ring_pivot.name = "QuantumRing%d" % i
+		ring_pivot.position = Vector3(0.0, 0.55, 0.0)
+		visual.add_child(ring_pivot)
+		var rot := Vector3(90.0, 0.0, 0.0) if i == 0 else Vector3(0.0, 0.0, 90.0)
+		var ring := LowPoly.add_mesh(ring_pivot, LowPoly.torus(0.64, 0.02, 12, 4), ring_mat, Vector3.ZERO, rot, Vector3.ONE, "QuantumRing")
+		bomb.register_glow(ring)
+		bomb.register_spinner(ring_pivot, Vector3(0.0, 1.0, 0.3), 0.5 if i == 0 else -0.38)
+	return 1.80
+
+
+# --- Tier 13: Star core -----------------------------------------------------
+
+static func _build_star_core(visual: Node3D, bomb: Bomb) -> float:
+	var star_mat := LowPoly.material(Color("#FFFDE7"), 0.0, 0.1, Color("#FFF176"), 4.2, true)
+	var beam_mat := LowPoly.material(Color("#FFE082"), 0.0, 0.2, Color("#FFE082"), 2.4, true, 0.75)
+	LowPoly.add_mesh(visual, LowPoly.sphere(0.30, 10, 5), star_mat, Vector3(0.0, 0.55, 0.0), Vector3.ZERO, Vector3.ONE, "Star")
+	var beams := Node3D.new()
+	beams.name = "LightBeams"
+	beams.position = Vector3(0.0, 0.55, 0.0)
+	visual.add_child(beams)
+	for i in range(4):
+		var angle := float(i) * 45.0
+		var beam := LowPoly.add_mesh(
+			beams,
+			LowPoly.box(Vector3(1.32, 0.045, 0.045)),
+			beam_mat,
+			Vector3.ZERO,
+			Vector3(0.0, angle, 0.0),
+			Vector3.ONE,
+			"Beam%d" % i
+		)
+		bomb.register_glow(beam)
+	bomb.register_spinner(beams, Vector3(0.0, 1.0, 0.0), 0.45)
+	var core := LowPoly.add_mesh(visual, LowPoly.sphere(0.15, 8, 4), star_mat, Vector3(0.0, 0.55, 0.0), Vector3.ZERO, Vector3.ONE, "StarCore")
+	bomb.register_glow(core)
+
+	var orbit := Node3D.new()
+	orbit.name = "Planets"
+	orbit.position = Vector3(0.0, 0.55, 0.0)
+	visual.add_child(orbit)
+	var planet_colors := [Color("#4FE0FF"), Color("#B6F23C"), Color("#FF7A9A")]
+	var radii: Array[float] = [0.66, 0.82, 0.96]
+	for i in range(3):
+		var pcol: Color = planet_colors[i]
+		var planet_mat := LowPoly.material(pcol, 0.15, 0.35, pcol, 0.6)
+		LowPoly.add_mesh(
+			orbit,
+			LowPoly.sphere(0.075, 6, 3),
+			planet_mat,
+			Vector3(radii[i], 0.05 * float(i - 1), 0.0),
+			Vector3.ZERO,
+			Vector3.ONE,
+			"Planet%d" % i
+		)
+	orbit.rotation_degrees.y = 25.0
+	bomb.register_spinner(orbit, Vector3(0.0, 1.0, 0.0), 0.55)
+	return 1.60
+
+
+# --- Tier 14: Galaxy --------------------------------------------------------
+
+static func _build_galaxy(visual: Node3D, bomb: Bomb) -> float:
+	var dark := LowPoly.material(Color("#0B0B1E"), 0.35, 0.6)
+	LowPoly.add_mesh(visual, LowPoly.sphere(0.48, 10, 5), dark, Vector3(0.0, 0.55, 0.0), Vector3.ZERO, Vector3.ONE, "GalaxySphere")
+	var swirl := Node3D.new()
+	swirl.name = "GalaxySwirl"
+	swirl.position = Vector3(0.0, 0.55, 0.0)
+	swirl.rotation_degrees = Vector3(18.0, 0.0, -10.0)
+	visual.add_child(swirl)
+	var palette := [
+		LowPoly.material(Color("#FFFFFF"), 0.0, 0.2, Color("#FFFFFF"), 2.4, true),
+		LowPoly.material(Color("#8F7CFF"), 0.0, 0.2, Color("#8F7CFF"), 2.4, true),
+		LowPoly.material(Color("#FF7AD9"), 0.0, 0.2, Color("#FF7AD9"), 2.2, true),
+		LowPoly.material(Color("#6AD7FF"), 0.0, 0.2, Color("#6AD7FF"), 2.2, true),
+	]
+	for i in range(12):
+		var t := float(i) / 11.0
+		var radius := 0.06 + t * 0.40
+		var angle := t * 2.15 * TAU
+		var surface_y := sqrt(maxf(0.2304 - radius * radius, 0.0))
+		LowPoly.add_mesh(
+			swirl,
+			LowPoly.box(Vector3(0.06, 0.035, 0.06)),
+			palette[i % palette.size()],
+			Vector3(cos(angle) * radius, surface_y + 0.01, sin(angle) * radius),
+			Vector3(0.0, -rad_to_deg(angle), 0.0),
+			Vector3.ONE,
+			"StarVoxel%d" % i
+		)
+	bomb.register_spinner(swirl, Vector3(0.0, 1.0, 0.0), 0.32)
+	var ring_mat := LowPoly.material(Color("#8F7CFF"), 0.0, 0.2, Color("#8F7CFF"), 2.0, true, 0.8)
+	var ring := LowPoly.add_mesh(visual, LowPoly.torus(0.62, 0.018, 16, 4), ring_mat, Vector3(0.0, 0.55, 0.0), Vector3(20.0, 0.0, 15.0), Vector3.ONE, "GalaxyRing")
+	bomb.register_glow(ring)
+	_add_drift_particles(visual, Vector3(0.0, 0.55, 0.0), Color("#8F7CFF"), 8)
+	return 1.72
+
+
+# --- Tier 15: Omega nuke ----------------------------------------------------
+
+static func _build_omega(visual: Node3D, bomb: Bomb) -> float:
+	visual.scale = Vector3.ONE * 1.12
+	var haze := LowPoly.material(Color("#FFFFFF"), 0.0, 0.1, Color("#FFC83D"), 1.6, true, 0.16, true)
+	var gold := LowPoly.material(Color("#FFC83D"), 0.0, 0.2, Color("#FFC83D"), 2.6, true)
+	var cyan := LowPoly.material(Color("#4FE0FF"), 0.0, 0.2, Color("#4FE0FF"), 2.4, true)
+	var core_mat := LowPoly.material_unique(Color("#FFFFFF"), Color("#FFC83D"), 3.8, true)
+	LowPoly.add_mesh(visual, LowPoly.sphere(0.62, 10, 5), haze, Vector3(0.0, 0.58, 0.0), Vector3.ZERO, Vector3.ONE, "OmegaHaze")
+	var core := LowPoly.add_mesh(visual, LowPoly.sphere(0.40, 12, 6), core_mat, Vector3(0.0, 0.58, 0.0), Vector3.ZERO, Vector3.ONE, "OmegaCore")
+	bomb.register_hue_material(core_mat)
+	bomb.register_glow(core)
+
+	var crown_defs: Array[Dictionary] = [
+		{"radius": 0.72, "rot": Vector3.ZERO, "axis": Vector3(0.0, 1.0, 0.0), "speed": 0.55, "mat": gold},
+		{"radius": 0.82, "rot": Vector3(90.0, 0.0, 20.0), "axis": Vector3(0.2, 1.0, 0.0), "speed": -0.38, "mat": cyan},
+		{"radius": 0.90, "rot": Vector3(20.0, 0.0, 90.0), "axis": Vector3(1.0, 0.2, 0.0), "speed": 0.30, "mat": gold},
+	]
+	for i in range(crown_defs.size()):
+		var def: Dictionary = crown_defs[i]
+		var pivot := Node3D.new()
+		pivot.name = "CrownRing%d" % i
+		pivot.position = Vector3(0.0, 0.58, 0.0)
+		visual.add_child(pivot)
+		var ring := LowPoly.add_mesh(
+			pivot,
+			LowPoly.torus(float(def["radius"]), 0.024, 12, 4),
+			def["mat"] as Material,
+			Vector3.ZERO,
+			def["rot"] as Vector3,
+			Vector3.ONE,
+			"CrownRing"
+		)
+		bomb.register_glow(ring)
+		bomb.register_spinner(pivot, def["axis"] as Vector3, float(def["speed"]))
+
+	var crown := Node3D.new()
+	crown.name = "CrownBlocks"
+	crown.position = Vector3(0.0, 1.22, 0.0)
+	visual.add_child(crown)
+	for i in range(8):
+		var angle := float(i) * TAU / 8.0
+		var block := LowPoly.add_mesh(
+			crown,
+			LowPoly.box(Vector3(0.10, 0.16, 0.10)),
+			gold,
+			Vector3(cos(angle) * 0.62, 0.0, sin(angle) * 0.62),
+			Vector3(0.0, -rad_to_deg(angle), 0.0),
+			Vector3.ONE,
+			"CrownBlock%d" % i
+		)
+		bomb.register_glow(block)
+	bomb.register_spinner(crown, Vector3(0.0, 1.0, 0.0), -0.65)
+	_add_spark_particles(visual, Vector3(0.0, 0.75, 0.0), Color("#FFC83D"), 12, 1.1, 0.9, 0.04)
+	_add_spark_particles(visual, Vector3(0.0, 0.55, 0.0), Color("#4FE0FF"), 8, 0.9, 0.85, 0.032)
+	return 2.25
+
 
 
 # --- Shared helpers ---------------------------------------------------------
@@ -268,6 +605,32 @@ static func _add_spark_particles(
 	particles.color = color
 	particles.mesh = LowPoly.sphere(1.0, 4, 2)
 	particles.material_override = LowPoly.material(color, 0.0, 0.2, color, 2.6, true)
+	particles.emitting = true
+	particles.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	parent.add_child(particles)
+
+
+static func _add_drift_particles(parent: Node3D, position: Vector3, color: Color, amount: int) -> void:
+	var particles := CPUParticles3D.new()
+	particles.name = "DriftStars"
+	particles.position = position
+	particles.amount = amount
+	particles.lifetime = 2.2
+	particles.one_shot = false
+	particles.explosiveness = 0.1
+	particles.preprocess = 1.0
+	particles.emission_shape = CPUParticles3D.EMISSION_SHAPE_SPHERE
+	particles.emission_sphere_radius = 0.55
+	particles.direction = Vector3(0.0, 0.2, 0.0)
+	particles.spread = 180.0
+	particles.gravity = Vector3(0.0, 0.02, 0.0)
+	particles.initial_velocity_min = 0.02
+	particles.initial_velocity_max = 0.10
+	particles.scale_amount_min = 0.022
+	particles.scale_amount_max = 0.045
+	particles.color = color
+	particles.mesh = LowPoly.sphere(1.0, 4, 2)
+	particles.material_override = LowPoly.material(color, 0.0, 0.2, color, 2.2, true)
 	particles.emitting = true
 	particles.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	parent.add_child(particles)
