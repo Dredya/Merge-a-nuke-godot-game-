@@ -1,19 +1,36 @@
 extends Control
 
-## Base screen: 3D plot + touch drag/merge + merge effects.
-## The HUD overlay (cash, buy button, nav) is added in step 5 of the spec.
+## Base screen: 3D plot, touch drag/merge, HUD, merge effects and retention popups.
 
 const FONT_PATH := "res://assets/fonts/LilitaOne-Regular.ttf"
 const DRAG_LIFT := 0.55
 const PICK_RADIUS := 1.18
 const INCOME_LABEL_POOL := 14
+const LOCK_COST := 500.0
+const LOCK_DURATION := 120.0
+const LOCK_COOLDOWN := 300.0
 
 @onready var world_view: SubViewportContainer = $WorldView
 @onready var sub_viewport: SubViewport = $WorldView/SubViewport
 @onready var plot_input: Control = $PlotInput
 @onready var flash_overlay: ColorRect = $FlashOverlay
 @onready var screen_glow: ColorRect = $ScreenGlow
-@onready var temp_hint: Label = $TempHint
+@onready var cash_label: Label = $TopHud/HudRow/CashPanel/CashBox/CashAmount
+@onready var income_label: Label = $TopHud/HudRow/CashPanel/CashBox/IncomeLabel
+@onready var locked_label: Label = $TopHud/HudRow/LockPanel/LockBox/LockedLabel
+@onready var lock_timer_label: Label = $TopHud/HudRow/LockPanel/LockBox/LockTimer
+@onready var lock_button: Button = $TopHud/HudRow/LockPanel/LockBox/LockButton
+@onready var event_banner: Label = $EventBannerPanel/EventBanner
+@onready var free_progress: ProgressBar = $BottomControls/BottomBox/FreePanel/FreeRow/FreeProgress
+@onready var free_seconds: Label = $BottomControls/BottomBox/FreePanel/FreeRow/FreeSeconds
+@onready var buy_button: Button = $BottomControls/BottomBox/BuyBombButton
+@onready var tutorial_popup: Control = $TutorialPopup
+@onready var tutorial_label: Label = $TutorialPopup/Center/Panel/Box/TutorialLabel
+@onready var tutorial_next_button: Button = $TutorialPopup/Center/Panel/Box/TutorialNextButton
+@onready var daily_popup: Control = $DailyPopup
+@onready var daily_day_label: Label = $DailyPopup/Center/Panel/Box/DayLabel
+@onready var daily_amount_label: Label = $DailyPopup/Center/Panel/Box/AmountLabel
+@onready var claim_daily_button: Button = $DailyPopup/Center/Panel/Box/ClaimDailyButton
 
 var world: BaseWorld
 var slot_bombs: Array[Bomb] = []
@@ -34,14 +51,28 @@ var _income_pool: Array[Label3D] = []
 var _label_font: Font
 var _rng := RandomNumberGenerator.new()
 
+var _tutorial_step: int = 0
+var _pending_daily: Dictionary = {}
+var _daily_popup_shown: bool = false
+
+const TUTORIAL_STEPS := [
+	"Tap BUY BOMB or wait for the free bomb every few seconds.",
+	"Drag a bomb onto another bomb of the same tier to merge them.",
+	"Higher tiers earn far more cash per second.",
+	"Lock your base to protect your cash from raids.",
+	"Raids, missions and codes are in the other tabs.",
+]
+
 
 func _ready() -> void:
 	_rng.randomize()
-	_low_quality = false
+	_low_quality = AudioManager.is_low_quality()
 	world = BaseWorld.new()
 	world.name = "BaseWorld"
 	sub_viewport.add_child(world)
 	world.setup(_low_quality)
+	world_view.resized.connect(_sync_viewport_size)
+	_sync_viewport_size()
 
 	slot_tiers.resize(BaseWorld.SLOT_COUNT)
 	slot_bombs.resize(BaseWorld.SLOT_COUNT)
@@ -54,8 +85,15 @@ func _ready() -> void:
 	_refresh_all_slots()
 
 	plot_input.gui_input.connect(_on_plot_input)
+	buy_button.pressed.connect(_on_buy_pressed)
+	lock_button.pressed.connect(_on_lock_pressed)
+	claim_daily_button.pressed.connect(_on_claim_daily)
+	tutorial_next_button.pressed.connect(_on_tutorial_next)
 	GameState.slots_changed.connect(_on_slots_changed)
+	GameState.cash_changed.connect(func(_cash): _update_hud())
 	Economy.income_granted.connect(_on_income_granted)
+	DailyRewardManager.daily_reward_available.connect(_on_daily_reward_available)
+	EventManager.event_changed.connect(func(_event): _update_event_banner())
 
 	_auto_timer = Timer.new()
 	_auto_timer.wait_time = _spawn_wait()
@@ -64,11 +102,25 @@ func _ready() -> void:
 	add_child(_auto_timer)
 
 	_ui_timer = Timer.new()
-	_ui_timer.wait_time = 0.25
+	_ui_timer.wait_time = 0.2
 	_ui_timer.autostart = true
-	_ui_timer.timeout.connect(_update_temp_hint)
+	_ui_timer.timeout.connect(_update_hud)
 	add_child(_ui_timer)
-	_update_temp_hint()
+
+	_update_hud()
+	_update_event_banner()
+	if GameState.tutorial_completed:
+		_check_pending_daily()
+	else:
+		_tutorial_step = 0
+		_show_tutorial_step()
+	get_tree().create_timer(0.6).timeout.connect(_check_pending_daily)
+
+
+func _sync_viewport_size() -> void:
+	var target := Vector2i(maxi(1, int(world_view.size.x)), maxi(1, int(world_view.size.y)))
+	if sub_viewport.size != target:
+		sub_viewport.size = target
 
 
 func _ensure_slot_capacity() -> void:
@@ -128,6 +180,7 @@ func _on_slots_changed() -> void:
 	if _suppress_slot_refresh or _is_dragging or _is_animating:
 		return
 	_refresh_all_slots()
+	_update_hud()
 
 
 # --- Touch picking and dragging --------------------------------------------
@@ -415,7 +468,8 @@ func _play_merge_fx(target: int, new_tier: int) -> void:
 
 	_spawn_flash(fx_pos, fx_color)
 	_spawn_shockwave(fx_pos, fx_color)
-	_spawn_particles(fx_pos, fx_color)
+	if not _low_quality:
+		_spawn_particles(fx_pos, fx_color)
 
 	flash_overlay.visible = true
 	flash_overlay.color = Color(1.0, 1.0, 1.0, 0.30)
@@ -423,7 +477,7 @@ func _play_merge_fx(target: int, new_tier: int) -> void:
 	flash_tween.tween_property(flash_overlay, "color:a", 0.0, 0.20)
 	flash_tween.finished.connect(func(): flash_overlay.visible = false)
 
-	if new_tier >= 15:
+	if new_tier >= 15 and not _low_quality:
 		screen_glow.visible = true
 		var glow_color := fx_color
 		glow_color.a = 0.26
@@ -544,7 +598,154 @@ func _get_income_label() -> Label3D:
 	return null
 
 
-# --- Auto spawn / temporary text -------------------------------------------
+# --- HUD --------------------------------------------------------------------
+
+func _on_buy_pressed() -> void:
+	if _is_dragging or _is_animating:
+		return
+	_suppress_slot_refresh = true
+	var index := GameState.try_buy_tier1()
+	_suppress_slot_refresh = false
+	if index >= 0:
+		_create_bomb(index, 1, true)
+		SaveManager.save()
+		AudioManager.play_sfx("buy")
+		_update_hud()
+
+
+func _on_lock_pressed() -> void:
+	var now := Time.get_unix_time_from_system()
+	if now < GameState.lock_until or now < GameState.lock_cooldown_until:
+		return
+	if GameState.cash < LOCK_COST:
+		return
+	GameState.cash -= LOCK_COST
+	GameState.cash_changed.emit(GameState.cash)
+	GameState.lock_until = now + LOCK_DURATION
+	GameState.lock_cooldown_until = now + LOCK_COOLDOWN
+	SaveManager.save()
+	AudioManager.play_sfx("lock")
+	_update_hud()
+
+
+func _update_hud() -> void:
+	var income := GameState.income_per_second_total() * Economy.income_multiplier * Economy.event_income_multiplier
+	cash_label.text = "$" + Economy.format_number(GameState.cash)
+	income_label.text = "+$" + Economy.format_number(income) + " / sec"
+
+	var now := Time.get_unix_time_from_system()
+	if now < GameState.lock_until:
+		locked_label.text = "BASE LOCKED"
+		locked_label.add_theme_color_override("font_color", Color("#6FA0FF"))
+		lock_timer_label.text = _format_time(GameState.lock_until - now)
+		lock_timer_label.add_theme_color_override("font_color", Color("#6FA0FF"))
+		lock_button.visible = false
+	elif now < GameState.lock_cooldown_until:
+		locked_label.text = "BASE OPEN"
+		locked_label.add_theme_color_override("font_color", Color("#A9B6E0"))
+		lock_timer_label.text = "READY " + _format_time(GameState.lock_cooldown_until - now)
+		lock_timer_label.add_theme_color_override("font_color", Color("#A9B6E0"))
+		lock_button.visible = true
+		lock_button.disabled = true
+		lock_button.text = "COOLDOWN"
+	else:
+		locked_label.text = "BASE OPEN"
+		locked_label.add_theme_color_override("font_color", Color("#A9B6E0"))
+		lock_timer_label.text = "SHIELD 2:00"
+		lock_timer_label.add_theme_color_override("font_color", Color("#A9B6E0"))
+		lock_button.visible = true
+		lock_button.disabled = GameState.cash < LOCK_COST
+		lock_button.text = "LOCK $%d" % int(LOCK_COST)
+
+	var tier_one: NukeTier = GameState.get_tier(1)
+	var cost := float(tier_one.buy_cost) if tier_one != null else 120.0
+	buy_button.text = "Buy Bomb  $%s" % Economy.format_number(cost)
+	buy_button.disabled = GameState.cash < cost or GameState.empty_slot_count() <= 0 or _is_dragging or _is_animating
+
+	if GameState.empty_slot_count() <= 0:
+		free_progress.value = 100.0
+		free_seconds.text = "FULL"
+	else:
+		var wait := maxf(_auto_timer.wait_time, 0.01)
+		var left := clampf(_auto_timer.time_left, 0.0, wait)
+		free_progress.value = (1.0 - left / wait) * 100.0
+		free_seconds.text = "%ds" % int(ceil(left))
+
+
+func _format_time(seconds_left: float) -> String:
+	var total := int(maxf(ceil(seconds_left), 0.0))
+	return "%d:%02d" % [total / 60, total % 60]
+
+
+func _update_event_banner() -> void:
+	var event_data := EventManager.active_event
+	if event_data is Dictionary and not event_data.is_empty():
+		var bonus := int(round(float(event_data.get("income_bonus", 0.0)) * 100.0))
+		event_banner.text = "%s  •  +%d%% INCOME" % [str(event_data.get("name", "EVENT")), bonus]
+		event_banner.get_parent().visible = true
+	else:
+		event_banner.get_parent().visible = false
+
+
+# --- Retention popups -------------------------------------------------------
+
+func _show_tutorial_step() -> void:
+	if _tutorial_step < TUTORIAL_STEPS.size():
+		tutorial_label.text = TUTORIAL_STEPS[_tutorial_step]
+		tutorial_popup.visible = true
+	else:
+		tutorial_popup.visible = false
+		GameState.tutorial_completed = true
+		SaveManager.save()
+		_check_pending_daily()
+
+
+func _on_tutorial_next() -> void:
+	_tutorial_step += 1
+	_show_tutorial_step()
+
+
+func _on_daily_reward_available(day: int, amount: float) -> void:
+	_pending_daily = {"day": day, "amount": amount}
+	if tutorial_popup.visible or _daily_popup_shown:
+		return
+	_show_daily(day, amount)
+
+
+func _check_pending_daily() -> void:
+	if _daily_popup_shown or daily_popup.visible or tutorial_popup.visible:
+		return
+	if not GameState.tutorial_completed:
+		return
+	var today := Time.get_date_string_from_system()
+	if GameState.daily_claimed_date == today:
+		return
+	var day := maxi(GameState.daily_streak, 1)
+	var amount := 100.0
+	if not _pending_daily.is_empty():
+		day = int(_pending_daily.get("day", day))
+		amount = float(_pending_daily.get("amount", amount))
+	else:
+		amount = DailyRewardManager.get_reward_amount(day)
+	_show_daily(day, amount)
+
+
+func _show_daily(day: int, amount: float) -> void:
+	_pending_daily = {"day": day, "amount": amount}
+	daily_day_label.text = "DAY %d STREAK" % day
+	daily_amount_label.text = "+$" + Economy.format_number(amount)
+	daily_popup.visible = true
+	_daily_popup_shown = true
+
+
+func _on_claim_daily() -> void:
+	DailyRewardManager.claim()
+	daily_popup.visible = false
+	GameState.cash_changed.emit(GameState.cash)
+	_update_hud()
+
+
+# --- Auto spawn -------------------------------------------------------------
 
 func _on_auto_spawn() -> void:
 	if _is_dragging or _is_animating:
@@ -555,11 +756,4 @@ func _on_auto_spawn() -> void:
 	if index >= 0:
 		_create_bomb(index, 1, true)
 		SaveManager.save()
-
-
-func _update_temp_hint() -> void:
-	var income := GameState.income_per_second_total() * Economy.income_multiplier
-	temp_hint.text = "$%s   •   +$%s / sec   •   DRAG A BOMB ONTO A MATCH TO MERGE" % [
-		Economy.format_number(GameState.cash),
-		Economy.format_number(income),
-	]
+		_update_hud()

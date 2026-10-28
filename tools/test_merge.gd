@@ -66,8 +66,34 @@ func _run() -> void:
 	_check(GameState.slots[0] == 2, "swap: slot 0 holds old slot 1 tier")
 	_check(GameState.slots[1] == 3, "swap: slot 1 holds old slot 0 tier")
 
+	# 4. Buy button spends cash and fills the first empty slot.
+	for i in range(GameState.MAX_SLOTS):
+		GameState.slots[i] = 0
+	GameState.cash = 1000.0
+	GameState.cash_changed.emit(GameState.cash)
+	_base.call("_refresh_all_slots")
+	await get_tree().create_timer(0.2).timeout
+	var buy_button := _base.get("buy_button") as Button
+	buy_button.emit_signal("pressed")
+	await get_tree().process_frame
+	_check(GameState.cash == 880.0, "buy: cost $120 deducted")
+	_check(GameState.slots[0] == 1, "buy: tier 1 placed in first empty slot")
+
+	# 5. Lock button spends cash and starts the shield countdown.
+	GameState.lock_until = 0.0
+	GameState.lock_cooldown_until = 0.0
+	var lock_button := _base.get("lock_button") as Button
+	lock_button.emit_signal("pressed")
+	await get_tree().process_frame
+	_check(GameState.lock_until > Time.get_unix_time_from_system(), "lock: shield countdown started")
+	_check(GameState.cash == 380.0, "lock: $500 deducted")
+
 	if DisplayServer.get_name() != "headless":
 		# Visual QA snapshot of a full board.
+		(_base.get("tutorial_popup") as Control).visible = false
+		(_base.get("daily_popup") as Control).visible = false
+		GameState.cash = 28800.0
+		GameState.cash_changed.emit(GameState.cash)
 		for i in range(GameState.MAX_SLOTS):
 			GameState.slots[i] = i + 1
 		_base.call("_refresh_all_slots")

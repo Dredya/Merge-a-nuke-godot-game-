@@ -13,53 +13,71 @@ grow_vertical = 2
 theme = ExtResource("2")
 script = ExtResource("1")
 
-[node name="MarginContainer" type="MarginContainer" parent="."]
+[node name="Background" type="ColorRect" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
+color = Color(0.0431373, 0.0627451, 0.12549, 1)
 
-[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+[node name="SafeArea" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="Shell" type="VBoxContainer" parent="SafeArea"]
 layout_mode = 2
 theme_override_constants/separation = 0
 
-[node name="ScreenContainer" type="Control" parent="MarginContainer/VBoxContainer"]
+[node name="ScreenContainer" type="Control" parent="SafeArea/Shell"]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="BottomNav" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+[node name="BottomNav" type="PanelContainer" parent="SafeArea/Shell"]
 layout_mode = 2
-custom_minimum_size = Vector2(0, 100)
+custom_minimum_size = Vector2(0, 124)
+theme_type_variation = &"PanelNav"
+
+[node name="NavRow" type="HBoxContainer" parent="SafeArea/Shell/BottomNav"]
+layout_mode = 2
 theme_override_constants/separation = 4
 
-[node name="BaseButton" type="Button" parent="MarginContainer/VBoxContainer/BottomNav"]
+[node name="BaseButton" type="Button" parent="SafeArea/Shell/BottomNav/NavRow"]
 layout_mode = 2
 size_flags_horizontal = 3
-custom_minimum_size = Vector2(0, 100)
-text = "Base"
+custom_minimum_size = Vector2(0, 112)
+theme_type_variation = &"NavButton"
 
-[node name="ShopButton" type="Button" parent="MarginContainer/VBoxContainer/BottomNav"]
+[node name="ShopButton" type="Button" parent="SafeArea/Shell/BottomNav/NavRow"]
 layout_mode = 2
 size_flags_horizontal = 3
-custom_minimum_size = Vector2(0, 100)
-text = "Shop"
+custom_minimum_size = Vector2(0, 112)
+theme_type_variation = &"NavButton"
 
-[node name="RaidButton" type="Button" parent="MarginContainer/VBoxContainer/BottomNav"]
+[node name="RaidButton" type="Button" parent="SafeArea/Shell/BottomNav/NavRow"]
 layout_mode = 2
 size_flags_horizontal = 3
-custom_minimum_size = Vector2(0, 100)
-text = "Raid"
+custom_minimum_size = Vector2(0, 112)
+theme_type_variation = &"NavButton"
 
-[node name="UpgradesButton" type="Button" parent="MarginContainer/VBoxContainer/BottomNav"]
+[node name="UpgradesButton" type="Button" parent="SafeArea/Shell/BottomNav/NavRow"]
 layout_mode = 2
 size_flags_horizontal = 3
-custom_minimum_size = Vector2(0, 100)
-text = "Upgrades"
+custom_minimum_size = Vector2(0, 112)
+theme_type_variation = &"NavButton"
 
-[node name="SettingsButton" type="Button" parent="MarginContainer/VBoxContainer/BottomNav"]
+[node name="SettingsButton" type="Button" parent="SafeArea/Shell/BottomNav/NavRow"]
 layout_mode = 2
 size_flags_horizontal = 3
-custom_minimum_size = Vector2(0, 100)
-text = "Settings"
+custom_minimum_size = Vector2(0, 112)
+theme_type_variation = &"NavButton"

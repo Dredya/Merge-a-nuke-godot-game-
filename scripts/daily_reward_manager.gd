@@ -36,11 +36,17 @@ func _check_login() -> void:
 
 func claim() -> void:
 	var today := Time.get_date_string_from_system()
-	var day_index := GameState.daily_streak - 1
-	var amount: float = REWARDS[day_index] if day_index < REWARDS.size() else REWARDS[-1]
+	var amount := get_reward_amount(GameState.daily_streak)
 	GameState.add_cash(amount)
 	GameState.daily_claimed_date = today
 	SaveManager.save()
+
+
+func get_reward_amount(day: int) -> float:
+	if REWARDS.is_empty():
+		return 0.0
+	var index := clampi(day - 1, 0, REWARDS.size() - 1)
+	return float(REWARDS[index])
 
 
 func _is_yesterday(last: String, today: String) -> bool:
