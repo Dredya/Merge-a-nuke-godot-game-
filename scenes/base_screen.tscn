@@ -49,6 +49,34 @@ text = "Buy Bomb"
 layout_mode = 2
 text = "Upgrades"
 
+[node name="RaidButton" type="Button" parent="MarginContainer/VBoxContainer/ButtonRow"]
+layout_mode = 2
+text = "Raid"
+
+[node name="LockButton" type="Button" parent="MarginContainer/VBoxContainer/ButtonRow"]
+layout_mode = 2
+text = "Lock Base"
+
+[node name="ShieldPanel" type="PanelContainer" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -120.0
+offset_top = -40.0
+offset_right = 120.0
+offset_bottom = 40.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ShieldLabel" type="Label" parent="ShieldPanel"]
+layout_mode = 2
+text = "SHIELDED"
+horizontal_alignment = 1
+
 [node name="AutoSpawnTimer" type="Timer" parent="."]
 wait_time = 4.0
 autostart = true

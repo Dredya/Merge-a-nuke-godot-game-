@@ -30,7 +30,7 @@ Update this list after every phase (mark `[x]` when complete).
 - [x] Phase 0 — Project setup: Godot version verified, project settings configured (portrait 1080x1920, canvas_items stretch, expand aspect, Mobile renderer, emulate mouse from touch), folder structure created, AGENTS.md written.
 - [x] Phase 1 — Core merge loop: NukeTier resource + 15-tier data, GameState autoload, BaseScreen with 6 slots, buy/auto-spawn, drag-and-drop merge with feedback.
 - [x] Phase 2 - Economy & saving: Economy autoload, big-number formatting, safe-area HUD, upgrades JSON + screen, SaveManager (versioned atomic save, autosave, offline earnings + welcome popup), AdService stub.
-- [ ] Phase 3 — Main menu & navigation.
+- [x] Phase 3 - Raiding and base lock: RaidService (AI targets), RaidScreen with raid sequence, revenge raids, Lock Base with persisted shield.
 - [ ] Phase 4 — Merge board gameplay.
 - [ ] Phase 5 — Economy: cash/sec and offline earnings.
 - [ ] Phase 6 — Raid system (attack AI bases, steal cash).

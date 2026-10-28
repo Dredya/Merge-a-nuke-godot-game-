@@ -5,10 +5,17 @@ extends Control
 const NukeTierScript = preload("res://scripts/nuke_tier.gd")
 const SLOT_SIZE := Vector2(100, 100)
 const POOL_SIZE := 12
+const LOCK_COST := 500.0
+const LOCK_DURATION := 120.0
+const LOCK_COOLDOWN := 300.0
 
 @onready var slot_grid: GridContainer = $MarginContainer/VBoxContainer/SlotGrid
 @onready var buy_button: Button = $MarginContainer/VBoxContainer/ButtonRow/BuyBombButton
 @onready var upgrades_button: Button = $MarginContainer/VBoxContainer/ButtonRow/UpgradesButton
+@onready var raid_button: Button = $MarginContainer/VBoxContainer/ButtonRow/RaidButton
+@onready var lock_button: Button = $MarginContainer/VBoxContainer/ButtonRow/LockButton
+@onready var shield_panel: PanelContainer = $ShieldPanel
+@onready var shield_label: Label = $ShieldPanel/ShieldLabel
 @onready var auto_timer: Timer = $AutoSpawnTimer
 @onready var welcome_popup: PanelContainer = $WelcomePopup
 @onready var welcome_amount_label: Label = $WelcomePopup/VBoxContainer/AmountLabel
@@ -36,6 +43,8 @@ func _ready() -> void:
 	_build_floating_pool()
 	buy_button.pressed.connect(_on_buy_pressed)
 	upgrades_button.pressed.connect(_on_upgrades_pressed)
+	raid_button.pressed.connect(_on_raid_pressed)
+	lock_button.pressed.connect(_on_lock_pressed)
 	auto_timer.timeout.connect(_on_auto_spawn)
 	claim_button.pressed.connect(_on_claim_offline.bind(1))
 	claim_x2_button.pressed.connect(_on_claim_x2)
@@ -112,6 +121,7 @@ func _process(_delta: float) -> void:
 	if is_dragging and drag_visual != null:
 		drag_visual.global_position = get_global_mouse_position() - SLOT_SIZE * 0.5
 	_update_auto_timer_wait()
+	_update_shield_visual()
 
 
 func _end_drag() -> void:
@@ -252,6 +262,44 @@ func _on_auto_spawn() -> void:
 
 func _on_upgrades_pressed() -> void:
 	get_tree().change_scene_to_file("res://scenes/upgrades_screen.tscn")
+
+
+func _on_raid_pressed() -> void:
+	get_tree().change_scene_to_file("res://scenes/raid_screen.tscn")
+
+
+func _on_lock_pressed() -> void:
+	var now := Time.get_unix_time_from_system()
+	if now < GameState.lock_until:
+		return
+	if now < GameState.lock_cooldown_until:
+		return
+	if GameState.cash < LOCK_COST:
+		return
+	GameState.cash -= LOCK_COST
+	GameState.cash_changed.emit(GameState.cash)
+	GameState.lock_until = now + LOCK_DURATION
+	GameState.lock_cooldown_until = now + LOCK_COOLDOWN
+	SaveManager.save()
+	_update_shield_visual()
+
+
+func _update_shield_visual() -> void:
+	var now := Time.get_unix_time_from_system()
+	if now < GameState.lock_until:
+		shield_panel.visible = true
+		var remaining := int(GameState.lock_until - now)
+		shield_label.text = "SHIELDED %ds" % remaining
+		lock_button.disabled = true
+	else:
+		shield_panel.visible = false
+		if now < GameState.lock_cooldown_until:
+			var remaining := int(GameState.lock_cooldown_until - now)
+			lock_button.text = "Lock (%ds)" % remaining
+			lock_button.disabled = true
+		else:
+			lock_button.text = "Lock Base"
+			lock_button.disabled = false
 
 
 func _on_income_granted(amount: float) -> void:

@@ -32,6 +32,8 @@ func save() -> void:
 		"slot_count": GameState.slot_count,
 		"slots": GameState.slots,
 		"upgrade_levels": Economy.upgrade_levels,
+		"lock_until": GameState.lock_until,
+		"lock_cooldown_until": GameState.lock_cooldown_until,
 		"last_save_time": Time.get_unix_time_from_system(),
 	}
 	var json_text := JSON.stringify(data)
@@ -90,6 +92,8 @@ func load_save() -> void:
 		for k in saved_upgrades.keys():
 			Economy.upgrade_levels[str(k)] = int(saved_upgrades[k])
 	Economy._recompute_multipliers()
+	GameState.lock_until = float(data.get("lock_until", 0.0))
+	GameState.lock_cooldown_until = float(data.get("lock_cooldown_until", 0.0))
 	GameState.cash_changed.emit(GameState.cash)
 	GameState.slots_changed.emit()
 	Economy.upgrades_loaded.emit()

@@ -14,6 +14,8 @@ var cash: float = 0.0
 var slot_count: int = 6
 var slots: Array[int] = []
 var owned_nukes: Dictionary = {}
+var lock_until: float = 0.0
+var lock_cooldown_until: float = 0.0
 
 
 func _ready() -> void:
