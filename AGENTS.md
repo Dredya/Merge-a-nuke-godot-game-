@@ -113,7 +113,7 @@ All tier data (name, colors, income/sec, buy cost, build id) lives in
 
 ## Implementation Checklist (3D visual rebuild)
 - [x] Spec added to AGENTS.md.
-- [ ] Step 1 — Environment, camera, baseplate, slots.
+- [x] Step 1 — Environment, camera, baseplate, slots.
 - [ ] Step 2 — Tier 1–6 bomb builders + debug gallery scene for all 15 tiers.
 - [ ] Step 3 — Tier 7–15 bomb builders.
 - [ ] Step 4 — 3D drag and drop, merge effects, bobbing/glow.

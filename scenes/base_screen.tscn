@@ -1,7 +1,6 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=2 format=3]
 
 [ext_resource type="Script" path="res://scripts/base_screen.gd" id="1"]
-[ext_resource type="PackedScene" path="res://scenes/hud.tscn" id="2"]
 
 [node name="BaseScreen" type="Control"]
 layout_mode = 3
@@ -12,263 +11,45 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1")
 
-[node name="MarginContainer" type="MarginContainer" parent="."]
+[node name="WorldView" type="SubViewportContainer" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/margin_left = 16
-theme_override_constants/margin_top = 16
-theme_override_constants/margin_right = 16
-theme_override_constants/margin_bottom = 16
+mouse_filter = 2
+stretch = true
 
-[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
-layout_mode = 2
-theme_override_constants/separation = 8
+[node name="SubViewport" type="SubViewport" parent="WorldView"]
+own_world_3d = true
+handle_input_locally = false
+size = Vector2i(1080, 1920)
+render_target_update_mode = 4
 
-[node name="EventBanner" type="Label" parent="MarginContainer/VBoxContainer"]
-layout_mode = 2
-text = ""
-horizontal_alignment = 1
-visible = false
-
-[node name="HUD" parent="MarginContainer/VBoxContainer" instance=ExtResource("2")]
-layout_mode = 2
-custom_minimum_size = Vector2(0, 48)
-
-[node name="SlotGrid" type="GridContainer" parent="MarginContainer/VBoxContainer"]
-layout_mode = 2
-size_flags_vertical = 3
-columns = 3
-
-[node name="ButtonRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
-layout_mode = 2
-theme_override_constants/separation = 8
-
-[node name="BuyBombButton" type="Button" parent="MarginContainer/VBoxContainer/ButtonRow"]
-layout_mode = 2
-text = "Buy Bomb"
-
-[node name="UpgradesButton" type="Button" parent="MarginContainer/VBoxContainer/ButtonRow"]
-layout_mode = 2
-text = "Upgrades"
-
-[node name="RaidButton" type="Button" parent="MarginContainer/VBoxContainer/ButtonRow"]
-layout_mode = 2
-text = "Raid"
-
-[node name="LockButton" type="Button" parent="MarginContainer/VBoxContainer/ButtonRow"]
-layout_mode = 2
-text = "Lock Base"
-
-[node name="RedeemButton" type="Button" parent="MarginContainer/VBoxContainer/ButtonRow"]
-layout_mode = 2
-text = "Redeem"
-
-[node name="MissionsButton" type="Button" parent="MarginContainer/VBoxContainer/ButtonRow"]
-layout_mode = 2
-text = "Missions"
-
-[node name="ShieldPanel" type="PanelContainer" parent="."]
-visible = false
+[node name="PlotInput" type="Control" parent="."]
 layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -120.0
-offset_top = -40.0
-offset_right = 120.0
-offset_bottom = 40.0
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 0
 
-[node name="ShieldLabel" type="Label" parent="ShieldPanel"]
-layout_mode = 2
-text = "SHIELDED"
-horizontal_alignment = 1
-
-[node name="RedeemPopup" type="PanelContainer" parent="."]
-visible = false
+[node name="TempHint" type="Label" parent="."]
 layout_mode = 1
-anchors_preset = 8
+anchors_preset = 7
 anchor_left = 0.5
-anchor_top = 0.3
+anchor_top = 1.0
 anchor_right = 0.5
-anchor_bottom = 0.3
-offset_left = -160.0
+anchor_bottom = 1.0
+offset_left = -300.0
 offset_top = -80.0
-offset_right = 160.0
-offset_bottom = 80.0
+offset_right = 300.0
+offset_bottom = -24.0
 grow_horizontal = 2
-grow_vertical = 2
-
-[node name="VBoxContainer" type="VBoxContainer" parent="RedeemPopup"]
-layout_mode = 2
-theme_override_constants/separation = 8
-
-[node name="TitleLabel" type="Label" parent="RedeemPopup/VBoxContainer"]
-layout_mode = 2
-text = "Redeem Code"
+grow_vertical = 0
+theme_override_colors/font_color = Color(0.662745, 0.713725, 0.878431, 1)
+theme_override_font_sizes/font_size = 26
+text = "4x3 PLOT  •  ISOMETRIC 3D WORLD"
 horizontal_alignment = 1
-
-[node name="CodeInput" type="LineEdit" parent="RedeemPopup/VBoxContainer"]
-layout_mode = 2
-placeholder_text = "Enter code"
-
-[node name="RedeemSubmitButton" type="Button" parent="RedeemPopup/VBoxContainer"]
-layout_mode = 2
-text = "Submit"
-
-[node name="RedeemCloseButton" type="Button" parent="RedeemPopup/VBoxContainer"]
-layout_mode = 2
-text = "Close"
-
-[node name="RedeemResultLabel" type="Label" parent="RedeemPopup/VBoxContainer"]
-layout_mode = 2
-text = ""
-horizontal_alignment = 1
-
-[node name="DailyRewardPopup" type="PanelContainer" parent="."]
-visible = false
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -160.0
-offset_top = -80.0
-offset_right = 160.0
-offset_bottom = 80.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="VBoxContainer" type="VBoxContainer" parent="DailyRewardPopup"]
-layout_mode = 2
-theme_override_constants/separation = 8
-
-[node name="TitleLabel" type="Label" parent="DailyRewardPopup/VBoxContainer"]
-layout_mode = 2
-text = "Daily Reward"
-horizontal_alignment = 1
-
-[node name="DayLabel" type="Label" parent="DailyRewardPopup/VBoxContainer"]
-layout_mode = 2
-text = "Day 1"
-horizontal_alignment = 1
-
-[node name="AmountLabel" type="Label" parent="DailyRewardPopup/VBoxContainer"]
-layout_mode = 2
-text = "+0"
-horizontal_alignment = 1
-
-[node name="ClaimDailyButton" type="Button" parent="DailyRewardPopup/VBoxContainer"]
-layout_mode = 2
-text = "Claim"
-
-[node name="MissionsPopup" type="PanelContainer" parent="."]
-visible = false
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -180.0
-offset_top = -160.0
-offset_right = 180.0
-offset_bottom = 160.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="VBoxContainer" type="VBoxContainer" parent="MissionsPopup"]
-layout_mode = 2
-theme_override_constants/separation = 8
-
-[node name="TitleLabel" type="Label" parent="MissionsPopup/VBoxContainer"]
-layout_mode = 2
-text = "Missions"
-horizontal_alignment = 1
-
-[node name="MissionsList" type="VBoxContainer" parent="MissionsPopup/VBoxContainer"]
-layout_mode = 2
-size_flags_vertical = 3
-theme_override_constants/separation = 6
-
-[node name="MissionsCloseButton" type="Button" parent="MissionsPopup/VBoxContainer"]
-layout_mode = 2
-text = "Close"
-
-[node name="WelcomePopup" type="PanelContainer" parent="."]
-visible = false
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -160.0
-offset_top = -80.0
-offset_right = 160.0
-offset_bottom = 80.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="VBoxContainer" type="VBoxContainer" parent="WelcomePopup"]
-layout_mode = 2
-theme_override_constants/separation = 8
-
-[node name="WelcomeLabel" type="Label" parent="WelcomePopup/VBoxContainer"]
-layout_mode = 2
-text = "Welcome back!"
-horizontal_alignment = 1
-
-[node name="AmountLabel" type="Label" parent="WelcomePopup/VBoxContainer"]
-layout_mode = 2
-text = "+0"
-horizontal_alignment = 1
-
-[node name="ClaimButton" type="Button" parent="WelcomePopup/VBoxContainer"]
-layout_mode = 2
-text = "Claim"
-
-[node name="ClaimX2Button" type="Button" parent="WelcomePopup/VBoxContainer"]
-layout_mode = 2
-text = "Claim x2"
-
-[node name="TutorialPopup" type="PanelContainer" parent="."]
-visible = false
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -200.0
-offset_top = -120.0
-offset_right = 200.0
-offset_bottom = 120.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="VBoxContainer" type="VBoxContainer" parent="TutorialPopup"]
-layout_mode = 2
-theme_override_constants/separation = 8
-
-[node name="TutorialLabel" type="Label" parent="TutorialPopup/VBoxContainer"]
-layout_mode = 2
-text = "Tutorial"
-horizontal_alignment = 1
-autowrap_mode = 2
-
-[node name="TutorialNextButton" type="Button" parent="TutorialPopup/VBoxContainer"]
-layout_mode = 2
-text = "Next"
-
-[node name="AutoSpawnTimer" type="Timer" parent="."]
-wait_time = 4.0
-autostart = true
