@@ -24,6 +24,7 @@ var daily_claimed_date: String = ""
 var mission_progress: Dictionary = {}
 var mission_claimed: Dictionary = {}
 var mission_last_reset_date: String = ""
+var tutorial_completed: bool = false
 
 
 func _ready() -> void:

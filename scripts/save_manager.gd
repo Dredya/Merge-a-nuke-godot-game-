@@ -8,6 +8,7 @@ const SAVE_VERSION := 1
 signal offline_earnings_ready(amount: float)
 
 var pending_offline: float = 0.0
+var _last_save_time: float = 0.0
 var _autosave_timer: Timer
 
 
@@ -23,6 +24,9 @@ func _ready() -> void:
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_APPLICATION_PAUSED or what == NOTIFICATION_WM_CLOSE_REQUEST:
 		save()
+		_last_save_time = Time.get_unix_time_from_system()
+	if what == NOTIFICATION_APPLICATION_RESUMED:
+		_handle_resume()
 
 
 func save() -> void:
@@ -41,6 +45,7 @@ func save() -> void:
 		"mission_progress": GameState.mission_progress,
 		"mission_claimed": GameState.mission_claimed,
 		"mission_last_reset_date": GameState.mission_last_reset_date,
+		"tutorial_completed": GameState.tutorial_completed,
 		"last_save_time": Time.get_unix_time_from_system(),
 	}
 	var json_text := JSON.stringify(data)
@@ -60,6 +65,7 @@ func save() -> void:
 	var err := dir.rename("save.json.tmp", "save.json")
 	if err != OK:
 		push_error("Failed to rename save file: %d" % err)
+	_last_save_time = Time.get_unix_time_from_system()
 
 
 func load_save() -> void:
@@ -116,6 +122,7 @@ func load_save() -> void:
 	if mc is Dictionary:
 		GameState.mission_claimed = (mc as Dictionary).duplicate()
 	GameState.mission_last_reset_date = str(data.get("mission_last_reset_date", ""))
+	GameState.tutorial_completed = bool(data.get("tutorial_completed", false))
 	GameState.cash_changed.emit(GameState.cash)
 	GameState.slots_changed.emit()
 	Economy.upgrades_loaded.emit()
@@ -134,3 +141,22 @@ func load_save() -> void:
 		if amount > 0.0:
 			pending_offline = amount
 			offline_earnings_ready.emit(amount)
+
+
+func _handle_resume() -> void:
+	if _last_save_time <= 0.0:
+		_last_save_time = Time.get_unix_time_from_system()
+		return
+	var now := Time.get_unix_time_from_system()
+	var elapsed := now - _last_save_time
+	var cap := Economy.offline_cap_hours * 3600.0
+	if elapsed > cap:
+		elapsed = cap
+	if elapsed < 0.0:
+		elapsed = 0.0
+	var income := GameState.income_per_second_total() * Economy.income_multiplier
+	var amount := elapsed * income
+	if amount > 0.0:
+		pending_offline = amount
+		offline_earnings_ready.emit(amount)
+	_last_save_time = now

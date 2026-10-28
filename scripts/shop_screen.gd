@@ -44,6 +44,7 @@ func _on_buy_tier(tier: int) -> void:
 			GameState.cash -= float(t.buy_cost)
 			GameState.cash_changed.emit(GameState.cash)
 			GameState.set_slot(i, tier)
+			_refresh()
 			return
 
 
@@ -56,6 +57,7 @@ func _on_expand_slots() -> void:
 	GameState.slot_count += 1
 	GameState.slots.append(0)
 	GameState.slots_changed.emit()
+	_refresh()
 
 
 func _on_back() -> void:

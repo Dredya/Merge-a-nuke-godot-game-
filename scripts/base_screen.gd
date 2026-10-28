@@ -31,6 +31,9 @@ const LOCK_COOLDOWN := 300.0
 @onready var missions_popup: PanelContainer = $MissionsPopup
 @onready var missions_list: VBoxContainer = $MissionsPopup/VBoxContainer/MissionsList
 @onready var missions_close_button: Button = $MissionsPopup/VBoxContainer/MissionsCloseButton
+@onready var tutorial_popup: PanelContainer = $TutorialPopup
+@onready var tutorial_label: Label = $TutorialPopup/VBoxContainer/TutorialLabel
+@onready var tutorial_next_button: Button = $TutorialPopup/VBoxContainer/TutorialNextButton
 @onready var welcome_popup: PanelContainer = $WelcomePopup
 @onready var welcome_amount_label: Label = $WelcomePopup/VBoxContainer/AmountLabel
 @onready var claim_button: Button = $WelcomePopup/VBoxContainer/ClaimButton
@@ -51,6 +54,14 @@ var _floating_pool: Array[Label] = []
 var _floating_active: Array[Label] = []
 
 var _pending_offline: float = 0.0
+var _tutorial_step: int = 0
+const TUTORIAL_STEPS := [
+	"Buy a bomb using the Buy Bomb button.",
+	"Drag a bomb and drop it on another of the same tier to merge.",
+	"Raid AI bases to steal cash.",
+	"Lock your base with a shield to protect it.",
+	"Tap Next to finish the tutorial.",
+]
 
 
 func _ready() -> void:
@@ -69,6 +80,7 @@ func _ready() -> void:
 	redeem_close_button.pressed.connect(func(): redeem_popup.visible = false)
 	claim_daily_button.pressed.connect(_on_claim_daily)
 	missions_close_button.pressed.connect(func(): missions_popup.visible = false)
+	tutorial_next_button.pressed.connect(_on_tutorial_next)
 	GameState.slots_changed.connect(_on_slots_changed)
 	Economy.income_granted.connect(_on_income_granted)
 	SaveManager.offline_earnings_ready.connect(_on_offline_ready)
@@ -78,6 +90,9 @@ func _ready() -> void:
 	_update_auto_timer_wait()
 	_update_event_banner()
 	code_input.virtual_keyboard_enabled = true
+	if not GameState.tutorial_completed:
+		_tutorial_step = 0
+		_show_tutorial_step()
 	# Keyboard handling: keep popup visible; Godot handles panning partially.
 	# Ensure code input doesn't get covered by setting popup top anchor (done in scene).
 
@@ -147,7 +162,6 @@ func _start_drag(index: int) -> void:
 func _process(_delta: float) -> void:
 	if is_dragging and drag_visual != null:
 		drag_visual.global_position = get_global_mouse_position() - SLOT_SIZE * 0.5
-	_update_auto_timer_wait()
 	_update_shield_visual()
 
 
@@ -484,3 +498,18 @@ func _update_event_banner() -> void:
 		event_banner.visible = true
 	else:
 		event_banner.visible = false
+
+
+func _show_tutorial_step() -> void:
+	if _tutorial_step < TUTORIAL_STEPS.size():
+		tutorial_label.text = TUTORIAL_STEPS[_tutorial_step]
+		tutorial_popup.visible = true
+	else:
+		tutorial_popup.visible = false
+		GameState.tutorial_completed = true
+		SaveManager.save()
+
+
+func _on_tutorial_next() -> void:
+	_tutorial_step += 1
+	_show_tutorial_step()

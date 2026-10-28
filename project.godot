@@ -12,8 +12,10 @@ config_version=5
 
 config/name="Merge a nuke"
 config/features=PackedStringArray("4.7", "Mobile")
-config/icon="res://icon.svg"
+config/icon="res://assets/icon.png"
 run/main_scene="res://scenes/main.tscn"
+boot_splash/show_image=true
+boot_splash/image="res://assets/splash.png"
 
 [display]
 

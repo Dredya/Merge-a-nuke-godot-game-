@@ -240,6 +240,35 @@ text = "Claim"
 layout_mode = 2
 text = "Claim x2"
 
+[node name="TutorialPopup" type="PanelContainer" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -120.0
+offset_right = 200.0
+offset_bottom = 120.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="TutorialPopup"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="TutorialLabel" type="Label" parent="TutorialPopup/VBoxContainer"]
+layout_mode = 2
+text = "Tutorial"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="TutorialNextButton" type="Button" parent="TutorialPopup/VBoxContainer"]
+layout_mode = 2
+text = "Next"
+
 [node name="AutoSpawnTimer" type="Timer" parent="."]
 wait_time = 4.0
 autostart = true

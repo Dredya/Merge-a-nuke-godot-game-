@@ -36,7 +36,7 @@ Update this list after every phase (mark `[x]` when complete).
 - [x] Phase 6 — Raid system (attack AI bases, steal cash). (done in Phase 3)
 - [x] Phase 7 — Base shield (timed protection). (done in Phase 3)
 - [x] Phase 8 - Codes & daily rewards: redeem codes, daily login streak, missions, events, AdService/IAPService stubs.
-- [ ] Phase 9 — Polish, Android export, and release readiness.
+- [x] Phase 9 - Polish and performance: tutorial overlay, null/edge-case review, pooled nodes, pause/resume handling, icon/splash/app name. (Android export pending real device)
 
 ## Notes
 - Gameplay is intentionally **not** implemented yet; only setup is complete.
