@@ -8,6 +8,10 @@ signal player_raided(amount: float)
 
 const REFRESH_INTERVAL := 120.0
 const AI_RAID_INTERVAL := 60.0
+const AI_NAMES := [
+	"Cinder Keep", "Neon Vault", "Rustbucket", "Mega Mine", "Sky Fort",
+	"Boom Bunker", "Toxic Depot", "Iron Yard", "Glow Peak", "Nuke Nest",
+]
 
 var targets: Array = []
 var _refresh_timer: Timer
@@ -46,13 +50,17 @@ func _on_refresh() -> void:
 
 func _generate_targets() -> void:
 	targets.clear()
+	# Loot scales with the player's economy so raids stay relevant.
+	var base_loot := maxf(1500.0, GameState.cash * 4.0 + GameState.income_per_second_total() * 90.0)
 	var count := randi_range(5, 8)
+	var name_offset := randi_range(0, AI_NAMES.size() - 1)
 	for i in range(count):
 		targets.append({
-			"id": "base_%d" % i,
-			"name": "Base %d" % (i + 1),
-			"cash": float(randi_range(100, 5000)),
-			"locked": randf() < 0.3,
+			"id": "base_%d_%d" % [Time.get_ticks_msec(), i],
+			"name": str(AI_NAMES[(name_offset + i) % AI_NAMES.size()]),
+			"cash": base_loot * randf_range(0.45, 1.6),
+			# Always show at least one locked target for the raid list design.
+			"locked": i == 1 or randf() < 0.25,
 			"cooldown_until": 0.0,
 			"is_revenge": false,
 		})

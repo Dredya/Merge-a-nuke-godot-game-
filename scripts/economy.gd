@@ -139,7 +139,11 @@ func format_number(value: float) -> String:
 		idx += 1
 	if idx == 0:
 		return str(int(v))
-	return "%.2f%s" % [v, suffixes[idx]]
+	if v < 10.0:
+		return "%.2f%s" % [v, suffixes[idx]]
+	if v < 100.0:
+		return "%.1f%s" % [v, suffixes[idx]]
+	return "%.0f%s" % [v, suffixes[idx]]
 
 
 func set_event_multiplier(value: float) -> void:
