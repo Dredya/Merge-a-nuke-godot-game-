@@ -162,4 +162,6 @@ func _screen_shake() -> void:
 
 
 func _on_back() -> void:
-	get_tree().change_scene_to_file("res://scenes/base_screen.tscn")
+	var main = get_tree().get_root().get_node_or_null("Main")
+	if main:
+		main.show_screen("base")

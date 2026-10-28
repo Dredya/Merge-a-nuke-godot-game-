@@ -31,7 +31,7 @@ Update this list after every phase (mark `[x]` when complete).
 - [x] Phase 1 — Core merge loop: NukeTier resource + 15-tier data, GameState autoload, BaseScreen with 6 slots, buy/auto-spawn, drag-and-drop merge with feedback.
 - [x] Phase 2 - Economy & saving: Economy autoload, big-number formatting, safe-area HUD, upgrades JSON + screen, SaveManager (versioned atomic save, autosave, offline earnings + welcome popup), AdService stub.
 - [x] Phase 3 - Raiding and base lock: RaidService (AI targets), RaidScreen with raid sequence, revenge raids, Lock Base with persisted shield.
-- [ ] Phase 4 — Merge board gameplay.
+- [x] Phase 4 - Navigation, UI, and settings: Main shell with bottom nav, ShopScreen, SettingsScreen, AudioManager, theme, button press animations.
 - [ ] Phase 5 — Economy: cash/sec and offline earnings.
 - [ ] Phase 6 — Raid system (attack AI bases, steal cash).
 - [ ] Phase 7 — Base shield (timed protection).

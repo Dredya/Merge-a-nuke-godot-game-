@@ -13,7 +13,7 @@ config_version=5
 config/name="Merge a nuke"
 config/features=PackedStringArray("4.7", "Mobile")
 config/icon="res://icon.svg"
-run/main_scene="res://scenes/base_screen.tscn"
+run/main_scene="res://scenes/main.tscn"
 
 [display]
 
@@ -33,6 +33,7 @@ Economy="*res://scripts/economy.gd"
 AdService="*res://scripts/ad_service.gd"
 SaveManager="*res://scripts/save_manager.gd"
 RaidService="*res://scripts/raid_service.gd"
+AudioManager="*res://scripts/audio_manager.gd"
 
 [editor_plugins]
 

@@ -247,7 +247,7 @@ func _on_merge_sound() -> void:
 
 
 func _on_merge_haptics() -> void:
-	Input.vibrate_handheld(100)
+	AudioManager.vibrate(100)
 
 
 func _on_buy_pressed() -> void:
@@ -261,11 +261,15 @@ func _on_auto_spawn() -> void:
 
 
 func _on_upgrades_pressed() -> void:
-	get_tree().change_scene_to_file("res://scenes/upgrades_screen.tscn")
+	var main = get_tree().get_root().get_node_or_null("Main")
+	if main:
+		main.show_screen("upgrades")
 
 
 func _on_raid_pressed() -> void:
-	get_tree().change_scene_to_file("res://scenes/raid_screen.tscn")
+	var main = get_tree().get_root().get_node_or_null("Main")
+	if main:
+		main.show_screen("raid")
 
 
 func _on_lock_pressed() -> void:
