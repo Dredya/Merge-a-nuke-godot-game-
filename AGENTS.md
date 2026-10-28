@@ -28,7 +28,7 @@ Android idle merge-and-raid game (Godot 4.x, GDScript, Mobile renderer).
 Update this list after every phase (mark `[x]` when complete).
 
 - [x] Phase 0 — Project setup: Godot version verified, project settings configured (portrait 1080x1920, canvas_items stretch, expand aspect, Mobile renderer, emulate mouse from touch), folder structure created, AGENTS.md written.
-- [ ] Phase 1 — Data definitions: bomb tiers (1–15), upgrades, codes, missions, balance constants in `resources/`/`data/`.
+- [x] Phase 1 — Core merge loop: NukeTier resource + 15-tier data, GameState autoload, BaseScreen with 6 slots, buy/auto-spawn, drag-and-drop merge with feedback.
 - [ ] Phase 2 — Core autoloads & save/load skeleton.
 - [ ] Phase 3 — Main menu & navigation.
 - [ ] Phase 4 — Merge board gameplay.

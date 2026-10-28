@@ -13,7 +13,7 @@ config_version=5
 config/name="Merge a nuke"
 config/features=PackedStringArray("4.7", "Mobile")
 config/icon="res://icon.svg"
-run/main_scene="res://scenes/main.tscn"
+run/main_scene="res://scenes/base_screen.tscn"
 
 [display]
 
@@ -25,6 +25,10 @@ window/stretch/aspect="expand"
 [input_devices]
 
 pointing/emulate_mouse_from_touch=true
+
+[autoload]
+
+GameState="*res://scripts/game_state.gd"
 
 [editor_plugins]
 
