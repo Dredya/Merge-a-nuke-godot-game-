@@ -151,7 +151,7 @@
   },
   {
     "tier": 16,
-    "name": "Tier 16",
+    "name": "32.8K",
     "build_id": "procedural",
     "color": "#34ebeb",
     "color_secondary": "#23668c",
@@ -161,7 +161,7 @@
   },
   {
     "tier": 17,
-    "name": "Tier 17",
+    "name": "65.5K",
     "build_id": "procedural",
     "color": "#34e6eb",
     "color_secondary": "#23648c",
@@ -171,7 +171,7 @@
   },
   {
     "tier": 18,
-    "name": "Tier 18",
+    "name": "131K",
     "build_id": "procedural",
     "color": "#34e1eb",
     "color_secondary": "#23618c",
@@ -181,7 +181,7 @@
   },
   {
     "tier": 19,
-    "name": "Tier 19",
+    "name": "262K",
     "build_id": "procedural",
     "color": "#34ddeb",
     "color_secondary": "#235e8c",
@@ -191,7 +191,7 @@
   },
   {
     "tier": 20,
-    "name": "Tier 20",
+    "name": "524K",
     "build_id": "procedural",
     "color": "#34d8eb",
     "color_secondary": "#235c8c",
@@ -201,7 +201,7 @@
   },
   {
     "tier": 21,
-    "name": "Tier 21",
+    "name": "1.05M",
     "build_id": "procedural",
     "color": "#34d3eb",
     "color_secondary": "#23598c",
@@ -211,7 +211,7 @@
   },
   {
     "tier": 22,
-    "name": "Tier 22",
+    "name": "2.1M",
     "build_id": "procedural",
     "color": "#34cfeb",
     "color_secondary": "#23568c",
@@ -221,7 +221,7 @@
   },
   {
     "tier": 23,
-    "name": "Tier 23",
+    "name": "4.19M",
     "build_id": "procedural",
     "color": "#34caeb",
     "color_secondary": "#23548c",
@@ -231,7 +231,7 @@
   },
   {
     "tier": 24,
-    "name": "Tier 24",
+    "name": "8.39M",
     "build_id": "procedural",
     "color": "#34c6eb",
     "color_secondary": "#23518c",
@@ -251,7 +251,7 @@
   },
   {
     "tier": 26,
-    "name": "Tier 26",
+    "name": "33.6M",
     "build_id": "procedural",
     "color": "#34bceb",
     "color_secondary": "#234c8c",
@@ -261,7 +261,7 @@
   },
   {
     "tier": 27,
-    "name": "Tier 27",
+    "name": "67.1M",
     "build_id": "procedural",
     "color": "#34b8eb",
     "color_secondary": "#23498c",
@@ -271,7 +271,7 @@
   },
   {
     "tier": 28,
-    "name": "Tier 28",
+    "name": "134M",
     "build_id": "procedural",
     "color": "#34b3eb",
     "color_secondary": "#23468c",
@@ -281,7 +281,7 @@
   },
   {
     "tier": 29,
-    "name": "Tier 29",
+    "name": "268M",
     "build_id": "procedural",
     "color": "#34aeeb",
     "color_secondary": "#23448c",
@@ -291,7 +291,7 @@
   },
   {
     "tier": 30,
-    "name": "Tier 30",
+    "name": "537M",
     "build_id": "procedural",
     "color": "#34aaeb",
     "color_secondary": "#23418c",
@@ -301,7 +301,7 @@
   },
   {
     "tier": 31,
-    "name": "Tier 31",
+    "name": "1.07B",
     "build_id": "procedural",
     "color": "#34a5eb",
     "color_secondary": "#233e8c",
@@ -311,7 +311,7 @@
   },
   {
     "tier": 32,
-    "name": "Tier 32",
+    "name": "2.15B",
     "build_id": "procedural",
     "color": "#34a1eb",
     "color_secondary": "#233c8c",
@@ -321,7 +321,7 @@
   },
   {
     "tier": 33,
-    "name": "Tier 33",
+    "name": "4.29B",
     "build_id": "procedural",
     "color": "#349ceb",
     "color_secondary": "#23398c",
@@ -331,7 +331,7 @@
   },
   {
     "tier": 34,
-    "name": "Tier 34",
+    "name": "8.59B",
     "build_id": "procedural",
     "color": "#3497eb",
     "color_secondary": "#23368c",
@@ -341,7 +341,7 @@
   },
   {
     "tier": 35,
-    "name": "Tier 35",
+    "name": "17.2B",
     "build_id": "procedural",
     "color": "#3493eb",
     "color_secondary": "#23348c",
@@ -351,7 +351,7 @@
   },
   {
     "tier": 36,
-    "name": "Tier 36",
+    "name": "34.4B",
     "build_id": "procedural",
     "color": "#348eeb",
     "color_secondary": "#23318c",
@@ -361,7 +361,7 @@
   },
   {
     "tier": 37,
-    "name": "Tier 37",
+    "name": "68.7B",
     "build_id": "procedural",
     "color": "#3489eb",
     "color_secondary": "#232e8c",
@@ -371,7 +371,7 @@
   },
   {
     "tier": 38,
-    "name": "Tier 38",
+    "name": "137B",
     "build_id": "procedural",
     "color": "#3485eb",
     "color_secondary": "#232c8c",
@@ -381,7 +381,7 @@
   },
   {
     "tier": 39,
-    "name": "Tier 39",
+    "name": "275B",
     "build_id": "procedural",
     "color": "#3480eb",
     "color_secondary": "#23298c",
@@ -391,7 +391,7 @@
   },
   {
     "tier": 40,
-    "name": "Tier 40",
+    "name": "550B",
     "build_id": "procedural",
     "color": "#347beb",
     "color_secondary": "#23278c",
@@ -401,7 +401,7 @@
   },
   {
     "tier": 41,
-    "name": "Tier 41",
+    "name": "1.1T",
     "build_id": "procedural",
     "color": "#3477eb",
     "color_secondary": "#23248c",
@@ -411,7 +411,7 @@
   },
   {
     "tier": 42,
-    "name": "Tier 42",
+    "name": "2.2T",
     "build_id": "procedural",
     "color": "#3472eb",
     "color_secondary": "#25238c",
@@ -421,7 +421,7 @@
   },
   {
     "tier": 43,
-    "name": "Tier 43",
+    "name": "4.4T",
     "build_id": "procedural",
     "color": "#346eeb",
     "color_secondary": "#28238c",
@@ -431,7 +431,7 @@
   },
   {
     "tier": 44,
-    "name": "Tier 44",
+    "name": "8.8T",
     "build_id": "procedural",
     "color": "#3469eb",
     "color_secondary": "#2a238c",
@@ -441,7 +441,7 @@
   },
   {
     "tier": 45,
-    "name": "Tier 45",
+    "name": "17.6T",
     "build_id": "procedural",
     "color": "#3464eb",
     "color_secondary": "#2d238c",
@@ -451,7 +451,7 @@
   },
   {
     "tier": 46,
-    "name": "Tier 46",
+    "name": "35.2T",
     "build_id": "procedural",
     "color": "#3460eb",
     "color_secondary": "#30238c",
@@ -461,7 +461,7 @@
   },
   {
     "tier": 47,
-    "name": "Tier 47",
+    "name": "70.4T",
     "build_id": "procedural",
     "color": "#345beb",
     "color_secondary": "#32238c",
@@ -471,7 +471,7 @@
   },
   {
     "tier": 48,
-    "name": "Tier 48",
+    "name": "141T",
     "build_id": "procedural",
     "color": "#3456eb",
     "color_secondary": "#35238c",
@@ -481,7 +481,7 @@
   },
   {
     "tier": 49,
-    "name": "Tier 49",
+    "name": "281T",
     "build_id": "procedural",
     "color": "#3452eb",
     "color_secondary": "#38238c",
@@ -501,7 +501,7 @@
   },
   {
     "tier": 51,
-    "name": "Tier 51",
+    "name": "1.13Qa",
     "build_id": "procedural",
     "color": "#3449eb",
     "color_secondary": "#3d238c",
@@ -511,7 +511,7 @@
   },
   {
     "tier": 52,
-    "name": "Tier 52",
+    "name": "2.25Qa",
     "build_id": "procedural",
     "color": "#3444eb",
     "color_secondary": "#40238c",
@@ -521,7 +521,7 @@
   },
   {
     "tier": 53,
-    "name": "Tier 53",
+    "name": "4.5Qa",
     "build_id": "procedural",
     "color": "#343feb",
     "color_secondary": "#42238c",
@@ -531,7 +531,7 @@
   },
   {
     "tier": 54,
-    "name": "Tier 54",
+    "name": "9.01Qa",
     "build_id": "procedural",
     "color": "#343beb",
     "color_secondary": "#45238c",
@@ -541,7 +541,7 @@
   },
   {
     "tier": 55,
-    "name": "Tier 55",
+    "name": "18Qa",
     "build_id": "procedural",
     "color": "#3436eb",
     "color_secondary": "#48238c",
@@ -551,7 +551,7 @@
   },
   {
     "tier": 56,
-    "name": "Tier 56",
+    "name": "36Qa",
     "build_id": "procedural",
     "color": "#3634eb",
     "color_secondary": "#4a238c",
@@ -561,7 +561,7 @@
   },
   {
     "tier": 57,
-    "name": "Tier 57",
+    "name": "72.1Qa",
     "build_id": "procedural",
     "color": "#3a34eb",
     "color_secondary": "#4d238c",
@@ -571,7 +571,7 @@
   },
   {
     "tier": 58,
-    "name": "Tier 58",
+    "name": "144Qa",
     "build_id": "procedural",
     "color": "#3f34eb",
     "color_secondary": "#50238c",
@@ -581,7 +581,7 @@
   },
   {
     "tier": 59,
-    "name": "Tier 59",
+    "name": "288Qa",
     "build_id": "procedural",
     "color": "#4434eb",
     "color_secondary": "#52238c",
@@ -591,7 +591,7 @@
   },
   {
     "tier": 60,
-    "name": "Tier 60",
+    "name": "576Qa",
     "build_id": "procedural",
     "color": "#4834eb",
     "color_secondary": "#55238c",
@@ -601,7 +601,7 @@
   },
   {
     "tier": 61,
-    "name": "Tier 61",
+    "name": "1.15Qi",
     "build_id": "procedural",
     "color": "#4d34eb",
     "color_secondary": "#58238c",
@@ -611,7 +611,7 @@
   },
   {
     "tier": 62,
-    "name": "Tier 62",
+    "name": "2.31Qi",
     "build_id": "procedural",
     "color": "#5234eb",
     "color_secondary": "#5a238c",
@@ -621,7 +621,7 @@
   },
   {
     "tier": 63,
-    "name": "Tier 63",
+    "name": "4.61Qi",
     "build_id": "procedural",
     "color": "#5634eb",
     "color_secondary": "#5d238c",
@@ -631,7 +631,7 @@
   },
   {
     "tier": 64,
-    "name": "Tier 64",
+    "name": "9.22Qi",
     "build_id": "procedural",
     "color": "#5b34eb",
     "color_secondary": "#5f238c",
@@ -641,7 +641,7 @@
   },
   {
     "tier": 65,
-    "name": "Tier 65",
+    "name": "18.4Qi",
     "build_id": "procedural",
     "color": "#5f34eb",
     "color_secondary": "#62238c",
@@ -651,7 +651,7 @@
   },
   {
     "tier": 66,
-    "name": "Tier 66",
+    "name": "36.9Qi",
     "build_id": "procedural",
     "color": "#6434eb",
     "color_secondary": "#65238c",
@@ -661,7 +661,7 @@
   },
   {
     "tier": 67,
-    "name": "Tier 67",
+    "name": "73.8Qi",
     "build_id": "procedural",
     "color": "#6934eb",
     "color_secondary": "#67238c",
@@ -671,7 +671,7 @@
   },
   {
     "tier": 68,
-    "name": "Tier 68",
+    "name": "148Qi",
     "build_id": "procedural",
     "color": "#6d34eb",
     "color_secondary": "#6a238c",
@@ -681,7 +681,7 @@
   },
   {
     "tier": 69,
-    "name": "Tier 69",
+    "name": "295Qi",
     "build_id": "procedural",
     "color": "#7234eb",
     "color_secondary": "#6d238c",
@@ -691,7 +691,7 @@
   },
   {
     "tier": 70,
-    "name": "Tier 70",
+    "name": "590Qi",
     "build_id": "procedural",
     "color": "#7734eb",
     "color_secondary": "#6f238c",
@@ -701,7 +701,7 @@
   },
   {
     "tier": 71,
-    "name": "Tier 71",
+    "name": "1.18Sx",
     "build_id": "procedural",
     "color": "#7b34eb",
     "color_secondary": "#72238c",
@@ -711,7 +711,7 @@
   },
   {
     "tier": 72,
-    "name": "Tier 72",
+    "name": "2.36Sx",
     "build_id": "procedural",
     "color": "#8034eb",
     "color_secondary": "#75238c",
@@ -721,7 +721,7 @@
   },
   {
     "tier": 73,
-    "name": "Tier 73",
+    "name": "4.72Sx",
     "build_id": "procedural",
     "color": "#8534eb",
     "color_secondary": "#77238c",
@@ -731,7 +731,7 @@
   },
   {
     "tier": 74,
-    "name": "Tier 74",
+    "name": "9.44Sx",
     "build_id": "procedural",
     "color": "#8934eb",
     "color_secondary": "#7a238c",
@@ -751,7 +751,7 @@
   },
   {
     "tier": 76,
-    "name": "Tier 76",
+    "name": "37.8Sx",
     "build_id": "procedural",
     "color": "#9234eb",
     "color_secondary": "#7f238c",
@@ -761,7 +761,7 @@
   },
   {
     "tier": 77,
-    "name": "Tier 77",
+    "name": "75.6Sx",
     "build_id": "procedural",
     "color": "#9734eb",
     "color_secondary": "#82238c",
@@ -771,7 +771,7 @@
   },
   {
     "tier": 78,
-    "name": "Tier 78",
+    "name": "151Sx",
     "build_id": "procedural",
     "color": "#9c34eb",
     "color_secondary": "#85238c",
@@ -781,7 +781,7 @@
   },
   {
     "tier": 79,
-    "name": "Tier 79",
+    "name": "302Sx",
     "build_id": "procedural",
     "color": "#a034eb",
     "color_secondary": "#87238c",
@@ -791,7 +791,7 @@
   },
   {
     "tier": 80,
-    "name": "Tier 80",
+    "name": "604Sx",
     "build_id": "procedural",
     "color": "#a534eb",
     "color_secondary": "#8a238c",
@@ -801,7 +801,7 @@
   },
   {
     "tier": 81,
-    "name": "Tier 81",
+    "name": "1.21Sp",
     "build_id": "procedural",
     "color": "#aa34eb",
     "color_secondary": "#8c238c",
@@ -811,7 +811,7 @@
   },
   {
     "tier": 82,
-    "name": "Tier 82",
+    "name": "2.42Sp",
     "build_id": "procedural",
     "color": "#ae34eb",
     "color_secondary": "#8c2389",
@@ -821,7 +821,7 @@
   },
   {
     "tier": 83,
-    "name": "Tier 83",
+    "name": "4.84Sp",
     "build_id": "procedural",
     "color": "#b334eb",
     "color_secondary": "#8c2386",
@@ -831,7 +831,7 @@
   },
   {
     "tier": 84,
-    "name": "Tier 84",
+    "name": "9.67Sp",
     "build_id": "procedural",
     "color": "#b734eb",
     "color_secondary": "#8c2384",
@@ -841,7 +841,7 @@
   },
   {
     "tier": 85,
-    "name": "Tier 85",
+    "name": "19.3Sp",
     "build_id": "procedural",
     "color": "#bc34eb",
     "color_secondary": "#8c2381",
@@ -851,7 +851,7 @@
   },
   {
     "tier": 86,
-    "name": "Tier 86",
+    "name": "38.7Sp",
     "build_id": "procedural",
     "color": "#c134eb",
     "color_secondary": "#8c237e",
@@ -861,7 +861,7 @@
   },
   {
     "tier": 87,
-    "name": "Tier 87",
+    "name": "77.4Sp",
     "build_id": "procedural",
     "color": "#c534eb",
     "color_secondary": "#8c237c",
@@ -871,7 +871,7 @@
   },
   {
     "tier": 88,
-    "name": "Tier 88",
+    "name": "155Sp",
     "build_id": "procedural",
     "color": "#ca34eb",
     "color_secondary": "#8c2379",
@@ -881,7 +881,7 @@
   },
   {
     "tier": 89,
-    "name": "Tier 89",
+    "name": "309Sp",
     "build_id": "procedural",
     "color": "#cf34eb",
     "color_secondary": "#8c2376",
@@ -891,7 +891,7 @@
   },
   {
     "tier": 90,
-    "name": "Tier 90",
+    "name": "619Sp",
     "build_id": "procedural",
     "color": "#d334eb",
     "color_secondary": "#8c2374",
@@ -901,7 +901,7 @@
   },
   {
     "tier": 91,
-    "name": "Tier 91",
+    "name": "1.24Oc",
     "build_id": "procedural",
     "color": "#d834eb",
     "color_secondary": "#8c2371",
@@ -911,7 +911,7 @@
   },
   {
     "tier": 92,
-    "name": "Tier 92",
+    "name": "2.48Oc",
     "build_id": "procedural",
     "color": "#dc34eb",
     "color_secondary": "#8c236e",
@@ -921,7 +921,7 @@
   },
   {
     "tier": 93,
-    "name": "Tier 93",
+    "name": "4.95Oc",
     "build_id": "procedural",
     "color": "#e134eb",
     "color_secondary": "#8c236c",
@@ -931,7 +931,7 @@
   },
   {
     "tier": 94,
-    "name": "Tier 94",
+    "name": "9.9Oc",
     "build_id": "procedural",
     "color": "#e634eb",
     "color_secondary": "#8c2369",
@@ -941,7 +941,7 @@
   },
   {
     "tier": 95,
-    "name": "Tier 95",
+    "name": "19.8Oc",
     "build_id": "procedural",
     "color": "#ea34eb",
     "color_secondary": "#8c2367",
@@ -951,7 +951,7 @@
   },
   {
     "tier": 96,
-    "name": "Tier 96",
+    "name": "39.6Oc",
     "build_id": "procedural",
     "color": "#eb34e6",
     "color_secondary": "#8c2364",
@@ -961,7 +961,7 @@
   },
   {
     "tier": 97,
-    "name": "Tier 97",
+    "name": "79.2Oc",
     "build_id": "procedural",
     "color": "#eb34e2",
     "color_secondary": "#8c2361",
@@ -971,7 +971,7 @@
   },
   {
     "tier": 98,
-    "name": "Tier 98",
+    "name": "158Oc",
     "build_id": "procedural",
     "color": "#eb34dd",
     "color_secondary": "#8c235f",
@@ -981,7 +981,7 @@
   },
   {
     "tier": 99,
-    "name": "Tier 99",
+    "name": "317Oc",
     "build_id": "procedural",
     "color": "#eb34d8",
     "color_secondary": "#8c235c",

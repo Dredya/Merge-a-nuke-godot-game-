@@ -65,7 +65,13 @@ func _load_base_tiers() -> Array:
 
 func _make_tier(tier: int) -> Dictionary:
 	var t := clampf(float(tier - 16) / 83.0, 0.0, 1.0)
-	var name := str(MILESTONES.get(tier, "Tier %d" % tier))
+	var income := pow(2.0, float(tier - 1))
+	var milestone_name: Variant = MILESTONES.get(tier, null)
+	var name := ""
+	if milestone_name != null:
+		name = str(milestone_name)
+	else:
+		name = _format_number(income)
 	var build_id := "singularity" if tier == 100 else "procedural"
 	var primary: Color
 	var secondary: Color
@@ -90,5 +96,37 @@ func _make_tier(tier: int) -> Dictionary:
 		"color_secondary": "#" + secondary.to_html(false),
 		"color_accent": "#" + accent.to_html(false),
 		"glow_color": "#" + glow.to_html(false),
-		"income_per_sec": pow(2.0, float(tier - 1)),
+		"income_per_sec": income,
 	}
+
+
+func _format_number(value: float) -> String:
+	if value >= 1.0e36:
+		return ("%.2e" % value).replace("+", "")
+	var suffixes := ["", "K", "M", "B", "T", "Qa", "Qi", "Sx", "Sp", "Oc", "No", "Dc"]
+	var v := value
+	var idx := 0
+	while v >= 1000.0 and idx < suffixes.size() - 1:
+		v /= 1000.0
+		idx += 1
+	if idx == 0:
+		return str(int(v))
+	if v < 10.0:
+		return _trim_decimal("%.2f%s" % [v, suffixes[idx]])
+	if v < 100.0:
+		return _trim_decimal("%.1f%s" % [v, suffixes[idx]])
+	return "%.0f%s" % [v, suffixes[idx]]
+
+
+func _trim_decimal(text: String) -> String:
+	var suffix := ""
+	for i in range(text.length()):
+		var ch := text.substr(i, 1)
+		if ch < "0" or ch > "9":
+			if ch == ".":
+				continue
+			suffix = text.substr(i)
+			text = text.substr(0, i)
+			break
+	text = text.rstrip("0").rstrip(".")
+	return text + suffix

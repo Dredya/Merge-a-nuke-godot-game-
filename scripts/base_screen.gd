@@ -507,7 +507,10 @@ func _set_singularity_glow(t: float) -> void:
 
 func _show_milestone(tier: int) -> void:
 	var tier_data := GameState.get_tier(tier)
-	if tier_data == null or tier_data.name.begins_with("Tier "):
+	if tier_data == null:
+		return
+	# Only the four milestone tiers get a toast; renamed income tiers do not.
+	if tier not in [25, 50, 75, 100]:
 		return
 	milestone_label.text = "MILESTONE  •  " + tier_data.name.to_upper()
 	milestone_panel.visible = true

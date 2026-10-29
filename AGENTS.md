@@ -68,7 +68,9 @@ and glow-pulse (looping Tweens). Budget: ≤ ~300 triangles per bomb.
 - One procedural builder scales with tier: body radius `0.45 → 0.70`, 2–4 rotating rings,
   growing emissive core, two fins, and orbiting shards from tier 50 upward.
 - Body/glow colors progress cyan → blue → indigo → purple → magenta via HSV.
-- Tier names are `Tier N` except milestones: **25 Hyper**, **50 Apex**, **75 Transcendent**.
+- Tier names for procedural tiers (16–99) are the formatted income value (e.g. `32.8K`, `4.19M`)
+  via the same K/M/B/… suffix rules as `Economy.format_number`; milestones keep
+  **25 Hyper**, **50 Apex**, **75 Transcendent**, **100 Singularity**. Tiers 1–15 keep showcase names.
 - Reaching a milestone shows a temporary gold `MILESTONE` toast on the base.
 - Still ≤ ~300 triangles per bomb.
 

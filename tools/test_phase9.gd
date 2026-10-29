@@ -102,7 +102,7 @@ func _test_data() -> void:
 			if data.name != "Singularity":
 				issues.append("tier 100 name is not Singularity")
 		else:
-			var expected_name := str(MILESTONES.get(tier, "Tier %d" % tier))
+			var expected_name := str(MILESTONES.get(tier, Economy.format_number(expected_income)))
 			if data.name != expected_name:
 				issues.append("tier %d name %s != %s" % [tier, data.name, expected_name])
 		if data.build_id != expected_id:
