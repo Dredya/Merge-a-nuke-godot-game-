@@ -61,8 +61,13 @@ func _on_reset_pressed() -> void:
 
 func _on_reset_confirmed() -> void:
 	var dir := DirAccess.open("user://")
-	if dir != null and dir.file_exists("save.json"):
-		dir.remove("save.json")
+	if dir != null:
+		if dir.file_exists("save.json"):
+			dir.remove("save.json")
+		if dir.file_exists("save.json.tmp"):
+			dir.remove("save.json.tmp")
+		if dir.file_exists("save.json.bak"):
+			dir.remove("save.json.bak")
 	GameState.cash = 0.0
 	GameState.slot_count = GameState.MAX_SLOTS
 	GameState.slots.clear()

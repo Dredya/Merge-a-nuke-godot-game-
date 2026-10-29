@@ -11,16 +11,21 @@ signal offline_earnings_ready(amount: float)
 var pending_offline: float = 0.0
 var pending_offline_seconds: float = 0.0
 var _last_save_time: float = 0.0
-var _autosave_timer: Timer
+var _autosave_accum: float = 0.0
+const AUTOSAVE_INTERVAL := 30.0
 
 
 func _ready() -> void:
-	_autosave_timer = Timer.new()
-	_autosave_timer.wait_time = 30.0
-	_autosave_timer.autostart = true
-	_autosave_timer.timeout.connect(save)
-	add_child(_autosave_timer)
+	_autosave_accum = 0.0
 	load_save()
+
+
+func _process(delta: float) -> void:
+	# Frame-accumulated autosave so it cannot stall the way a Timer can.
+	_autosave_accum += delta
+	if _autosave_accum >= AUTOSAVE_INTERVAL:
+		_autosave_accum = 0.0
+		save()
 
 
 func _notification(what: int) -> void:
@@ -51,37 +56,93 @@ func save() -> void:
 		"last_save_time": Time.get_unix_time_from_system(),
 	}
 	var json_text := JSON.stringify(data)
-	var tmp_path := SAVE_PATH + ".tmp"
+	# Write to a temp file first, verify it, then atomically promote it.
+	var tmp_path := "user://save.json.tmp"
 	var f := FileAccess.open(tmp_path, FileAccess.WRITE)
 	if f == null:
 		push_error("Failed to open temp save file")
+		# Fall back to a direct write so progress is never lost.
+		_write_direct(json_text)
+		_last_save_time = Time.get_unix_time_from_system()
 		return
 	f.store_string(json_text)
 	f.close()
-	var dir := DirAccess.open("user://")
-	if dir == null:
-		push_error("Failed to open user dir for save")
+	# Verify the temp file is readable and non-empty.
+	var check := FileAccess.open(tmp_path, FileAccess.READ)
+	if check == null or check.get_length() <= 0:
+		push_error("Temp save file is empty or unreadable")
+		if check != null:
+			check.close()
+		_write_direct(json_text)
+		_last_save_time = Time.get_unix_time_from_system()
 		return
-	if dir.file_exists("save.json"):
-		dir.remove("save.json")
-	var err := dir.rename("save.json.tmp", "save.json")
-	if err != OK:
-		push_error("Failed to rename save file: %d" % err)
+	check.close()
+	# Keep a backup of the previous save before promoting.
+	var dir := DirAccess.open("user://")
+	if dir != null:
+		if dir.file_exists("save.json"):
+			# Copy current save to .bak (best-effort).
+			var old_file := FileAccess.open("user://save.json", FileAccess.READ)
+			if old_file != null:
+				var old_text := old_file.get_as_text()
+				old_file.close()
+				var bak := FileAccess.open("user://save.json.bak", FileAccess.WRITE)
+				if bak != null:
+					bak.store_string(old_text)
+					bak.close()
+		# Promote tmp -> save. Remove destination first (some platforms require it).
+		if dir.file_exists("save.json"):
+			dir.remove("save.json")
+		var err := dir.rename("save.json.tmp", "save.json")
+		if err != OK:
+			push_error("Failed to rename save file: %d" % err)
+			_write_direct(json_text)
+	# Clean up the temp file if it still exists.
+	if dir != null and dir.file_exists("save.json.tmp"):
+		dir.remove("save.json.tmp")
 	_last_save_time = Time.get_unix_time_from_system()
 
 
+func _write_direct(json_text: String) -> void:
+	var f := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
+	if f == null:
+		push_error("Failed to open save file for direct write")
+		return
+	f.store_string(json_text)
+	f.close()
+
+
 func load_save() -> void:
-	if not FileAccess.file_exists(SAVE_PATH):
-		return
-	var file := FileAccess.open(SAVE_PATH, FileAccess.READ)
+	var path := SAVE_PATH
+	if not FileAccess.file_exists(path):
+		# Try the backup if the main save is missing.
+		if FileAccess.file_exists("user://save.json.bak"):
+			path = "user://save.json.bak"
+		else:
+			return
+	var file := FileAccess.open(path, FileAccess.READ)
 	if file == null:
-		return
+		# Last resort: try the backup.
+		if path != "user://save.json.bak" and FileAccess.file_exists("user://save.json.bak"):
+			file = FileAccess.open("user://save.json.bak", FileAccess.READ)
+		if file == null:
+			return
 	var text := file.get_as_text()
 	file.close()
 	var parsed: Variant = JSON.parse_string(text)
 	if not (parsed is Dictionary):
-		push_error("Invalid save file format")
-		return
+		# Try backup on corrupt primary.
+		if path != "user://save.json.bak" and FileAccess.file_exists("user://save.json.bak"):
+			var bak_file := FileAccess.open("user://save.json.bak", FileAccess.READ)
+			if bak_file != null:
+				var bak_text := bak_file.get_as_text()
+				bak_file.close()
+				var bak_parsed: Variant = JSON.parse_string(bak_text)
+				if bak_parsed is Dictionary:
+					parsed = bak_parsed
+		if not (parsed is Dictionary):
+			push_error("Invalid save file format")
+			return
 	var data := parsed as Dictionary
 	# Version check (simple migration placeholder).
 	var version := int(data.get("version", 0))
@@ -101,7 +162,7 @@ func load_save() -> void:
 	GameState.highest_tier_reached = int(data.get("highest_tier_reached", 0))
 	for slot_tier in GameState.slots:
 		GameState.highest_tier_reached = maxi(GameState.highest_tier_reached, slot_tier)
-	# Old six-slot saves are migrated into the fixed 4x3 board.
+	# Old saves with fewer slots are migrated into the current board.
 	for i in range(GameState.slots.size()):
 		if i >= saved_size:
 			GameState.slots[i] = 0
@@ -127,8 +188,11 @@ func load_save() -> void:
 	GameState.cash_changed.emit(GameState.cash)
 	GameState.slots_changed.emit()
 	Economy.upgrades_loaded.emit()
-	# Offline earnings
+	# Restore the last save time so resume/offline earnings work.
 	var last_time := float(data.get("last_save_time", 0.0))
+	if last_time > 0.0:
+		_last_save_time = last_time
+	# Offline earnings
 	if last_time > 0.0:
 		var now := Time.get_unix_time_from_system()
 		var elapsed := now - last_time
