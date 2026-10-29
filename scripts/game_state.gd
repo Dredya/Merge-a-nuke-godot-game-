@@ -78,14 +78,6 @@ func add_cash(amount: float) -> void:
 	cash_changed.emit(cash)
 
 
-func set_slot(index: int, tier_number: int) -> void:
-	if index < 0 or index >= slots.size():
-		return
-	slots[index] = clampi(tier_number, 0, MAX_TIER)
-	_note_tier(slots[index])
-	slots_changed.emit()
-
-
 func commit_slots(new_slots: Array[int]) -> void:
 	## Replace the whole board in one notification (drag / merge operations).
 	if new_slots.size() != slots.size():
