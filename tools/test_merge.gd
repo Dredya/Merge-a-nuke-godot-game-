@@ -36,7 +36,7 @@ func _run() -> void:
 			f.close()
 
 	# Deterministic board: bomb at 0, bomb at 1, bomb at 2.
-	for i in range(GameState.MAX_SLOTS):
+	for i in range(GameState.slot_count):
 		GameState.slots[i] = 0
 	GameState.slots[0] = 1
 	GameState.slots[1] = 2
@@ -107,8 +107,8 @@ func _run() -> void:
 		SaveManager.pending_offline = 0.0
 		GameState.cash = 28800.0
 		GameState.cash_changed.emit(GameState.cash)
-		var showcase := [1, 2, 3, 4, 5, 6, 7, 8, 9, 50, 0, 100]
-		for i in range(GameState.MAX_SLOTS):
+		var showcase := [1, 2, 3, 4, 5, 50]
+		for i in range(GameState.slot_count):
 			GameState.slots[i] = showcase[i]
 		_base.call("_refresh_all_slots")
 		await get_tree().create_timer(0.8).timeout
@@ -116,7 +116,7 @@ func _run() -> void:
 		if board_image != null:
 			board_image.save_png("user://step9_board.png")
 		# Snapshot the tier-100 Singularity merge.
-		for i in range(GameState.MAX_SLOTS):
+		for i in range(GameState.slot_count):
 			GameState.slots[i] = 0
 		GameState.slots[0] = 99
 		GameState.slots[1] = 99

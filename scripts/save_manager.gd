@@ -90,7 +90,8 @@ func load_save() -> void:
 		# For now, still attempt load.
 		pass
 	GameState.cash = float(data.get("cash", 0.0))
-	GameState.slot_count = GameState.MAX_SLOTS
+	var saved_slot_count := int(data.get("slot_count", 6))
+	GameState.slot_count = clampi(saved_slot_count, 6, GameState.MAX_SLOTS)
 	GameState.slots.resize(GameState.slot_count)
 	var saved_slots: Variant = data.get("slots", [])
 	var saved_size := 0

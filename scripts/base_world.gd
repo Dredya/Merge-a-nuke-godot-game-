@@ -4,9 +4,12 @@ extends Node3D
 ## The player's 3D plot: sky, sun, blocky baseplate, 4x3 diamond slot pads,
 ## drifting clouds and the fixed isometric camera.
 
-const ROWS := 3
-const COLS := 4
-const SLOT_COUNT := ROWS * COLS
+# Layout is configured at setup()/rebuild() time.
+var cols: int = 2
+var rows: int = 3
+var SLOT_COUNT: int:
+	get:
+		return cols * rows
 const SLOT_SPACING := 2.55
 const PAD_SIZE := 1.72
 const PAD_TOP_Y := 0.16
@@ -28,8 +31,10 @@ var _clouds: Array[Dictionary] = []
 var _time: float = 0.0
 
 
-func setup(quality_low: bool = false) -> void:
+func setup(quality_low: bool = false, p_cols: int = 2, p_rows: int = 3) -> void:
 	low_quality = quality_low
+	cols = maxi(1, p_cols)
+	rows = maxi(1, p_rows)
 	_build_environment()
 	_build_ground()
 	_build_baseplate()
@@ -40,12 +45,12 @@ func setup(quality_low: bool = false) -> void:
 
 
 func slot_position(index: int) -> Vector3:
-	var col := index % COLS
-	var row := index / COLS
+	var col := index % cols
+	var row := index / cols
 	return Vector3(
-		(float(col) - float(COLS - 1) * 0.5) * SLOT_SPACING,
+		(float(col) - float(cols - 1) * 0.5) * SLOT_SPACING,
 		PAD_TOP_Y,
-		(float(row) - float(ROWS - 1) * 0.5) * SLOT_SPACING
+		(float(row) - float(rows - 1) * 0.5) * SLOT_SPACING
 	)
 
 
@@ -73,9 +78,9 @@ func _build_baseplate() -> void:
 	add_child(plate)
 
 	var slab_size := Vector3(
-		float(COLS) * SLOT_SPACING + 2.0,
+		float(cols) * SLOT_SPACING + 2.0,
 		SLAB_THICKNESS,
-		float(ROWS) * SLOT_SPACING + 2.0
+		float(rows) * SLOT_SPACING + 2.0
 	)
 
 	# Main chunky slab (dark green body). The top and visible sides get their own
@@ -215,6 +220,21 @@ func _process(delta: float) -> void:
 		if mat != null:
 			mat.albedo_color.a = pulse
 			mat.emission_energy_multiplier = 1.4 + pulse * 1.6
+
+
+func rebuild(p_cols: int, p_rows: int) -> void:
+	cols = maxi(1, p_cols)
+	rows = maxi(1, p_rows)
+	var plate := get_node_or_null("Baseplate")
+	if plate != null:
+		remove_child(plate)
+		plate.free()
+	if slots_root != null:
+		remove_child(slots_root)
+		slots_root.free()
+		slots_root = null
+	_build_baseplate()
+	_build_slots()
 
 
 func show_slot_highlight(index: int) -> void:

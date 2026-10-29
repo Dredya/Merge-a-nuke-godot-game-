@@ -186,7 +186,7 @@ func _prepare_base() -> void:
 	var auto_timer := _base.get("_auto_timer") as Timer
 	if auto_timer != null:
 		auto_timer.stop()
-	for i in range(GameState.MAX_SLOTS):
+	for i in range(GameState.slot_count):
 		GameState.slots[i] = 0
 	GameState.cash = 1000.0
 	GameState.cash_changed.emit(GameState.cash)
@@ -213,7 +213,7 @@ func _test_base_ui() -> void:
 	tutorial_popup.visible = false
 
 	# Auto-spawn works without the buying system.
-	for i in range(GameState.MAX_SLOTS):
+	for i in range(GameState.slot_count):
 		GameState.slots[i] = 0
 	_base.call("_refresh_all_slots")
 	await get_tree().process_frame
@@ -222,7 +222,7 @@ func _test_base_ui() -> void:
 	_check(GameState.slots[0] == 1, "base: free spawn places a tier 1 bomb")
 
 	# Full-board progress state.
-	for i in range(GameState.MAX_SLOTS):
+	for i in range(GameState.slot_count):
 		GameState.slots[i] = 1
 	_base.call("_refresh_all_slots")
 	_base.call("_update_hud")
@@ -296,7 +296,7 @@ func _test_shop() -> void:
 # --- Save round-trip --------------------------------------------------------
 
 func _test_save_roundtrip() -> void:
-	for i in range(GameState.MAX_SLOTS):
+	for i in range(GameState.slot_count):
 		GameState.slots[i] = 0
 	GameState.slots[0] = 100
 	GameState.cash = 987654.0

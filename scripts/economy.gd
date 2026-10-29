@@ -94,7 +94,13 @@ func _apply_upgrade_effect(id: String, u: Dictionary) -> void:
 	var effect := float(u.get("effect_per_level", 0.0))
 	match id:
 		"slot_count":
-			GameState.slot_count += int(effect)
+			GameState.slot_count = mini(GameState.slot_count + int(effect), GameState.MAX_SLOTS)
+			if GameState.slots.size() < GameState.slot_count:
+				GameState.slots.resize(GameState.slot_count)
+			for i in range(GameState.slots.size()):
+				if i >= GameState.slot_count:
+					GameState.slots[i] = 0
+			GameState.slot_count_changed.emit()
 		"spawn_tier":
 			spawn_tier_level = get_upgrade_level(id)
 		"offline_cap":

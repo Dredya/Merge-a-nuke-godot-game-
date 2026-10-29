@@ -6,14 +6,15 @@ const NukeTierScript = preload("res://scripts/nuke_tier.gd")
 
 signal cash_changed(new_cash: float)
 signal slots_changed
+signal slot_count_changed
 
 const TIER_DATA_PATH := "res://data/nuke_tiers.json"
-const MAX_SLOTS := 12
+const MAX_SLOTS := 18
 const MAX_TIER := 100
 
 var tiers: Array[NukeTierScript] = []
 var cash: float = 0.0
-var slot_count: int = MAX_SLOTS
+var slot_count: int = 6
 var slots: Array[int] = []
 var owned_nukes: Dictionary = {}
 # Highest tier the player has ever owned; drives the raid target scale.

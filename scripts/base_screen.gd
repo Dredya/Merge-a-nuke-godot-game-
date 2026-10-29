@@ -77,16 +77,18 @@ func _ready() -> void:
 	world = BaseWorld.new()
 	world.name = "BaseWorld"
 	sub_viewport.add_child(world)
-	world.setup(_low_quality)
+	var start_cols := 2
+	var start_rows := maxi(1, GameState.slot_count / start_cols)
+	world.setup(_low_quality, start_cols, start_rows)
 	world_view.resized.connect(_sync_viewport_size)
 	var root_vp := get_viewport()
 	if root_vp != null and not root_vp.size_changed.is_connected(_sync_viewport_size):
 		root_vp.size_changed.connect(_sync_viewport_size)
 	_sync_viewport_size()
 
-	slot_tiers.resize(BaseWorld.SLOT_COUNT)
-	slot_bombs.resize(BaseWorld.SLOT_COUNT)
-	for i in range(BaseWorld.SLOT_COUNT):
+	slot_tiers.resize(GameState.slot_count)
+	slot_bombs.resize(GameState.slot_count)
+	for i in range(GameState.slot_count):
 		slot_tiers[i] = 0
 		slot_bombs[i] = null
 
@@ -101,6 +103,7 @@ func _ready() -> void:
 	claim_x2_button.pressed.connect(_on_claim_offline_x2)
 	claim_button.pressed.connect(func(): _claim_offline(1))
 	GameState.slots_changed.connect(_on_slots_changed)
+	GameState.slot_count_changed.connect(_on_slot_count_changed)
 	GameState.cash_changed.connect(func(_cash): _update_hud())
 	Economy.income_granted.connect(_on_income_granted)
 	DailyRewardManager.daily_reward_available.connect(_on_daily_reward_available)
@@ -141,14 +144,14 @@ func _sync_viewport_size() -> void:
 
 
 func _ensure_slot_capacity() -> void:
-	if GameState.slots.size() != BaseWorld.SLOT_COUNT:
-		GameState.slots.resize(BaseWorld.SLOT_COUNT)
-		for i in range(BaseWorld.SLOT_COUNT):
+	if GameState.slots.size() != GameState.slot_count:
+		GameState.slots.resize(GameState.slot_count)
+		for i in range(GameState.slot_count):
 			if GameState.slots[i] < 0:
 				GameState.slots[i] = 0
 	for i in range(GameState.slots.size()):
 		GameState.slots[i] = clampi(GameState.slots[i], 0, GameState.MAX_TIER)
-	GameState.slot_count = BaseWorld.SLOT_COUNT
+	GameState.slot_count = clampi(GameState.slot_count, 6, GameState.MAX_SLOTS)
 
 
 func _spawn_wait() -> float:
@@ -161,11 +164,11 @@ func _spawn_wait() -> float:
 func _refresh_all_slots() -> void:
 	if _is_dragging or _is_animating:
 		return
-	for i in range(BaseWorld.SLOT_COUNT):
+	for i in range(GameState.slot_count):
 		if slot_bombs[i] != null:
 			slot_bombs[i].queue_free()
 			slot_bombs[i] = null
-	for i in range(BaseWorld.SLOT_COUNT):
+	for i in range(GameState.slot_count):
 		var tier := GameState.slots[i]
 		slot_tiers[i] = tier
 		if tier > 0:
@@ -190,8 +193,8 @@ func _create_bomb(index: int, tier: int, pop: bool) -> Bomb:
 
 func _board_copy() -> Array[int]:
 	var copy: Array[int] = []
-	copy.resize(BaseWorld.SLOT_COUNT)
-	for i in range(BaseWorld.SLOT_COUNT):
+	copy.resize(GameState.slot_count)
+	for i in range(GameState.slot_count):
 		copy[i] = GameState.slots[i]
 	return copy
 
@@ -199,6 +202,21 @@ func _board_copy() -> Array[int]:
 func _on_slots_changed() -> void:
 	if _suppress_slot_refresh or _is_dragging or _is_animating:
 		return
+	_refresh_all_slots()
+	_update_hud()
+
+
+func _on_slot_count_changed() -> void:
+	var cols := 2
+	var rows := maxi(1, GameState.slot_count / cols)
+	if world != null:
+		world.rebuild(cols, rows)
+	slot_tiers.resize(GameState.slot_count)
+	slot_bombs.resize(GameState.slot_count)
+	for i in range(slot_tiers.size()):
+		slot_tiers[i] = 0
+		slot_bombs[i] = null
+	_ensure_slot_capacity()
 	_refresh_all_slots()
 	_update_hud()
 
@@ -250,13 +268,13 @@ func _pick_bomb(viewport_point: Vector2) -> int:
 	var direction := world.camera.project_ray_normal(viewport_point)
 	var best := -1
 	var best_t := 100000.0
-	for i in range(BaseWorld.SLOT_COUNT):
+	for i in range(GameState.slot_count):
 		if GameState.slots[i] <= 0:
 			continue
-		var center := world.slot_position(i) + Vector3(0.0, 0.78, 0.0)
+		var center := world.slot_position(i) + Vector3(0.0, 0.16, 0.0)
 		var oc := origin - center
 		var b := oc.dot(direction)
-		var c := oc.length_squared() - 0.72 * 0.72
+		var c := oc.length_squared() - 1.0 * 1.0
 		var discriminant := b * b - c
 		if discriminant < 0.0:
 			continue
@@ -270,7 +288,7 @@ func _pick_bomb(viewport_point: Vector2) -> int:
 func _nearest_slot(point: Vector3) -> int:
 	var best := -1
 	var best_distance := 100000.0
-	for i in range(BaseWorld.SLOT_COUNT):
+	for i in range(GameState.slot_count):
 		var slot_pos := world.slot_position(i)
 		var distance := Vector2(point.x - slot_pos.x, point.z - slot_pos.z).length()
 		if distance < best_distance:
@@ -618,7 +636,7 @@ func _on_income_granted(amount: float) -> void:
 	if amount <= 0.0 or _income_pool.is_empty():
 		return
 	var occupied: Array[int] = []
-	for i in range(BaseWorld.SLOT_COUNT):
+	for i in range(GameState.slot_count):
 		if GameState.slots[i] > 0:
 			occupied.append(i)
 	if occupied.is_empty():

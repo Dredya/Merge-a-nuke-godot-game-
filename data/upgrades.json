@@ -1,4 +1,5 @@
 [
   {"id": "spawn_tier", "name": "Spawn Tier", "base_cost": 2000, "cost_scale": 2.0, "max_level": 98, "effect_per_level": 1},
+  {"id": "slot_count", "name": "Grid Size", "base_cost": 5000, "cost_scale": 2.0, "max_level": 3, "effect_per_level": 4},
   {"id": "offline_cap", "name": "Offline Cap", "base_cost": 200, "cost_scale": 2.0, "max_level": 10, "effect_per_level": 2.0}
 ]
