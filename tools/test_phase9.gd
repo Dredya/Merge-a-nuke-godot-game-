@@ -146,8 +146,9 @@ func _test_factory() -> void:
 		if triangles > 400:
 			build_issues.append("tier %d uses %d triangles" % [tier, triangles])
 		var label := bomb.find_child("TierLabel", true, false) as Label3D
-		if label == null or label.text != str(tier):
-			label_issues.append("tier %d label mismatch" % tier)
+		var expected_label := Economy.format_number(pow(2.0, float(tier - 1)))
+		if label == null or label.text != expected_label:
+			label_issues.append("tier %d label mismatch (got %s expected %s)" % [tier, label.text if label != null else "<null>", expected_label])
 		if tier == 100 and bomb.find_child("SingularityShards", true, false) == null:
 			build_issues.append("tier 100 missing SingularityShards")
 		if tier == 15 and bomb.find_child("SingularityShards", true, false) != null:

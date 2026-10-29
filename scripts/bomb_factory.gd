@@ -776,7 +776,8 @@ static func _build_singularity(visual: Node3D, bomb: Bomb) -> float:
 static func _add_label(parent: Node3D, tier: int, height: float) -> void:
 	var label := Label3D.new()
 	label.name = "TierLabel"
-	label.text = str(tier)
+	# Display the doubled value (2^(tier-1)), not the internal tier index.
+	label.text = _format_value(tier)
 	label.font = _get_label_font()
 	label.font_size = 58
 	label.pixel_size = 0.0055
@@ -793,6 +794,40 @@ static func _get_label_font() -> Font:
 	if _label_font == null:
 		_label_font = load(FONT_PATH) as Font
 	return _label_font
+
+
+static func _format_value(tier: int) -> String:
+	# Compact display of 2^(tier-1), mirroring Economy.format_number.
+	var value := pow(2.0, float(tier - 1))
+	if value >= 1.0e36:
+		return ("%.2e" % value).replace("+", "")
+	var suffixes := ["", "K", "M", "B", "T", "Qa", "Qi", "Sx", "Sp", "Oc", "No", "Dc"]
+	var v := value
+	var idx := 0
+	while v >= 1000.0 and idx < suffixes.size() - 1:
+		v /= 1000.0
+		idx += 1
+	if idx == 0:
+		return str(int(v))
+	if v < 10.0:
+		return _trim_decimal_value("%.2f%s" % [v, suffixes[idx]])
+	if v < 100.0:
+		return _trim_decimal_value("%.1f%s" % [v, suffixes[idx]])
+	return "%.0f%s" % [v, suffixes[idx]]
+
+
+static func _trim_decimal_value(text: String) -> String:
+	var suffix := ""
+	for i in range(text.length()):
+		var ch := text.substr(i, 1)
+		if ch < "0" or ch > "9":
+			if ch == ".":
+				continue
+			suffix = text.substr(i)
+			text = text.substr(0, i)
+			break
+	text = text.rstrip("0").rstrip(".")
+	return text + suffix
 
 
 static func _add_spark_particles(

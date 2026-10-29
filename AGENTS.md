@@ -44,7 +44,7 @@ Android idle merge-and-raid game (Godot 4.7, GDScript, Mobile renderer, 3D, Robl
 ### 2. Bomb tiers
 Each bomb is built in code from primitives (`SphereMesh`, `CylinderMesh`, `CapsuleMesh`,
 `BoxMesh`, `PrismMesh`, `TorusMesh`) with `StandardMaterial3D`. Glowing parts use emission.
-Each bomb has a billboard `Label3D` tier number (white, dark outline). All bombs gently bob
+Each bomb has a billboard `Label3D` showing the doubled value `2^(tier-1)` (white, dark outline), not the tier index. All bombs gently bob
 and glow-pulse (looping Tweens). Budget: ≤ ~300 triangles per bomb.
 
 **Tiers 1–15 (hand-tuned showcase):**
