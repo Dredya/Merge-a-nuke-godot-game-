@@ -1,0 +1,6 @@
+[
+  {"id": "cash_5k", "name": "Starter Cash", "cash": 5000, "label": "GET $5K"},
+  {"id": "cash_50k", "name": "Pile of Cash", "cash": 50000, "label": "GET $50K"},
+  {"id": "cash_500k", "name": "Vault of Cash", "cash": 500000, "label": "GET $500K"},
+  {"id": "cash_5m", "name": "Mega Vault", "cash": 5000000, "label": "GET $5M"}
+]

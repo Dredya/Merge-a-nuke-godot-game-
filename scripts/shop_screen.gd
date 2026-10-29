@@ -1,14 +1,12 @@
 extends Control
 
-## Shop: daily reward, redeem codes and missions. Bombs now arrive for free on the base.
+## Shop: daily reward and missions. Bombs now arrive for free on the base.
 
 var _content: VBoxContainer
 var _cash_label: Label
 var _daily_day_label: Label
 var _daily_amount_label: Label
 var _daily_button: Button
-var _code_input: LineEdit
-var _code_result: Label
 var _missions_box: VBoxContainer
 
 
@@ -16,6 +14,7 @@ func _ready() -> void:
 	_build_ui()
 	GameState.cash_changed.connect(func(_cash): _update_states())
 	MissionManager.mission_progress_changed.connect(func(_id, _progress): _refresh_missions())
+	IAPService.purchase_completed.connect(_on_iap_completed)
 	_refresh_all()
 
 
@@ -56,6 +55,7 @@ func _build_ui() -> void:
 	scroll.add_child(_content)
 
 	_build_rewards()
+	_build_iap()
 	_build_missions()
 
 
@@ -102,34 +102,36 @@ func _build_rewards() -> void:
 	_daily_button.pressed.connect(_on_claim_daily)
 	daily_row.add_child(_daily_button)
 
-	var code_card := _card()
-	_content.add_child(code_card)
-	var code_box := VBoxContainer.new()
-	code_box.add_theme_constant_override("separation", 8)
-	code_card.add_child(code_box)
-	var code_title := Label.new()
-	code_title.text = "Redeem Code"
-	code_title.theme_type_variation = &"WhiteLabel"
-	code_box.add_child(code_title)
-	var code_row := HBoxContainer.new()
-	code_row.add_theme_constant_override("separation", 10)
-	code_box.add_child(code_row)
-	_code_input = LineEdit.new()
-	_code_input.placeholder_text = "ENTER CODE"
-	_code_input.virtual_keyboard_enabled = true
-	_code_input.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_code_input.custom_minimum_size = Vector2(0, 64)
-	code_row.add_child(_code_input)
-	var redeem := Button.new()
-	redeem.theme_type_variation = &"OrangeButton"
-	redeem.text = "REDEEM"
-	redeem.custom_minimum_size = Vector2(180, 64)
-	redeem.add_theme_font_size_override("font_size", 26)
-	redeem.pressed.connect(_on_redeem)
-	code_row.add_child(redeem)
-	_code_result = Label.new()
-	_code_result.theme_type_variation = &"MutedLabel"
-	code_box.add_child(_code_result)
+
+func _build_iap() -> void:
+	_section("BUY CASH")
+	for product in IAPService.get_products():
+		if not (product is Dictionary):
+			continue
+		var pid := str(product.get("id", ""))
+		var card := _card()
+		_content.add_child(card)
+		var row := HBoxContainer.new()
+		row.add_theme_constant_override("separation", 14)
+		card.add_child(row)
+		var info := VBoxContainer.new()
+		info.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		row.add_child(info)
+		var title := Label.new()
+		title.text = str(product.get("name", pid))
+		title.theme_type_variation = &"WhiteLabel"
+		info.add_child(title)
+		var amount := Label.new()
+		amount.text = "+$" + Economy.format_number(float(product.get("cash", 0.0)))
+		amount.theme_type_variation = &"GoldLabel"
+		info.add_child(amount)
+		var buy := Button.new()
+		buy.theme_type_variation = &"GreenButton"
+		buy.custom_minimum_size = Vector2(180, 64)
+		buy.add_theme_font_size_override("font_size", 24)
+		buy.text = str(product.get("label", "GET"))
+		buy.pressed.connect(_on_buy_cash.bind(pid))
+		row.add_child(buy)
 
 
 func _build_missions() -> void:
@@ -215,17 +217,20 @@ func _on_claim_daily() -> void:
 	_update_states()
 
 
-func _on_redeem() -> void:
-	var result := CodeManager.redeem(_code_input.text)
-	_code_result.text = str(result.get("message", ""))
-	if bool(result.get("ok", false)):
-		_code_input.text = ""
-		GameState.cash_changed.emit(GameState.cash)
-		_update_states()
-
-
 func _on_claim_mission(id: String) -> void:
 	if MissionManager.claim(id):
 		GameState.cash_changed.emit(GameState.cash)
 		_update_states()
 	_refresh_missions()
+
+
+func _on_buy_cash(product_id: String) -> void:
+	IAPService.purchase(product_id)
+
+
+func _on_iap_completed(product_id: String) -> void:
+	var reward := IAPService.get_reward(product_id)
+	if reward > 0.0:
+		GameState.add_cash(reward)
+		GameState.cash_changed.emit(GameState.cash)
+	_update_states()
