@@ -196,9 +196,9 @@ func _prepare_base() -> void:
 
 func _test_base_ui() -> void:
 	_check(_base.get_node_or_null("BottomControls/BottomBox/BuyBombButton") == null, "base: Buy Bomb button removed")
-	var hint := _base.get_node_or_null("BottomControls/BottomBox/MergeHint") as Label
+	var hint := _base.get_node_or_null("VBox/BottomControls/BottomBox/MergeHint") as Label
 	_check(hint != null and hint.text.contains("MERGE"), "base: merge hint present")
-	var hud := _base.get_node_or_null("TopHud/HudRow/CashPanel/CashBox/CashAmount") as Label
+	var hud := _base.get_node_or_null("VBox/TopHud/HudRow/CashPanel/CashBox/CashAmount") as Label
 	_check(hud != null, "base: cash HUD present")
 	var tutorial := _base.get("tutorial_label") as Label
 	_base.set("_tutorial_step", 0)

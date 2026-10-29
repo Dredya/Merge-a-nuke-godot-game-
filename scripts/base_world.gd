@@ -207,6 +207,16 @@ func _build_camera() -> void:
 	add_child(camera)
 
 
+func fit_camera(viewport_size: Vector2i) -> void:
+	if camera == null:
+		return
+	var aspect := float(viewport_size.x) / float(maxi(1, viewport_size.y))
+	var plot_w := float((cols - 1) * SLOT_SPACING + 2.6)
+	var plot_h := float((rows - 1) * SLOT_SPACING + 2.6)
+	var required_v := maxf(plot_h, plot_w / maxf(aspect, 0.01)) * 1.25
+	camera.size = clampf(required_v, 18.0, 40.0)
+
+
 func _process(delta: float) -> void:
 	_time += delta
 	for cloud in _clouds:

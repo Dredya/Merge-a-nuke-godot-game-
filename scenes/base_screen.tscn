@@ -11,7 +11,82 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1")
 
-[node name="WorldView" type="SubViewportContainer" parent="."]
+[node name="VBox" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 0
+
+[node name="TopHud" type="MarginContainer" parent="VBox"]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 0
+
+[node name="HudRow" type="HBoxContainer" parent="VBox/TopHud"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="CashPanel" type="PanelContainer" parent="VBox/TopHud/HudRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"PanelHud"
+
+[node name="CashBox" type="VBoxContainer" parent="VBox/TopHud/HudRow/CashPanel"]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="CashCaption" type="Label" parent="VBox/TopHud/HudRow/CashPanel/CashBox"]
+layout_mode = 2
+theme_type_variation = &"HudCaption"
+text = "CASH"
+
+[node name="CashAmount" type="Label" parent="VBox/TopHud/HudRow/CashPanel/CashBox"]
+layout_mode = 2
+theme_type_variation = &"CashAmount"
+text = "$0"
+
+[node name="IncomeLabel" type="Label" parent="VBox/TopHud/HudRow/CashPanel/CashBox"]
+layout_mode = 2
+theme_type_variation = &"IncomeLabel"
+text = "+$0 / sec"
+
+[node name="LockPanel" type="PanelContainer" parent="VBox/TopHud/HudRow"]
+custom_minimum_size = Vector2(236, 0)
+layout_mode = 2
+theme_type_variation = &"PanelLock"
+
+[node name="LockBox" type="VBoxContainer" parent="VBox/TopHud/HudRow/LockPanel"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="LockedLabel" type="Label" parent="VBox/TopHud/HudRow/LockPanel/LockBox"]
+layout_mode = 2
+theme_type_variation = &"LockedLabel"
+text = "BASE OPEN"
+horizontal_alignment = 1
+
+[node name="LockTimer" type="Label" parent="VBox/TopHud/HudRow/LockPanel/LockBox"]
+layout_mode = 2
+theme_type_variation = &"TimerLabel"
+text = "5:00"
+horizontal_alignment = 1
+
+[node name="LockButton" type="Button" parent="VBox/TopHud/HudRow/LockPanel/LockBox"]
+custom_minimum_size = Vector2(0, 64)
+layout_mode = 2
+theme_type_variation = &"SmallButton"
+text = "LOCK $500"
+
+[node name="Middle" type="Control" parent="VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="WorldView" type="SubViewportContainer" parent="VBox/Middle"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -21,13 +96,13 @@ grow_vertical = 2
 mouse_filter = 2
 stretch = false
 
-[node name="SubViewport" type="SubViewport" parent="WorldView"]
+[node name="SubViewport" type="SubViewport" parent="VBox/Middle/WorldView"]
 own_world_3d = true
 handle_input_locally = false
-size = Vector2i(1080, 1920)
+size = Vector2i(2, 2)
 render_target_update_mode = 4
 
-[node name="PlotInput" type="Control" parent="."]
+[node name="PlotInput" type="Control" parent="VBox/Middle"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -36,7 +111,7 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 0
 
-[node name="ScreenGlow" type="ColorRect" parent="."]
+[node name="ScreenGlow" type="ColorRect" parent="VBox/Middle"]
 visible = false
 layout_mode = 1
 anchors_preset = 15
@@ -47,7 +122,7 @@ grow_vertical = 2
 mouse_filter = 2
 color = Color(1, 0.784314, 0.239216, 0.26)
 
-[node name="FlashOverlay" type="ColorRect" parent="."]
+[node name="FlashOverlay" type="ColorRect" parent="VBox/Middle"]
 visible = false
 layout_mode = 1
 anchors_preset = 15
@@ -58,71 +133,54 @@ grow_vertical = 2
 mouse_filter = 2
 color = Color(1, 1, 1, 0.3)
 
-[node name="TopHud" type="MarginContainer" parent="."]
-layout_mode = 1
-anchors_preset = 10
-anchor_right = 1.0
-offset_bottom = 200.0
-grow_horizontal = 2
+[node name="BottomControls" type="MarginContainer" parent="VBox"]
+layout_mode = 2
 theme_override_constants/margin_left = 20
-theme_override_constants/margin_top = 16
+theme_override_constants/margin_top = 0
 theme_override_constants/margin_right = 20
-theme_override_constants/margin_bottom = 0
+theme_override_constants/margin_bottom = 18
 
-[node name="HudRow" type="HBoxContainer" parent="TopHud"]
+[node name="BottomBox" type="VBoxContainer" parent="VBox/BottomControls"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="FreePanel" type="PanelContainer" parent="VBox/BottomControls/BottomBox"]
+custom_minimum_size = Vector2(0, 64)
+layout_mode = 2
+theme_type_variation = &"PanelHud"
+
+[node name="FreeRow" type="HBoxContainer" parent="VBox/BottomControls/BottomBox/FreePanel"]
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="CashPanel" type="PanelContainer" parent="TopHud/HudRow"]
+[node name="FreeLabel" type="Label" parent="VBox/BottomControls/BottomBox/FreePanel/FreeRow"]
+layout_mode = 2
+theme_type_variation = &"WhiteLabel"
+text = "Next free bomb"
+
+[node name="FreeProgress" type="ProgressBar" parent="VBox/BottomControls/BottomBox/FreePanel/FreeRow"]
+custom_minimum_size = Vector2(0, 26)
 layout_mode = 2
 size_flags_horizontal = 3
-theme_type_variation = &"PanelHud"
+size_flags_vertical = 4
+show_percentage = false
+value = 0.0
 
-[node name="CashBox" type="VBoxContainer" parent="TopHud/HudRow/CashPanel"]
-layout_mode = 2
-theme_override_constants/separation = 0
-
-[node name="CashCaption" type="Label" parent="TopHud/HudRow/CashPanel/CashBox"]
-layout_mode = 2
-theme_type_variation = &"HudCaption"
-text = "CASH"
-
-[node name="CashAmount" type="Label" parent="TopHud/HudRow/CashPanel/CashBox"]
-layout_mode = 2
-theme_type_variation = &"CashAmount"
-text = "$0"
-
-[node name="IncomeLabel" type="Label" parent="TopHud/HudRow/CashPanel/CashBox"]
+[node name="FreeSeconds" type="Label" parent="VBox/BottomControls/BottomBox/FreePanel/FreeRow"]
+custom_minimum_size = Vector2(64, 0)
 layout_mode = 2
 theme_type_variation = &"IncomeLabel"
-text = "+$0 / sec"
+text = "4s"
+horizontal_alignment = 2
 
-[node name="LockPanel" type="PanelContainer" parent="TopHud/HudRow"]
-custom_minimum_size = Vector2(236, 0)
+[node name="MergeHint" type="Label" parent="VBox/BottomControls/BottomBox"]
 layout_mode = 2
-theme_type_variation = &"PanelLock"
-
-[node name="LockBox" type="VBoxContainer" parent="TopHud/HudRow/LockPanel"]
-layout_mode = 2
-theme_override_constants/separation = 4
-
-[node name="LockedLabel" type="Label" parent="TopHud/HudRow/LockPanel/LockBox"]
-layout_mode = 2
-theme_type_variation = &"LockedLabel"
-text = "BASE OPEN"
+theme_type_variation = &"WhiteLabel"
+theme_override_colors/font_color = Color(0.662745, 0.713725, 0.878431, 1)
+theme_override_colors/font_outline_color = Color(0.0431373, 0.0627451, 0.12549, 1)
+theme_override_constants/outline_size = 6
+text = "MERGE TWO IDENTICAL BOMBS TO LEVEL UP"
 horizontal_alignment = 1
-
-[node name="LockTimer" type="Label" parent="TopHud/HudRow/LockPanel/LockBox"]
-layout_mode = 2
-theme_type_variation = &"TimerLabel"
-text = "5:00"
-horizontal_alignment = 1
-
-[node name="LockButton" type="Button" parent="TopHud/HudRow/LockPanel/LockBox"]
-custom_minimum_size = Vector2(0, 54)
-layout_mode = 2
-theme_type_variation = &"SmallButton"
-text = "LOCK $500"
 
 [node name="EventBannerPanel" type="PanelContainer" parent="."]
 visible = false
@@ -161,62 +219,6 @@ layout_mode = 2
 theme_type_variation = &"H2"
 theme_override_colors/font_color = Color(1, 0.784314, 0.239216, 1)
 text = "MILESTONE"
-horizontal_alignment = 1
-
-[node name="BottomControls" type="MarginContainer" parent="."]
-layout_mode = 1
-anchors_preset = 12
-anchor_top = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_top = -128.0
-grow_horizontal = 2
-grow_vertical = 0
-theme_override_constants/margin_left = 20
-theme_override_constants/margin_top = 0
-theme_override_constants/margin_right = 20
-theme_override_constants/margin_bottom = 18
-
-[node name="BottomBox" type="VBoxContainer" parent="BottomControls"]
-layout_mode = 2
-theme_override_constants/separation = 8
-
-[node name="FreePanel" type="PanelContainer" parent="BottomControls/BottomBox"]
-custom_minimum_size = Vector2(0, 64)
-layout_mode = 2
-theme_type_variation = &"PanelHud"
-
-[node name="FreeRow" type="HBoxContainer" parent="BottomControls/BottomBox/FreePanel"]
-layout_mode = 2
-theme_override_constants/separation = 12
-
-[node name="FreeLabel" type="Label" parent="BottomControls/BottomBox/FreePanel/FreeRow"]
-layout_mode = 2
-theme_type_variation = &"WhiteLabel"
-text = "Next free bomb"
-
-[node name="FreeProgress" type="ProgressBar" parent="BottomControls/BottomBox/FreePanel/FreeRow"]
-custom_minimum_size = Vector2(0, 26)
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 4
-show_percentage = false
-value = 0.0
-
-[node name="FreeSeconds" type="Label" parent="BottomControls/BottomBox/FreePanel/FreeRow"]
-custom_minimum_size = Vector2(64, 0)
-layout_mode = 2
-theme_type_variation = &"IncomeLabel"
-text = "4s"
-horizontal_alignment = 2
-
-[node name="MergeHint" type="Label" parent="BottomControls/BottomBox"]
-layout_mode = 2
-theme_type_variation = &"WhiteLabel"
-theme_override_colors/font_color = Color(0.662745, 0.713725, 0.878431, 1)
-theme_override_colors/font_outline_color = Color(0.0431373, 0.0627451, 0.12549, 1)
-theme_override_constants/outline_size = 6
-text = "MERGE TWO IDENTICAL BOMBS TO LEVEL UP"
 horizontal_alignment = 1
 
 [node name="TutorialPopup" type="Control" parent="."]
@@ -383,7 +385,7 @@ autowrap_mode = 3
 [node name="OfflineAmount" type="Label" parent="OfflinePopup/Center/Panel/Box"]
 layout_mode = 2
 theme_type_variation = &"BigGold"
-text = "+$2.4M"
+text = "+$100"
 horizontal_alignment = 1
 
 [node name="ClaimX2Button" type="Button" parent="OfflinePopup/Center/Panel/Box"]

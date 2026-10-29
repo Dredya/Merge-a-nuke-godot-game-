@@ -521,6 +521,16 @@ func _explode(pos: Vector3) -> void:
 		get_tree().create_timer(1.6).timeout.connect(particles.queue_free)
 
 
+func fit_camera(viewport_size: Vector2i) -> void:
+	if camera == null:
+		return
+	var aspect := float(viewport_size.x) / float(maxi(1, viewport_size.y))
+	var plot_w := 11.0
+	var plot_h := 7.0
+	var required_v := maxf(plot_h, plot_w / maxf(aspect, 0.01)) * 1.15
+	camera.size = clampf(required_v, 8.0, 16.0)
+
+
 func _process(delta: float) -> void:
 	if _shake_time > 0.0:
 		_shake_time -= delta

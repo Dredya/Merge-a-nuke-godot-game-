@@ -10,19 +10,20 @@ const LOCK_COST := 500.0
 const LOCK_DURATION := 120.0
 const LOCK_COOLDOWN := 300.0
 
-@onready var world_view: SubViewportContainer = $WorldView
-@onready var sub_viewport: SubViewport = $WorldView/SubViewport
-@onready var plot_input: Control = $PlotInput
-@onready var flash_overlay: ColorRect = $FlashOverlay
-@onready var screen_glow: ColorRect = $ScreenGlow
-@onready var cash_label: Label = $TopHud/HudRow/CashPanel/CashBox/CashAmount
-@onready var income_label: Label = $TopHud/HudRow/CashPanel/CashBox/IncomeLabel
-@onready var locked_label: Label = $TopHud/HudRow/LockPanel/LockBox/LockedLabel
-@onready var lock_timer_label: Label = $TopHud/HudRow/LockPanel/LockBox/LockTimer
-@onready var lock_button: Button = $TopHud/HudRow/LockPanel/LockBox/LockButton
+@onready var world_view: SubViewportContainer = $VBox/Middle/WorldView
+@onready var sub_viewport: SubViewport = $VBox/Middle/WorldView/SubViewport
+@onready var middle: Control = $VBox/Middle
+@onready var plot_input: Control = $VBox/Middle/PlotInput
+@onready var flash_overlay: ColorRect = $VBox/Middle/FlashOverlay
+@onready var screen_glow: ColorRect = $VBox/Middle/ScreenGlow
+@onready var cash_label: Label = $VBox/TopHud/HudRow/CashPanel/CashBox/CashAmount
+@onready var income_label: Label = $VBox/TopHud/HudRow/CashPanel/CashBox/IncomeLabel
+@onready var locked_label: Label = $VBox/TopHud/HudRow/LockPanel/LockBox/LockedLabel
+@onready var lock_timer_label: Label = $VBox/TopHud/HudRow/LockPanel/LockBox/LockTimer
+@onready var lock_button: Button = $VBox/TopHud/HudRow/LockPanel/LockBox/LockButton
 @onready var event_banner: Label = $EventBannerPanel/EventBanner
-@onready var free_progress: ProgressBar = $BottomControls/BottomBox/FreePanel/FreeRow/FreeProgress
-@onready var free_seconds: Label = $BottomControls/BottomBox/FreePanel/FreeRow/FreeSeconds
+@onready var free_progress: ProgressBar = $VBox/BottomControls/BottomBox/FreePanel/FreeRow/FreeProgress
+@onready var free_seconds: Label = $VBox/BottomControls/BottomBox/FreePanel/FreeRow/FreeSeconds
 @onready var milestone_panel: PanelContainer = $MilestoneToastPanel
 @onready var milestone_label: Label = $MilestoneToastPanel/MilestoneToastLabel
 @onready var tutorial_popup: Control = $TutorialPopup
@@ -81,10 +82,13 @@ func _ready() -> void:
 	var start_rows := maxi(1, GameState.slot_count / start_cols)
 	world.setup(_low_quality, start_cols, start_rows)
 	world_view.resized.connect(_sync_viewport_size)
+	if middle != null and not middle.resized.is_connected(_sync_viewport_size):
+		middle.resized.connect(_sync_viewport_size)
 	var root_vp := get_viewport()
 	if root_vp != null and not root_vp.size_changed.is_connected(_sync_viewport_size):
 		root_vp.size_changed.connect(_sync_viewport_size)
 	_sync_viewport_size()
+	_cap_popup_widths()
 
 	slot_tiers.resize(GameState.slot_count)
 	slot_bombs.resize(GameState.slot_count)
@@ -135,12 +139,42 @@ func _ready() -> void:
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_RESIZED:
 		_sync_viewport_size()
+		_cap_popup_widths()
+
+
+func _cap_popup_widths() -> void:
+	if tutorial_popup == null:
+		return
+	var vp_w := get_viewport().get_visible_rect().size.x
+	var cap := func(panel: PanelContainer, base_min: float):
+		if panel != null:
+			panel.custom_minimum_size.x = min(base_min, max(240.0, vp_w - 40.0))
+	var tp := tutorial_popup.get_node_or_null("Center/Panel") as PanelContainer
+	cap.call(tp, 760.0)
+	if daily_popup != null:
+		var dp := daily_popup.get_node_or_null("Center/Panel") as PanelContainer
+		cap.call(dp, 720.0)
+	if offline_popup != null:
+		var op := offline_popup.get_node_or_null("Center/Panel") as PanelContainer
+		cap.call(op, 780.0)
+	var event_panel := get_node_or_null("EventBannerPanel") as PanelContainer
+	if event_panel != null:
+		event_panel.custom_minimum_size.x = min(540.0, max(200.0, vp_w - 40.0))
 
 
 func _sync_viewport_size() -> void:
-	var target := Vector2i(maxi(1, int(world_view.size.x)), maxi(1, int(world_view.size.y)))
+	if world_view == null or sub_viewport == null:
+		return
+	# Drive the SubViewport from the parent area, not from the container:
+	# SubViewportContainer's minimum size follows the SubViewport size, so
+	# reading world_view.size would self-lock the 3D view at its initial size
+	# and overflow over the HUD.
+	var area := middle.size if middle != null else world_view.size
+	var target := Vector2i(maxi(2, int(area.x)), maxi(2, int(area.y)))
 	if sub_viewport.size != target:
 		sub_viewport.size = target
+	if world != null and world.has_method("fit_camera"):
+		world.call("fit_camera", target)
 
 
 func _ensure_slot_capacity() -> void:
@@ -207,16 +241,25 @@ func _on_slots_changed() -> void:
 
 
 func _on_slot_count_changed() -> void:
+	# Make sure GameState.slots matches the new count before touching the visuals.
+	_ensure_slot_capacity()
 	var cols := 2
 	var rows := maxi(1, GameState.slot_count / cols)
 	if world != null:
 		world.rebuild(cols, rows)
+		if world.has_method("fit_camera"):
+			var vp: Vector2i = world_view.size if world_view != null else Vector2i(1080, 1920)
+			world.call("fit_camera", vp)
+	# Free any bombs still referenced by the old (smaller) arrays before resizing.
+	for i in range(slot_bombs.size()):
+		if slot_bombs[i] != null:
+			slot_bombs[i].queue_free()
+			slot_bombs[i] = null
 	slot_tiers.resize(GameState.slot_count)
 	slot_bombs.resize(GameState.slot_count)
 	for i in range(slot_tiers.size()):
 		slot_tiers[i] = 0
 		slot_bombs[i] = null
-	_ensure_slot_capacity()
 	_refresh_all_slots()
 	_update_hud()
 

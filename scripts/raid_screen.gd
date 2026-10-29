@@ -7,8 +7,9 @@ const AVATAR_COLORS := [
 	Color("#C77DFF"), Color("#FF9A3D"), Color("#6AD7FF"), Color("#8F7CFF"),
 ]
 
-@onready var world_view: SubViewportContainer = $Margin/VBox/WorldFrame/WorldView
-@onready var sub_viewport: SubViewport = $Margin/VBox/WorldFrame/WorldView/SubViewport
+@onready var world_clip: Control = $Margin/VBox/WorldFrame/WorldClip
+@onready var world_view: SubViewportContainer = $Margin/VBox/WorldFrame/WorldClip/WorldView
+@onready var sub_viewport: SubViewport = $Margin/VBox/WorldFrame/WorldClip/WorldView/SubViewport
 @onready var cash_label: Label = $Margin/VBox/Header/CashLabel
 @onready var targets_box: VBoxContainer = $Margin/VBox/Scroll/Targets
 @onready var result_popup: Control = $ResultPopup
@@ -28,6 +29,15 @@ func _ready() -> void:
 	sub_viewport.add_child(world)
 	world.setup(AudioManager.is_low_quality(), GameState.highest_tier_reached)
 
+	world_view.resized.connect(_sync_viewport_size)
+	if world_clip != null and not world_clip.resized.is_connected(_sync_viewport_size):
+		world_clip.resized.connect(_sync_viewport_size)
+	var root_vp := get_viewport()
+	if root_vp != null and not root_vp.size_changed.is_connected(_sync_viewport_size):
+		root_vp.size_changed.connect(_sync_viewport_size)
+	_sync_viewport_size()
+	_cap_popup_widths()
+
 	result_ok.pressed.connect(_close_result)
 	RaidService.targets_refreshed.connect(_refresh_targets)
 	GameState.cash_changed.connect(func(_cash): _update_cash())
@@ -39,6 +49,35 @@ func _ready() -> void:
 	_cooldown_timer.autostart = true
 	_cooldown_timer.timeout.connect(_update_cooldowns)
 	add_child(_cooldown_timer)
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_RESIZED:
+		_sync_viewport_size()
+		_cap_popup_widths()
+
+
+func _cap_popup_widths() -> void:
+	if result_popup == null:
+		return
+	var vp_w := get_viewport().get_visible_rect().size.x
+	var panel := result_popup.get_node_or_null("Center/Panel") as PanelContainer
+	if panel != null:
+		panel.custom_minimum_size.x = min(700.0, max(240.0, vp_w - 40.0))
+
+
+func _sync_viewport_size() -> void:
+	if world_view == null or sub_viewport == null:
+		return
+	# Drive the SubViewport from the WorldClip wrapper, not from the container:
+	# SubViewportContainer's minimum size follows the SubViewport size, so
+	# reading world_view.size would self-lock the 3D view at its initial size.
+	var area := world_clip.size if world_clip != null else world_view.size
+	var target := Vector2i(maxi(2, int(area.x)), maxi(2, int(area.y)))
+	if sub_viewport.size != target:
+		sub_viewport.size = target
+	if world != null and world.has_method("fit_camera"):
+		world.call("fit_camera", target)
 
 
 func _close_result() -> void:

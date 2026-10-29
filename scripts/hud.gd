@@ -21,12 +21,22 @@ func _ready() -> void:
 
 
 func _apply_safe_area() -> void:
-	var safe := DisplayServer.get_display_safe_area()
-	var win_size := get_viewport().get_visible_rect().size
-	safe_margin.add_theme_constant_override("margin_left", int(safe.position.x))
-	safe_margin.add_theme_constant_override("margin_top", int(safe.position.y))
-	safe_margin.add_theme_constant_override("margin_right", int(win_size.x) - int(safe.end.x))
-	safe_margin.add_theme_constant_override("margin_bottom", int(win_size.y) - int(safe.end.y))
+	var left := 12
+	var top := 12
+	var right := 12
+	var bottom := 12
+	if OS.has_feature("mobile"):
+		var safe := DisplayServer.get_display_safe_area()
+		var win_size := get_viewport().get_visible_rect().size
+		if safe.size.x > 0 and safe.size.y > 0:
+			left = maxi(12, int(safe.position.x))
+			top = maxi(12, int(safe.position.y))
+			right = maxi(12, int(win_size.x) - int(safe.end.x))
+			bottom = maxi(12, int(win_size.y) - int(safe.end.y))
+	safe_margin.add_theme_constant_override("margin_left", left)
+	safe_margin.add_theme_constant_override("margin_top", top)
+	safe_margin.add_theme_constant_override("margin_right", right)
+	safe_margin.add_theme_constant_override("margin_bottom", bottom)
 
 
 func _refresh() -> void:

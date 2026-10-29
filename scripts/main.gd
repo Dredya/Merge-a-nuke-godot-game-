@@ -11,6 +11,8 @@ const SCREENS := {
 }
 const C_LIME := Color("#B6F23C")
 const C_MUTED := Color("#A9B6E0")
+## Max logical width of the centered UI column on wide windows (desktop/tablet).
+const MAX_CONTENT_WIDTH := 1200.0
 
 @onready var safe_area: MarginContainer = $SafeArea
 @onready var screen_container: Control = $SafeArea/Shell/ScreenContainer
@@ -29,6 +31,9 @@ var _nav_parts: Dictionary = {}
 func _ready() -> void:
 	_apply_safe_area()
 	get_viewport().size_changed.connect(_apply_safe_area)
+	if not OS.has_feature("mobile"):
+		# Keep the desktop window from being shrunk below readable size.
+		get_window().min_size = Vector2i(360, 640)
 	_setup_nav()
 	show_screen("base")
 
@@ -50,6 +55,23 @@ func _apply_safe_area() -> void:
 	safe_area.add_theme_constant_override("margin_top", top)
 	safe_area.add_theme_constant_override("margin_right", right)
 	safe_area.add_theme_constant_override("margin_bottom", bottom)
+	_apply_content_width_cap()
+
+
+func _apply_content_width_cap() -> void:
+	# On windows much wider than 9:16 (desktop landscape, 4:3 tablets) keep the
+	# UI in a centered column instead of stretching it across the screen.
+	var vp_size := get_viewport().get_visible_rect().size
+	if vp_size.x > MAX_CONTENT_WIDTH:
+		safe_area.anchor_left = 0.5
+		safe_area.anchor_right = 0.5
+		safe_area.offset_left = -MAX_CONTENT_WIDTH * 0.5
+		safe_area.offset_right = MAX_CONTENT_WIDTH * 0.5
+	else:
+		safe_area.anchor_left = 0.0
+		safe_area.anchor_right = 1.0
+		safe_area.offset_left = 0.0
+		safe_area.offset_right = 0.0
 
 
 func _setup_nav() -> void:
