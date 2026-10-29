@@ -1,4 +1,0 @@
-[
-  {"code": "BOOM", "reward_type": "cash", "reward_amount": 1000, "one_time": true},
-  {"code": "WELCOME", "reward_type": "cash", "reward_amount": 500, "one_time": true}
-]

@@ -61,7 +61,7 @@ Cash and raids do not create bombs, so there is currently no path to high tiers.
 This should be decided before calling the 100-tier game “playable”.
 
 ### P2 — UX: “Shop” no longer sells anything
-The Shop tab now contains Rewards, Redeem Code and Missions only. The nav label is misleading.
+The Shop tab now contains Rewards and Missions only. The nav label is misleading.
 
 **Recommendation:** rename the tab to **Extras** or **Rewards**, or add non-purchase content (e.g. a bomb index / collection book).
 

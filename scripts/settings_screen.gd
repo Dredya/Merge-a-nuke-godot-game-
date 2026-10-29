@@ -75,7 +75,6 @@ func _on_reset_confirmed() -> void:
 	GameState.tutorial_completed = false
 	GameState.mission_progress.clear()
 	GameState.mission_claimed.clear()
-	GameState.redeemed_codes.clear()
 	GameState.daily_streak = 0
 	GameState.last_login_date = ""
 	GameState.daily_claimed_date = ""

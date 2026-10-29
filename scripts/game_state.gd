@@ -22,7 +22,6 @@ var highest_tier_reached: int = 0
 var lock_until: float = 0.0
 var lock_cooldown_until: float = 0.0
 # Retention
-var redeemed_codes: Array[String] = []
 var daily_streak: int = 0
 var last_login_date: String = ""
 var daily_claimed_date: String = ""

@@ -41,7 +41,6 @@ func save() -> void:
 		"upgrade_levels": Economy.upgrade_levels,
 		"lock_until": GameState.lock_until,
 		"lock_cooldown_until": GameState.lock_cooldown_until,
-		"redeemed_codes": GameState.redeemed_codes,
 		"daily_streak": GameState.daily_streak,
 		"last_login_date": GameState.last_login_date,
 		"daily_claimed_date": GameState.daily_claimed_date,
@@ -114,11 +113,6 @@ func load_save() -> void:
 	Economy._recompute_multipliers()
 	GameState.lock_until = float(data.get("lock_until", 0.0))
 	GameState.lock_cooldown_until = float(data.get("lock_cooldown_until", 0.0))
-	var rc: Variant = data.get("redeemed_codes", [])
-	if rc is Array:
-		GameState.redeemed_codes.clear()
-		for c in rc:
-			GameState.redeemed_codes.append(str(c))
 	GameState.daily_streak = int(data.get("daily_streak", 0))
 	GameState.last_login_date = str(data.get("last_login_date", ""))
 	GameState.daily_claimed_date = str(data.get("daily_claimed_date", ""))
