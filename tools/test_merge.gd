@@ -88,7 +88,28 @@ func _run() -> void:
 	await _drag(0, 1)
 	_check(GameState.slots[0] == 100 and GameState.slots[1] == 100, "max tier: 100 + 100 stays 100")
 
-	# 6. Lock button spends cash and starts the shield countdown.
+	# 6. Tap-to-select + SELL button: the selected bomb is cashed in.
+	(_base.get("_auto_timer") as Timer).stop()
+	for i in range(GameState.slot_count):
+		GameState.slots[i] = 0
+	GameState.slots[0] = 4
+	_base.call("_refresh_all_slots")
+	await get_tree().create_timer(0.25).timeout
+	GameState.cash = 0.0
+	GameState.cash_changed.emit(GameState.cash)
+	await _tap(0)
+	var sell_button := _base.get("sell_button") as Button
+	_check(int(_base.get("_selected_slot")) == 0, "sell: tap selects the bomb")
+	_check(sell_button != null and not sell_button.disabled, "sell: button enabled by selection")
+	_check(GameState.slots[0] == 4, "sell: selecting does not move the bomb")
+	sell_button.emit_signal("pressed")
+	await get_tree().create_timer(0.5).timeout
+	_check(GameState.slots[0] == 0, "sell: slot emptied")
+	_check((_base.get("slot_bombs") as Array)[0] == null, "sell: bomb visual removed")
+	_check(GameState.cash >= 240.0, "sell: cash granted")
+	_check(int(_base.get("_selected_slot")) == -1, "sell: selection cleared")
+
+	# 7. Lock button spends cash and starts the shield countdown.
 	GameState.cash = 1000.0
 	GameState.cash_changed.emit(GameState.cash)
 	GameState.lock_until = 0.0
@@ -160,6 +181,14 @@ func _drag(from_slot: int, to_slot: int) -> void:
 	await get_tree().process_frame
 	_base.call("_finish_drag", to_pos)
 	await get_tree().create_timer(0.9).timeout
+
+
+func _tap(slot: int) -> void:
+	var pos: Vector2 = _local_for_slot(slot)
+	_base.call("_try_start_drag", pos)
+	await get_tree().process_frame
+	_base.call("_finish_drag", pos)
+	await get_tree().create_timer(0.4).timeout
 
 
 func _local_for_slot(slot: int) -> Vector2:

@@ -9,6 +9,10 @@ const INCOME_LABEL_POOL := 14
 const LOCK_COST := 500.0
 const LOCK_DURATION := 120.0
 const LOCK_COOLDOWN := 300.0
+## A press that moves less than this many pixels is treated as a tap (select),
+## not a drag.
+const TAP_MOVE_THRESHOLD := 16.0
+const MERGE_HINT := "MERGE TWO IDENTICAL BOMBS TO LEVEL UP"
 
 @onready var world_view: SubViewportContainer = $VBox/Middle/WorldView
 @onready var sub_viewport: SubViewport = $VBox/Middle/WorldView/SubViewport
@@ -22,8 +26,10 @@ const LOCK_COOLDOWN := 300.0
 @onready var lock_timer_label: Label = $VBox/TopHud/HudRow/LockPanel/LockBox/LockTimer
 @onready var lock_button: Button = $VBox/TopHud/HudRow/LockPanel/LockBox/LockButton
 @onready var event_banner: Label = $EventBannerPanel/EventBanner
-@onready var free_progress: ProgressBar = $VBox/BottomControls/BottomBox/FreePanel/FreeRow/FreeProgress
-@onready var free_seconds: Label = $VBox/BottomControls/BottomBox/FreePanel/FreeRow/FreeSeconds
+@onready var free_progress: ProgressBar = $VBox/BottomControls/BottomBox/ControlRow/FreePanel/FreeRow/FreeProgress
+@onready var free_seconds: Label = $VBox/BottomControls/BottomBox/ControlRow/FreePanel/FreeRow/FreeSeconds
+@onready var sell_button: Button = $VBox/BottomControls/BottomBox/ControlRow/SellButton
+@onready var merge_hint: Label = $VBox/BottomControls/BottomBox/MergeHint
 @onready var milestone_panel: PanelContainer = $MilestoneToastPanel
 @onready var milestone_label: Label = $MilestoneToastPanel/MilestoneToastLabel
 @onready var tutorial_popup: Control = $TutorialPopup
@@ -50,7 +56,10 @@ var _drag_bomb: Bomb = null
 var _drag_from: int = -1
 var _drag_tier: int = 0
 var _drag_offset: Vector2 = Vector2.ZERO
+var _drag_start_local: Vector2 = Vector2.ZERO
+var _drag_moved: bool = false
 var _suppress_slot_refresh: bool = false
+var _selected_slot: int = -1
 
 var _auto_timer: Timer
 var _ui_timer: Timer
@@ -66,6 +75,7 @@ var _milestone_tween: Tween
 const TUTORIAL_STEPS := [
 	"A free bomb arrives every few seconds. Wait for two of the same tier.",
 	"Drag a bomb onto another bomb of the same tier to merge them.",
+	"Tap a bomb to select it, then press SELL to cash it in.",
 	"Higher tiers earn far more cash per second.",
 	"Lock your base to protect your cash from raids.",
 	"Raids, missions and codes are in the other tabs.",
@@ -101,6 +111,7 @@ func _ready() -> void:
 
 	plot_input.gui_input.connect(_on_plot_input)
 	lock_button.pressed.connect(_on_lock_pressed)
+	sell_button.pressed.connect(_on_sell_pressed)
 	claim_daily_button.pressed.connect(_on_claim_daily)
 	tutorial_next_button.pressed.connect(_on_tutorial_next)
 	claim_x2_button.pressed.connect(_on_claim_offline_x2)
@@ -252,6 +263,7 @@ func _on_slots_changed() -> void:
 
 
 func _on_slot_count_changed() -> void:
+	_clear_selection()
 	# Make sure GameState.slots matches the new count before touching the visuals.
 	_ensure_slot_capacity()
 	var dims := _grid_dims(GameState.slot_count)
@@ -361,7 +373,11 @@ func _try_start_drag(local_position: Vector2) -> void:
 		if hit != null:
 			slot = _nearest_slot(hit as Vector3)
 	if slot < 0 or GameState.slots[slot] <= 0 or slot_bombs[slot] == null:
+		# Pressing empty ground/tarmac clears the current selection.
+		_clear_selection()
 		return
+	_drag_start_local = local_position
+	_drag_moved = false
 	_is_dragging = true
 	_drag_from = slot
 	_drag_tier = slot_tiers[slot]
@@ -386,6 +402,10 @@ func _try_start_drag(local_position: Vector2) -> void:
 func _move_drag(local_position: Vector2) -> void:
 	if _drag_bomb == null:
 		return
+	if not _drag_moved and local_position.distance_to(_drag_start_local) > TAP_MOVE_THRESHOLD:
+		# Past the tap threshold this is a real drag; drop any prior selection.
+		_drag_moved = true
+		_clear_selection()
 	var hit: Variant = _ground_point(local_position, BaseWorld.PAD_TOP_Y)
 	if hit == null:
 		return
@@ -418,6 +438,13 @@ func _finish_drag(local_position: Vector2) -> void:
 	_move_drag(local_position)
 	_is_dragging = false
 	world.set_sell_highlight(false)
+	if not _drag_moved:
+		# A tap (no significant movement) selects the bomb instead of moving it.
+		var tapped := _drag_from
+		_return_drag()
+		_select_slot(tapped)
+		return
+	_clear_selection()
 	# Selling takes priority over placement.
 	var sell_center := world.sell_zone_center()
 	var dxz := Vector2(_drag_bomb.position.x - sell_center.x, _drag_bomb.position.z - sell_center.z)
@@ -472,11 +499,7 @@ func _sell_dragged() -> void:
 	var from := _drag_from
 	var bomb := _drag_bomb
 	var tier := _drag_tier
-	var tier_data := GameState.get_tier(tier)
-	var income := 0.0
-	if tier_data != null:
-		income = tier_data.income_per_sec
-	var value := maxf(1.0, income * Economy.sell_income_seconds)
+	var value := _sell_value(tier)
 	# Fly the bomb to the sell bin, then grant cash.
 	var bin_pos := world.sell_zone_center()
 	var tween := create_tween()
@@ -493,19 +516,7 @@ func _sell_dragged() -> void:
 		new_slots[from] = 0
 	GameState.commit_slots(new_slots)
 	GameState.add_cash(value)
-	# Floating label at the bin.
-	var label := _get_income_label()
-	if label != null:
-		label.text = "+$" + Economy.format_number(value)
-		label.position = bin_pos + Vector3(0.0, 1.4, 0.0)
-		label.modulate = Color("#FFC83D")
-		label.outline_modulate = Color("#0E1420")
-		label.visible = true
-		var start_y := label.position.y
-		var lt := create_tween()
-		lt.tween_property(label, "position:y", start_y + 0.9, 0.9).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-		lt.parallel().tween_property(label, "modulate:a", 0.0, 0.9)
-		lt.finished.connect(func(): label.visible = false)
+	_spawn_sell_label(bin_pos, value)
 	AudioManager.play_sfx("claim")
 	AudioManager.vibrate(20)
 	SaveManager.save()
@@ -514,6 +525,94 @@ func _sell_dragged() -> void:
 	_drag_tier = 0
 	_is_animating = false
 	_update_hud()
+
+
+# --- Tap selection and Sell button ------------------------------------------
+
+func _select_slot(slot: int) -> void:
+	# Selection is validated against game state, not visuals: during a drag the
+	# visual reference is detached from the slot until the return tween ends.
+	if slot < 0 or slot >= GameState.slot_count or GameState.slots[slot] <= 0:
+		_clear_selection()
+		return
+	_selected_slot = slot
+	world.show_slot_highlight(slot)
+	_update_selection_ui()
+
+
+func _clear_selection() -> void:
+	if _selected_slot < 0:
+		return
+	_selected_slot = -1
+	if world != null:
+		world.hide_slot_highlight()
+	_update_selection_ui()
+
+
+func _sell_value(tier: int) -> float:
+	var tier_data := GameState.get_tier(tier)
+	var income := 0.0
+	if tier_data != null:
+		income = tier_data.income_per_sec
+	return maxf(1.0, income * Economy.sell_income_seconds)
+
+
+func _on_sell_pressed() -> void:
+	if _selected_slot < 0 or _is_dragging or _is_animating:
+		return
+	var slot := _selected_slot
+	if slot >= GameState.slot_count or GameState.slots[slot] <= 0 or slot_bombs[slot] == null:
+		_clear_selection()
+		return
+	_clear_selection()
+	_sell_slot(slot)
+
+
+func _sell_slot(slot: int) -> void:
+	# Sell the bomb where it sits so the action reads clearly even though the 3D
+	# sell bin sits at the edge of the framed view.
+	if slot < 0 or slot >= GameState.slot_count:
+		return
+	var bomb := slot_bombs[slot]
+	if bomb == null or GameState.slots[slot] <= 0:
+		return
+	_is_animating = true
+	var tier := GameState.slots[slot]
+	var value := _sell_value(tier)
+	var slot_pos := world.slot_position(slot)
+	var tween := create_tween()
+	tween.tween_property(bomb, "position", slot_pos + Vector3(0.0, 1.1, 0.0), 0.18).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	tween.parallel().tween_property(bomb, "scale", Vector3(0.12, 0.12, 0.12), 0.22).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_IN)
+	await tween.finished
+	bomb.queue_free()
+	slot_bombs[slot] = null
+	slot_tiers[slot] = 0
+	var new_slots := _board_copy()
+	new_slots[slot] = 0
+	GameState.commit_slots(new_slots)
+	GameState.add_cash(value)
+	_spawn_sell_label(slot_pos, value)
+	AudioManager.play_sfx("claim")
+	AudioManager.vibrate(20)
+	SaveManager.save()
+	_is_animating = false
+	_update_hud()
+
+
+func _spawn_sell_label(pos: Vector3, value: float) -> void:
+	var label := _get_income_label()
+	if label == null:
+		return
+	label.text = "+$" + Economy.format_number(value)
+	label.position = pos + Vector3(0.0, 1.4, 0.0)
+	label.modulate = Color("#FFC83D")
+	label.outline_modulate = Color("#0E1420")
+	label.visible = true
+	var start_y := label.position.y
+	var tween := create_tween()
+	tween.tween_property(label, "position:y", start_y + 0.9, 0.9).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	tween.parallel().tween_property(label, "modulate:a", 0.0, 0.9)
+	tween.finished.connect(func(): label.visible = false)
 
 
 func _move_to_slot(target: int) -> void:
@@ -842,6 +941,35 @@ func _update_hud() -> void:
 		var left := clampf(_auto_timer.time_left, 0.0, wait)
 		free_progress.value = (1.0 - left / wait) * 100.0
 		free_seconds.text = "%ds" % int(ceil(left))
+
+	_update_selection_ui()
+
+
+func _update_selection_ui() -> void:
+	if sell_button == null:
+		return
+	# Drop a selection that no longer points at a live bomb (sold, merged, resized).
+	var has_selection := (
+		_selected_slot >= 0
+		and _selected_slot < GameState.slot_count
+		and GameState.slots[_selected_slot] > 0
+	)
+	if not has_selection and _selected_slot >= 0:
+		_selected_slot = -1
+		if world != null:
+			world.hide_slot_highlight()
+	sell_button.disabled = not has_selection or _is_dragging or _is_animating
+	var variation := &"OrangeButton" if has_selection else &"SmallButton"
+	if sell_button.theme_type_variation != variation:
+		sell_button.theme_type_variation = variation
+	var hint := MERGE_HINT
+	var hint_color := Color("#B8C2D8")
+	if has_selection:
+		hint = "SELECTED BOMB • SELLS FOR +$" + Economy.format_number(_sell_value(GameState.slots[_selected_slot]))
+		hint_color = Color("#FFC83D")
+	if merge_hint.text != hint:
+		merge_hint.text = hint
+		merge_hint.add_theme_color_override("font_color", hint_color)
 
 
 func _format_time(seconds_left: float) -> String:
