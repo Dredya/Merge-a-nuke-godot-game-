@@ -9,7 +9,7 @@ signal slots_changed
 signal slot_count_changed
 
 const TIER_DATA_PATH := "res://data/nuke_tiers.json"
-const MAX_SLOTS := 18
+const MAX_SLOTS := 16
 const MAX_TIER := 100
 
 var tiers: Array[NukeTierScript] = []

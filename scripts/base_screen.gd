@@ -78,9 +78,8 @@ func _ready() -> void:
 	world = BaseWorld.new()
 	world.name = "BaseWorld"
 	sub_viewport.add_child(world)
-	var start_cols := 2
-	var start_rows := maxi(1, GameState.slot_count / start_cols)
-	world.setup(_low_quality, start_cols, start_rows)
+	var dims := _grid_dims(GameState.slot_count)
+	world.setup(_low_quality, dims.x, dims.y)
 	world_view.resized.connect(_sync_viewport_size)
 	if middle != null and not middle.resized.is_connected(_sync_viewport_size):
 		middle.resized.connect(_sync_viewport_size)
@@ -188,6 +187,18 @@ func _ensure_slot_capacity() -> void:
 	GameState.slot_count = clampi(GameState.slot_count, 6, GameState.MAX_SLOTS)
 
 
+func _grid_dims(n: int) -> Vector2i:
+	# Pick cols <= rows so the board stays tall on phones, and cols*rows == n.
+	# For a perfect square (e.g. 16) this yields cols == rows.
+	var best_cols := 1
+	var c := 1
+	while c * c <= n:
+		if n % c == 0:
+			best_cols = c
+		c += 1
+	return Vector2i(best_cols, n / best_cols)
+
+
 func _spawn_wait() -> float:
 	# Fixed spawn cadence; progression comes from the Spawn Tier upgrade.
 	return 6.0
@@ -243,8 +254,9 @@ func _on_slots_changed() -> void:
 func _on_slot_count_changed() -> void:
 	# Make sure GameState.slots matches the new count before touching the visuals.
 	_ensure_slot_capacity()
-	var cols := 2
-	var rows := maxi(1, GameState.slot_count / cols)
+	var dims := _grid_dims(GameState.slot_count)
+	var cols := dims.x
+	var rows := dims.y
 	if world != null:
 		world.rebuild(cols, rows)
 		if world.has_method("fit_camera"):
