@@ -79,6 +79,9 @@ func _ready() -> void:
 	sub_viewport.add_child(world)
 	world.setup(_low_quality)
 	world_view.resized.connect(_sync_viewport_size)
+	var root_vp := get_viewport()
+	if root_vp != null and not root_vp.size_changed.is_connected(_sync_viewport_size):
+		root_vp.size_changed.connect(_sync_viewport_size)
 	_sync_viewport_size()
 
 	slot_tiers.resize(BaseWorld.SLOT_COUNT)
@@ -124,6 +127,11 @@ func _ready() -> void:
 		_tutorial_step = 0
 		_show_tutorial_step()
 	get_tree().create_timer(0.6).timeout.connect(_check_pending_popups)
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_RESIZED:
+		_sync_viewport_size()
 
 
 func _sync_viewport_size() -> void:
@@ -215,10 +223,17 @@ func _to_viewport(local_position: Vector2) -> Vector2:
 	var container_size := world_view.size
 	if container_size.x <= 1.0 or container_size.y <= 1.0:
 		return Vector2.ZERO
-	return Vector2(
+	if sub_viewport.size.x <= 0 or sub_viewport.size.y <= 0:
+		return Vector2.ZERO
+	var result := Vector2(
 		local_position.x / container_size.x * float(sub_viewport.size.x),
 		local_position.y / container_size.y * float(sub_viewport.size.y)
 	)
+	# Keep the point inside the render target so a stale/out-of-range coordinate
+	# cannot produce a misleading ground-plane hit after a resize.
+	result.x = clampf(result.x, 0.0, float(sub_viewport.size.x) - 1.0)
+	result.y = clampf(result.y, 0.0, float(sub_viewport.size.y) - 1.0)
+	return result
 
 
 func _ground_point(local_position: Vector2, height: float) -> Variant:
