@@ -100,7 +100,7 @@ Bomb purchasing is removed; `buy_cost` is no longer part of the tier data.
 - Bottom nav, 5 icon buttons: Base, Shop, Raid, Upgrades, Settings (active lime `#B6F23C`, inactive `#A9B6E0`, ≥48px tall).
 
 ### 5. Screen 2 — Raid
-- Top 3D mini scene: player's neon warhead (tier 6) arcs through the sky on a dotted white path
+- Top 3D mini scene: player's biggest bomb (highest tier reached) arcs through the sky on a dotted white path
   toward a small enemy base plot (2×2).
 - Target cards: colored avatar block, name, `Loot: $310K` gold, orange `Launch` button `#FF6A3D`;
   locked targets show a gray `Locked` tag.

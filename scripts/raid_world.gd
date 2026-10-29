@@ -36,6 +36,8 @@ var missile: Bomb
 var trail: CPUParticles3D
 # 0 village, 1 city, 2 country, 3 planet, 4 galaxy.
 var target_index: int = 1
+# The player's biggest bomb; shown as the raid missile.
+var player_tier: int = 1
 # Ground-level shockwave height; raised for the galaxy so the ring reads in space.
 var impact_ring_y: float = 0.25
 
@@ -48,6 +50,7 @@ var _rng := RandomNumberGenerator.new()
 func setup(quality_low: bool = false, highest_tier: int = 0) -> void:
 	low_quality = quality_low
 	target_index = _target_index_for(highest_tier)
+	player_tier = clampi(highest_tier, 1, GameState.MAX_TIER)
 	_rng.randomize()
 	add_child(LowPoly.create_environment(not low_quality))
 	add_child(LowPoly.create_sun())
@@ -378,7 +381,8 @@ func _build_dotted_arc() -> void:
 
 
 func _build_missile() -> void:
-	missile = BombFactory.build(6, low_quality, GameState.get_tier(6))
+	# Show the player's biggest bomb, not a fixed tier.
+	missile = BombFactory.build(player_tier, low_quality, GameState.get_tier(player_tier))
 	missile.name = "RaidMissile"
 	missile.position = ARC_START
 	missile.scale = Vector3.ONE * 2.0

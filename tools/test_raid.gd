@@ -34,6 +34,9 @@ func _run() -> void:
 		"cooldown_until": 0.0,
 		"is_revenge": true,
 	})
+	# The raid diorama must show the player's biggest bomb, not a fixed tier.
+	var original_highest := GameState.highest_tier_reached
+	GameState.highest_tier_reached = 42
 	main.call("show_screen", "raid")
 	await get_tree().process_frame
 	await get_tree().process_frame
@@ -42,6 +45,10 @@ func _run() -> void:
 		push_error("RaidScreen not found")
 		get_tree().quit(1)
 		return
+	var raid_world = raid.get("world")
+	var missile = raid_world.get("missile") if raid_world != null else null
+	_check(missile != null and (missile as Bomb).tier == 42, "raid: missile shows player's biggest bomb")
+	GameState.highest_tier_reached = original_highest
 
 	_had_save = FileAccess.file_exists("user://save.json")
 	if _had_save:
