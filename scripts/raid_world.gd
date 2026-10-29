@@ -428,8 +428,8 @@ func _build_clouds() -> void:
 
 
 func _build_camera() -> void:
-	camera = LowPoly.create_camera(14.0)
-	camera.position = Vector3(14.0, 12.0, 14.0)
+	camera = LowPoly.create_camera(16.0)
+	camera.position = Vector3(16.0, 14.0, 16.0)
 	camera.rotation_degrees = Vector3(-32.0, 45.0, 0.0)
 	add_child(camera)
 
@@ -529,10 +529,10 @@ func fit_camera(viewport_size: Vector2i) -> void:
 	if camera == null:
 		return
 	var aspect := float(viewport_size.x) / float(maxi(1, viewport_size.y))
-	var plot_w := 12.0
-	var plot_h := 9.0
-	var required_v := maxf(plot_h, plot_w / maxf(aspect, 0.01)) * 1.25
-	camera.size = clampf(required_v, 10.0, 18.0)
+	var plot_w := 13.0
+	var plot_h := 10.0
+	var required_v := maxf(plot_h, plot_w / maxf(aspect, 0.01)) * 1.3
+	camera.size = clampf(required_v, 12.0, 20.0)
 
 
 func _process(delta: float) -> void:
