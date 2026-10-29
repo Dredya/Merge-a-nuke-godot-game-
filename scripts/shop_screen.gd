@@ -8,6 +8,8 @@ var _daily_day_label: Label
 var _daily_amount_label: Label
 var _daily_button: Button
 var _missions_box: VBoxContainer
+var _iap_amount_labels: Dictionary = {}
+var _iap_button_labels: Dictionary = {}
 
 
 func _ready() -> void:
@@ -15,6 +17,7 @@ func _ready() -> void:
 	GameState.cash_changed.connect(func(_cash): _update_states())
 	MissionManager.mission_progress_changed.connect(func(_id, _progress): _refresh_missions())
 	IAPService.purchase_completed.connect(_on_iap_completed)
+	Economy.income_granted.connect(func(_amount): _refresh_iap())
 	_refresh_all()
 
 
@@ -122,9 +125,10 @@ func _build_iap() -> void:
 		title.theme_type_variation = &"WhiteLabel"
 		info.add_child(title)
 		var amount := Label.new()
-		amount.text = "+$" + Economy.format_number(float(product.get("cash", 0.0)))
+		amount.text = "+$" + Economy.format_number(IAPService.get_reward_for(product as Dictionary))
 		amount.theme_type_variation = &"GoldLabel"
 		info.add_child(amount)
+		_iap_amount_labels[pid] = amount
 		var buy := Button.new()
 		buy.theme_type_variation = &"GreenButton"
 		buy.custom_minimum_size = Vector2(180, 64)
@@ -132,6 +136,17 @@ func _build_iap() -> void:
 		buy.text = str(product.get("label", "GET"))
 		buy.pressed.connect(_on_buy_cash.bind(pid))
 		row.add_child(buy)
+		_iap_button_labels[pid] = buy
+
+
+func _refresh_iap() -> void:
+	for product in IAPService.get_products():
+		if not (product is Dictionary):
+			continue
+		var pid := str(product.get("id", ""))
+		if _iap_amount_labels.has(pid):
+			var label := _iap_amount_labels[pid] as Label
+			label.text = "+$" + Economy.format_number(IAPService.get_reward_for(product as Dictionary))
 
 
 func _build_missions() -> void:

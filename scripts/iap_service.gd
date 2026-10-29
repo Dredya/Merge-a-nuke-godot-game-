@@ -33,8 +33,19 @@ func get_products() -> Array:
 func get_reward(product_id: String) -> float:
 	for p in _products:
 		if p is Dictionary and str(p.get("id", "")) == product_id:
-			return float(p.get("cash", 0.0))
+			var base_cash := float(p.get("cash", 0.0))
+			var income_seconds := float(p.get("income_seconds", 0.0))
+			var income := GameState.income_per_second_total() * Economy.event_income_multiplier
+			var scaled := income * income_seconds
+			return maxf(base_cash, scaled)
 	return 0.0
+
+
+func get_reward_for(product: Dictionary) -> float:
+	var base_cash := float(product.get("cash", 0.0))
+	var income_seconds := float(product.get("income_seconds", 0.0))
+	var income := GameState.income_per_second_total() * Economy.event_income_multiplier
+	return maxf(base_cash, income * income_seconds)
 
 
 func purchase(product_id: String) -> void:
