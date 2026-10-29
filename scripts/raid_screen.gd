@@ -273,7 +273,7 @@ func _on_launch(target: Dictionary) -> void:
 	_raiding = true
 	for button in _launch_buttons:
 		button.disabled = true
-	var stolen := maxf(float(target.get("cash", 0.0)) * 0.2, 1.0)
+	var stolen := maxf(float(target.get("cash", 0.0)) * RaidService.STEAL_FRACTION, 1.0)
 	AudioManager.play_sfx("raid")
 	await world.launch()
 	GameState.add_cash(stolen)

@@ -159,6 +159,8 @@ Bomb purchasing is removed; `buy_cost` is no longer part of the tier data.
 - Graphics quality Low disables environment glow, bomb/merge/raid particles and blob shadows.
   Settings are persisted in `user://settings.cfg`, separately from game progress.
 - Offline earnings require at least 60 seconds away and are capped by the offline-cap upgrade.
+- Raid loot scales with the player's income (≈15s of income per raid, ~half of idle income per
+  120s refresh cycle), not with current cash, to prevent exponential compounding.
 
 ## Validation Commands
 ```bash

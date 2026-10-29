@@ -69,7 +69,7 @@ func _run() -> void:
 		return
 
 	var cash_before := GameState.cash
-	var expected := maxf(float(target.get("cash", 0.0)) * 0.2, 1.0)
+	var expected := maxf(float(target.get("cash", 0.0)) * RaidService.STEAL_FRACTION, 1.0)
 	await raid.call("_on_launch", target)
 	await get_tree().create_timer(0.2).timeout
 	_check(GameState.cash >= cash_before + expected - 0.01, "raid: cash granted")
