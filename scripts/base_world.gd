@@ -49,6 +49,7 @@ var camera: Camera3D
 var slots_root: Node3D
 var highlight: MeshInstance3D
 var _props: Node3D = null
+var _sell_bin_root: Node3D = null
 var _clouds: Array[Dictionary] = []
 var _time: float = 0.0
 
@@ -229,6 +230,7 @@ func _build_props() -> void:
 		remove_child(_props)
 		_props.free()
 		_props = null
+		_sell_bin_root = null
 	var root := Node3D.new()
 	root.name = "Props"
 	add_child(root)
@@ -257,6 +259,62 @@ func _build_props() -> void:
 	_build_radar(root, Vector3(-hx - 3.2, GROUND_TOP_Y, -1.2))
 	_build_runway(root, hz)
 	_build_sign(root, Vector3(hx + 1.8, GROUND_TOP_Y, -1.6))
+	_build_sell_bin(root, hx, hz)
+
+
+func _build_sell_bin(root: Node3D, hx: float, hz: float) -> void:
+	# A small sell bin on the near edge (camera side) of the apron so a dragged
+	# bomb can be dropped onto it to be sold. Kept low so it never occludes bombs.
+	var body_mat := LowPoly.material(Color("#C0392B"), 0.1, 0.6)
+	var lid_mat := LowPoly.material(Color("#8B2A1F"), 0.2, 0.5)
+	var label_mat := LowPoly.material(C_SIGN, 0.0, 0.4, C_SIGN, 0.0 if low_quality else 1.2)
+	var pos := Vector3(6.0, GROUND_TOP_Y, hz + 3.6)
+	_sell_bin_root = Node3D.new()
+	_sell_bin_root.name = "SellBin"
+	_sell_bin_root.position = pos
+	root.add_child(_sell_bin_root)
+	# Body
+	LowPoly.add_mesh(
+		_sell_bin_root,
+		LowPoly.box(Vector3(1.5, 1.1, 1.2)),
+		body_mat,
+		Vector3(0.0, 0.55, 0.0),
+		Vector3.ZERO,
+		Vector3.ONE,
+		"SellBody"
+	)
+	# Lid (slightly wider, tilted).
+	LowPoly.add_mesh(
+		_sell_bin_root,
+		LowPoly.box(Vector3(1.7, 0.12, 1.35)),
+		lid_mat,
+		Vector3(0.0, 1.18, 0.05),
+		Vector3(0.0, 0.0, -12.0),
+		Vector3.ONE,
+		"SellLid"
+	)
+	# Dollar sign marker on the front.
+	LowPoly.add_mesh(
+		_sell_bin_root,
+		LowPoly.box(Vector3(0.7, 0.7, 0.06)),
+		label_mat,
+		Vector3(0.0, 0.55, 0.62),
+		Vector3.ZERO,
+		Vector3.ONE,
+		"SellMark"
+	)
+	# Floating "SELL" label above the bin.
+	var label := Label3D.new()
+	label.name = "SellLabel"
+	label.text = "SELL"
+	label.font_size = 48
+	label.pixel_size = 0.01
+	label.outline_size = 12
+	label.modulate = Color("#FFC83D")
+	label.outline_modulate = Color("#0E1420")
+	label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+	label.position = Vector3(0.0, 1.9, 0.0)
+	_sell_bin_root.add_child(label)
 
 
 func _build_fence(root: Node3D, hx: float, hz: float) -> void:
@@ -674,9 +732,34 @@ func rebuild(p_cols: int, p_rows: int) -> void:
 		remove_child(_props)
 		_props.free()
 		_props = null
+		_sell_bin_root = null
 	_build_baseplate()
 	_build_slots()
 	_build_props()
+
+
+func sell_zone_center() -> Vector3:
+	if _sell_bin_root != null and is_instance_valid(_sell_bin_root):
+		return _sell_bin_root.global_position
+	return Vector3(6.0, BaseWorld.PAD_TOP_Y, 0.0)
+
+
+func set_sell_highlight(active: bool) -> void:
+	if _sell_bin_root == null or not is_instance_valid(_sell_bin_root):
+		return
+	var target_scale := Vector3.ONE * (1.18 if active else 1.0)
+	_sell_bin_root.scale = target_scale
+	for child in _sell_bin_root.get_children():
+		if child is MeshInstance3D:
+			var mi := child as MeshInstance3D
+			if mi.material_override is StandardMaterial3D:
+				var mat := mi.material_override as StandardMaterial3D
+				if active:
+					mat.emission_enabled = true
+					mat.emission = Color("#FFC83D")
+					mat.emission_energy_multiplier = 2.0
+				else:
+					mat.emission_enabled = false
 
 
 func show_slot_highlight(index: int) -> void:

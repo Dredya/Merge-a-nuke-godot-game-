@@ -395,6 +395,14 @@ func _move_drag(local_position: Vector2) -> void:
 		BaseWorld.PAD_TOP_Y + DRAG_LIFT,
 		p.z + _drag_offset.y
 	)
+	# Sell zone takes priority when the dragged bomb hovers over it.
+	var sell_center := world.sell_zone_center()
+	var dxz := Vector2(_drag_bomb.position.x - sell_center.x, _drag_bomb.position.z - sell_center.z)
+	if dxz.length() <= 1.7:
+		world.set_sell_highlight(true)
+		world.hide_slot_highlight()
+		return
+	world.set_sell_highlight(false)
 	var slot := _nearest_slot(_drag_bomb.position)
 	if slot >= 0:
 		world.show_slot_highlight(slot)
@@ -409,6 +417,13 @@ func _finish_drag(local_position: Vector2) -> void:
 		return
 	_move_drag(local_position)
 	_is_dragging = false
+	world.set_sell_highlight(false)
+	# Selling takes priority over placement.
+	var sell_center := world.sell_zone_center()
+	var dxz := Vector2(_drag_bomb.position.x - sell_center.x, _drag_bomb.position.z - sell_center.z)
+	if dxz.length() <= 1.7:
+		_sell_dragged()
+		return
 	var target := _nearest_slot(_drag_bomb.position)
 	world.hide_slot_highlight()
 	if target < 0 or target == _drag_from:
@@ -430,6 +445,7 @@ func _return_drag() -> void:
 	if _drag_bomb == null:
 		return
 	_is_animating = true
+	world.set_sell_highlight(false)
 	var from := _drag_from
 	var bomb := _drag_bomb
 	var tween := create_tween()
@@ -446,6 +462,58 @@ func _return_drag() -> void:
 	_drag_from = -1
 	_drag_tier = 0
 	_is_animating = false
+
+
+func _sell_dragged() -> void:
+	if _drag_bomb == null:
+		_is_animating = false
+		return
+	_is_animating = true
+	var from := _drag_from
+	var bomb := _drag_bomb
+	var tier := _drag_tier
+	var tier_data := GameState.get_tier(tier)
+	var income := 0.0
+	if tier_data != null:
+		income = tier_data.income_per_sec
+	var value := maxf(1.0, income * Economy.sell_income_seconds)
+	# Fly the bomb to the sell bin, then grant cash.
+	var bin_pos := world.sell_zone_center()
+	var tween := create_tween()
+	tween.tween_property(bomb, "position", bin_pos + Vector3(0.0, 0.6, 0.0), 0.18).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	tween.tween_property(bomb, "scale", Vector3(0.1, 0.1, 0.1), 0.14)
+	await tween.finished
+	bomb.queue_free()
+	# Free the slot.
+	if from >= 0:
+		slot_bombs[from] = null
+		slot_tiers[from] = 0
+	var new_slots := _board_copy()
+	if from >= 0:
+		new_slots[from] = 0
+	GameState.commit_slots(new_slots)
+	GameState.add_cash(value)
+	# Floating label at the bin.
+	var label := _get_income_label()
+	if label != null:
+		label.text = "+$" + Economy.format_number(value)
+		label.position = bin_pos + Vector3(0.0, 1.4, 0.0)
+		label.modulate = Color("#FFC83D")
+		label.outline_modulate = Color("#0E1420")
+		label.visible = true
+		var start_y := label.position.y
+		var lt := create_tween()
+		lt.tween_property(label, "position:y", start_y + 0.9, 0.9).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+		lt.parallel().tween_property(label, "modulate:a", 0.0, 0.9)
+		lt.finished.connect(func(): label.visible = false)
+	AudioManager.play_sfx("claim")
+	AudioManager.vibrate(20)
+	SaveManager.save()
+	_drag_bomb = null
+	_drag_from = -1
+	_drag_tier = 0
+	_is_animating = false
+	_update_hud()
 
 
 func _move_to_slot(target: int) -> void:

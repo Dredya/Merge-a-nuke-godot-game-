@@ -3,6 +3,7 @@ extends Node
 ## Autoload: cash flow, income, upgrades, and number formatting.
 
 const UPGRADES_PATH := "res://data/upgrades.json"
+const BALANCE_PATH := "res://data/balance.json"
 
 signal income_granted(amount: float)
 signal upgrade_purchased(upgrade_id: String)
@@ -13,12 +14,14 @@ var upgrade_levels: Dictionary = {}
 var event_income_multiplier: float = 1.0
 var spawn_tier_level: int = 0
 var offline_cap_hours: float = 8.0
+var sell_income_seconds: float = 30.0
 
 var _income_timer: Timer
 
 
 func _ready() -> void:
 	_load_upgrades()
+	_load_balance()
 	_income_timer = Timer.new()
 	_income_timer.wait_time = 1.0
 	_income_timer.autostart = true
@@ -41,6 +44,19 @@ func _load_upgrades() -> void:
 				upgrade_levels[str(u.get("id", ""))] = 0
 	upgrades_loaded.emit()
 	_recompute_multipliers()
+
+
+func _load_balance() -> void:
+	if not FileAccess.file_exists(BALANCE_PATH):
+		return
+	var file := FileAccess.open(BALANCE_PATH, FileAccess.READ)
+	if file == null:
+		return
+	var text := file.get_as_text()
+	file.close()
+	var parsed: Variant = JSON.parse_string(text)
+	if parsed is Dictionary:
+		sell_income_seconds = float((parsed as Dictionary).get("sell_income_seconds", sell_income_seconds))
 
 
 func get_upgrade(id: String) -> Dictionary:
