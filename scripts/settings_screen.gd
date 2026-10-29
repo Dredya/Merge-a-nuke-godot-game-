@@ -7,6 +7,7 @@ extends Control
 @onready var vibration_check: CheckButton = $Margin/VBox/Scroll/Content/AudioCard/AudioBox/VibrationCheck
 @onready var quality_option: OptionButton = $Margin/VBox/Scroll/Content/VideoCard/VideoBox/QualityOption
 @onready var fps_option: OptionButton = $Margin/VBox/Scroll/Content/VideoCard/VideoBox/FpsOption
+@onready var save_button: Button = $Margin/VBox/Scroll/Content/SaveButton
 @onready var reset_button: Button = $Margin/VBox/Scroll/Content/ResetButton
 @onready var back_button: Button = $Margin/VBox/Scroll/Content/BackButton
 @onready var confirm_dialog: AcceptDialog = $ConfirmDialog
@@ -31,6 +32,7 @@ func _ready() -> void:
 	quality_option.item_selected.connect(_on_quality_selected)
 	fps_option.item_selected.connect(_on_fps_selected)
 	reset_button.pressed.connect(_on_reset_pressed)
+	save_button.pressed.connect(_on_save_pressed)
 	back_button.pressed.connect(_on_back)
 	confirm_dialog.confirmed.connect(_on_reset_confirmed)
 
@@ -53,6 +55,18 @@ func _on_quality_selected(index: int) -> void:
 
 func _on_fps_selected(index: int) -> void:
 	AudioManager.set_fps_cap(30 if index == 0 else 60)
+
+
+func _on_save_pressed() -> void:
+	save_button.disabled = true
+	save_button.text = "SAVING..."
+	SaveManager.save()
+	save_button.text = "SAVED"
+	AudioManager.play_sfx("claim")
+	await get_tree().create_timer(1.2).timeout
+	if is_instance_valid(save_button):
+		save_button.text = "SAVE NOW"
+		save_button.disabled = false
 
 
 func _on_reset_pressed() -> void:

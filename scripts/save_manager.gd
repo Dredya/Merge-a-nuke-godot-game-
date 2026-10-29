@@ -12,7 +12,7 @@ var pending_offline: float = 0.0
 var pending_offline_seconds: float = 0.0
 var _last_save_time: float = 0.0
 var _autosave_accum: float = 0.0
-const AUTOSAVE_INTERVAL := 30.0
+const AUTOSAVE_INTERVAL := 15.0
 
 
 func _ready() -> void:
@@ -29,7 +29,7 @@ func _process(delta: float) -> void:
 
 
 func _notification(what: int) -> void:
-	if what == NOTIFICATION_APPLICATION_PAUSED or what == NOTIFICATION_WM_CLOSE_REQUEST:
+	if what == NOTIFICATION_APPLICATION_PAUSED or what == NOTIFICATION_WM_CLOSE_REQUEST or what == NOTIFICATION_WM_GO_BACK_REQUEST:
 		save()
 		_last_save_time = Time.get_unix_time_from_system()
 	if what == NOTIFICATION_APPLICATION_RESUMED:
@@ -113,13 +113,37 @@ func _write_direct(json_text: String) -> void:
 
 
 func load_save() -> void:
-	var path := SAVE_PATH
-	if not FileAccess.file_exists(path):
-		# Try the backup if the main save is missing.
-		if FileAccess.file_exists("user://save.json.bak"):
-			path = "user://save.json.bak"
-		else:
-			return
+	# Pick the best available save between save.json and save.json.bak so a
+	# stranded backup (with more progress) is never ignored.
+	var candidates: Array[String] = []
+	if FileAccess.file_exists(SAVE_PATH):
+		candidates.append(SAVE_PATH)
+	if FileAccess.file_exists("user://save.json.bak"):
+		candidates.append("user://save.json.bak")
+	if candidates.is_empty():
+		return
+	var best_path := candidates[0]
+	var best_score := -1.0
+	var best_time := 0.0
+	for cpath in candidates:
+		var cf := FileAccess.open(cpath, FileAccess.READ)
+		if cf == null:
+			continue
+		var ctext := cf.get_as_text()
+		cf.close()
+		var cparsed: Variant = JSON.parse_string(ctext)
+		if not (cparsed is Dictionary):
+			continue
+		var cd := cparsed as Dictionary
+		var ccash := float(cd.get("cash", 0.0))
+		var ctier := int(cd.get("highest_tier_reached", 0))
+		var ctime := float(cd.get("last_save_time", 0.0))
+		var score := float(ctier) * 1000000000.0 + ccash
+		if score > best_score or (score == best_score and ctime > best_time):
+			best_score = score
+			best_time = ctime
+			best_path = cpath
+	var path := best_path
 	var file := FileAccess.open(path, FileAccess.READ)
 	if file == null:
 		# Last resort: try the backup.

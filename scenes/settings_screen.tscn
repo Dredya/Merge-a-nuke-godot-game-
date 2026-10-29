@@ -119,6 +119,12 @@ theme_type_variation = &"H2"
 theme_override_colors/font_color = Color(1, 0.784314, 0.239216, 1)
 text = "DATA"
 
+[node name="SaveButton" type="Button" parent="Margin/VBox/Scroll/Content"]
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+theme_type_variation = &"GreenButton"
+text = "SAVE NOW"
+
 [node name="ResetButton" type="Button" parent="Margin/VBox/Scroll/Content"]
 custom_minimum_size = Vector2(0, 80)
 layout_mode = 2
