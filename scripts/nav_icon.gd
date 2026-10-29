@@ -4,11 +4,11 @@ extends Control
 ## Tiny code-drawn navigation icon (no image assets).
 
 @export_enum("home", "shop", "raid", "upgrades", "settings") var kind: String = "home"
-@export var icon_color: Color = Color("#A9B6E0"):
+@export var icon_color: Color = Color("#B8C2D8"):
 	set(value):
 		icon_color = value
 		queue_redraw()
-@export var plate_color: Color = Color("#0B1020")
+@export var plate_color: Color = Color("#0E1420")
 
 
 func _ready() -> void:

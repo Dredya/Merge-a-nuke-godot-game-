@@ -32,11 +32,11 @@ Android idle merge-and-raid game (Godot 4.7, GDScript, Mobile renderer, 3D, Robl
 ### 1. World and camera
 - Fixed `Camera3D`, isometric-style: yaw 45°, pitch −35°, orthographic.
 - Player plot: **4×3 grid of slots** on a blocky baseplate slab.
-  - Slab top `#4CAF50`, left side `#2E7D32`, right side `#3E9B43`.
-  - Each slot is a flat diamond-aligned pad (thin BoxMesh) `#66C26A`, small gap between pads.
-- Environment: `ProceduralSkyMaterial` sky gradient `#5BB8FF` (top) → `#BFE6FF` (horizon);
-  green ground `#9BE08A`; a few floating white blocky clouds (BoxMesh) drifting slowly.
-- One directional light, no real-time shadows.
+  - Slab top `#7B8088` (concrete), left side `#3E4450`, right side `#5A606B`.
+  - Each slot is a flat diamond-aligned pad (thin BoxMesh) `#8A8F99`, small gap between pads.
+- Environment: `ProceduralSkyMaterial` sky gradient `#6FA8D8` (top) → `#E8D4A8` (horizon);
+  desert sand ground `#D6BF96`; a few floating white blocky clouds (BoxMesh) drifting slowly.
+- One directional light (warm), no real-time shadows.
 - `WorldEnvironment` with low-intensity glow so emissive parts glow.
 - Every bomb has a cheap blob shadow (flat dark transparent disc).
 

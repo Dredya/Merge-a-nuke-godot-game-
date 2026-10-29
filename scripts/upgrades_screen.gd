@@ -96,7 +96,7 @@ func _refresh() -> void:
 		badge.text = _badge_text(id)
 		badge.theme_type_variation = &"TitleLabel"
 		badge.add_theme_font_size_override("font_size", 22 if id == "spawn_tier" else 30)
-		badge.add_theme_color_override("font_color", Color("#0B1020"))
+		badge.add_theme_color_override("font_color", Color("#0E1420"))
 		badge.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		badge.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		badge_panel.add_child(badge)
@@ -148,7 +148,7 @@ func _badge_style(id: String) -> StyleBoxFlat:
 			color = Color("#4FE0FF")
 	var style := StyleBoxFlat.new()
 	style.bg_color = color
-	style.border_color = Color("#0B1020")
+	style.border_color = Color("#0E1420")
 	style.set_border_width_all(3)
 	style.set_corner_radius_all(12)
 	style.content_margin_left = 4

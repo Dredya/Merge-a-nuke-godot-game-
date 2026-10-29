@@ -11,9 +11,9 @@ const ARC_START := Vector3(-4.3, 1.5, 2.7)
 const ARC_CONTROL := Vector3(0.4, 8.6, 0.2)
 const ARC_END := Vector3(4.3, 1.6, -2.7)
 
-const C_PLAYER_TOP := Color("#4CAF50")
-const C_PLAYER_SIDE := Color("#2E7D32")
-const C_PAD := Color("#66C26A")
+const C_PLAYER_TOP := Color("#7B8088")
+const C_PLAYER_SIDE := Color("#3E4450")
+const C_PAD := Color("#8A8F99")
 # Modern glass/steel enemy city palette.
 const C_CITY_TOP := Color("#6B7280")
 const C_CITY_SIDE := Color("#4A4F5A")
@@ -41,6 +41,11 @@ var player_tier: int = 1
 # Ground-level shockwave height; raised for the galaxy so the ring reads in space.
 var impact_ring_y: float = 0.25
 
+# Desert biome colours shared with the base screen.
+const C_SKY_TOP := Color("#6FA8D8")
+const C_SKY_HORIZON := Color("#E8D4A8")
+const C_SAND := Color("#D6BF96")
+
 var _launching: bool = false
 var _progress: float = 0.0
 var _shake_time: float = 0.0
@@ -52,8 +57,8 @@ func setup(quality_low: bool = false, highest_tier: int = 0) -> void:
 	target_index = _target_index_for(highest_tier)
 	player_tier = clampi(highest_tier, 1, GameState.MAX_TIER)
 	_rng.randomize()
-	add_child(LowPoly.create_environment(not low_quality))
-	add_child(LowPoly.create_sun())
+	add_child(LowPoly.create_environment(not low_quality, C_SKY_TOP, C_SKY_HORIZON, C_SAND, C_SKY_HORIZON))
+	add_child(LowPoly.create_sun(Color("#FFF1D6"), 1.25))
 	_build_ground()
 	_build_player_base()
 	_build_enemy_base()
@@ -79,7 +84,7 @@ func _target_index_for(highest_tier: int) -> int:
 func _build_ground() -> void:
 	var ground := MeshInstance3D.new()
 	ground.mesh = LowPoly.cylinder(11.0, 10.4, 1.8, 28, false)
-	ground.material_override = LowPoly.material(Color("#9BE08A"), 0.0, 0.95)
+	ground.material_override = LowPoly.material(C_SAND, 0.0, 0.95)
 	ground.position = Vector3(0.0, -2.4, 0.0)
 	ground.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	add_child(ground)

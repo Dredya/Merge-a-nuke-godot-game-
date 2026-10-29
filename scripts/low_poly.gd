@@ -197,13 +197,24 @@ static func blob_shadow(radius: float = 0.5) -> MeshInstance3D:
 
 # --- Environment ------------------------------------------------------------
 
-static func create_environment(glow_enabled: bool = true) -> WorldEnvironment:
+## Build a WorldEnvironment.
+##
+## The palette is parameterised so each screen can pick its own biome while
+## sharing one implementation. Defaults are the original bright-sky/green set,
+## so callers that do not care (bomb gallery) are unaffected.
+static func create_environment(
+	glow_enabled: bool = true,
+	sky_top: Color = Color("#5BB8FF"),
+	sky_horizon: Color = Color("#BFE6FF"),
+	ground_bottom: Color = Color("#9BE08A"),
+	ground_horizon: Color = Color("#BFE6FF")
+) -> WorldEnvironment:
 	var sky_material := ProceduralSkyMaterial.new()
-	sky_material.sky_top_color = Color.html("#5BB8FF")
-	sky_material.sky_horizon_color = Color.html("#BFE6FF")
+	sky_material.sky_top_color = sky_top
+	sky_material.sky_horizon_color = sky_horizon
 	sky_material.sky_curve = 0.18
-	sky_material.ground_bottom_color = Color.html("#9BE08A")
-	sky_material.ground_horizon_color = Color.html("#BFE6FF")
+	sky_material.ground_bottom_color = ground_bottom
+	sky_material.ground_horizon_color = ground_horizon
 	sky_material.sun_angle_max = 0.0
 	sky_material.sun_curve = 0.1
 
@@ -231,12 +242,17 @@ static func create_environment(glow_enabled: bool = true) -> WorldEnvironment:
 	return world_env
 
 
-static func create_sun() -> DirectionalLight3D:
+## One directional "sun". Color/energy are parameterised so the desert screens
+## can bake warmer light without touching the shared default.
+static func create_sun(
+	light_color: Color = Color(1.0, 0.97, 0.9),
+	light_energy: float = 1.15
+) -> DirectionalLight3D:
 	var sun := DirectionalLight3D.new()
 	sun.name = "Sun"
 	sun.rotation_degrees = Vector3(-52.0, -38.0, 0.0)
-	sun.light_color = Color(1.0, 0.97, 0.9)
-	sun.light_energy = 1.15
+	sun.light_color = light_color
+	sun.light_energy = light_energy
 	sun.shadow_enabled = false
 	sun.directional_shadow_mode = DirectionalLight3D.SHADOW_ORTHOGONAL
 	return sun

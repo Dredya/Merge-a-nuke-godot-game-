@@ -678,7 +678,7 @@ func _build_income_pool() -> void:
 		label.pixel_size = 0.006
 		label.outline_size = 14
 		label.modulate = Color("#B6F23C")
-		label.outline_modulate = Color("#0B1020")
+		label.outline_modulate = Color("#0E1420")
 		label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
 		label.double_sided = true
 		label.no_depth_test = true
@@ -703,7 +703,7 @@ func _on_income_granted(amount: float) -> void:
 	label.text = "+$" + Economy.format_number(amount)
 	label.position = world.slot_position(slot) + Vector3(0.0, 1.55, 0.0)
 	label.modulate = Color("#B6F23C")
-	label.outline_modulate = Color("#0B1020")
+	label.outline_modulate = Color("#0E1420")
 	label.visible = true
 	var start_y := label.position.y
 	var tween := create_tween()
@@ -751,17 +751,17 @@ func _update_hud() -> void:
 		lock_button.visible = false
 	elif now < GameState.lock_cooldown_until:
 		locked_label.text = "BASE OPEN"
-		locked_label.add_theme_color_override("font_color", Color("#A9B6E0"))
+		locked_label.add_theme_color_override("font_color", Color("#B8C2D8"))
 		lock_timer_label.text = "READY " + _format_time(GameState.lock_cooldown_until - now)
-		lock_timer_label.add_theme_color_override("font_color", Color("#A9B6E0"))
+		lock_timer_label.add_theme_color_override("font_color", Color("#B8C2D8"))
 		lock_button.visible = true
 		lock_button.disabled = true
 		lock_button.text = "COOLDOWN"
 	else:
 		locked_label.text = "BASE OPEN"
-		locked_label.add_theme_color_override("font_color", Color("#A9B6E0"))
+		locked_label.add_theme_color_override("font_color", Color("#B8C2D8"))
 		lock_timer_label.text = "NO SHIELD"
-		lock_timer_label.add_theme_color_override("font_color", Color("#A9B6E0"))
+		lock_timer_label.add_theme_color_override("font_color", Color("#B8C2D8"))
 		lock_button.visible = true
 		lock_button.disabled = GameState.cash < LOCK_COST
 		lock_button.text = "LOCK $%d" % int(LOCK_COST)

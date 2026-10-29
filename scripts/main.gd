@@ -10,7 +10,7 @@ const SCREENS := {
 	"settings": "res://scenes/settings_screen.tscn",
 }
 const C_LIME := Color("#B6F23C")
-const C_MUTED := Color("#A9B6E0")
+const C_MUTED := Color("#B8C2D8")
 ## Max logical width of the centered UI column on wide windows (desktop/tablet).
 const MAX_CONTENT_WIDTH := 1200.0
 

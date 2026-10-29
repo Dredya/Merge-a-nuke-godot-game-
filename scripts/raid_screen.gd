@@ -217,7 +217,7 @@ func _add_target_card(target: Dictionary, is_revenge: bool) -> void:
 func _avatar_style(color: Color) -> StyleBoxFlat:
 	var style := StyleBoxFlat.new()
 	style.bg_color = color
-	style.border_color = Color("#0B1020")
+	style.border_color = Color("#0E1420")
 	style.set_border_width_all(3)
 	style.set_corner_radius_all(12)
 	style.content_margin_left = 4
@@ -230,7 +230,7 @@ func _avatar_style(color: Color) -> StyleBoxFlat:
 func _tag_style() -> StyleBoxFlat:
 	var style := StyleBoxFlat.new()
 	style.bg_color = Color("#2A3355")
-	style.border_color = Color("#0B1020")
+	style.border_color = Color("#0E1420")
 	style.set_border_width_all(2)
 	style.set_corner_radius_all(10)
 	style.content_margin_left = 12
@@ -259,7 +259,7 @@ func _update_cooldowns() -> void:
 
 func _readable_text(color: Color) -> Color:
 	var luminance := 0.299 * color.r + 0.587 * color.g + 0.114 * color.b
-	return Color("#0B1020") if luminance > 0.55 else Color.WHITE
+	return Color("#0E1420") if luminance > 0.55 else Color.WHITE
 
 
 func _on_launch(target: Dictionary) -> void:

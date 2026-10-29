@@ -69,7 +69,7 @@ func _build_overlay() -> void:
 	title.add_theme_font_override("font", load(LABEL_FONT) as Font)
 	title.add_theme_font_size_override("font_size", 34)
 	title.add_theme_color_override("font_color", Color("#FFC83D"))
-	title.add_theme_color_override("font_outline_color", Color("#0B1020"))
+	title.add_theme_color_override("font_outline_color", Color("#0E1420"))
 	title.add_theme_constant_override("outline_size", 10)
 	title.set_anchors_preset(Control.PRESET_TOP_WIDE)
 	title.offset_top = 20.0
@@ -81,7 +81,7 @@ func _build_overlay() -> void:
 	legend.add_theme_font_override("font", load(LABEL_FONT) as Font)
 	legend.add_theme_font_size_override("font_size", 20)
 	legend.add_theme_color_override("font_color", Color("#EAF0FF"))
-	legend.add_theme_color_override("font_outline_color", Color("#0B1020"))
+	legend.add_theme_color_override("font_outline_color", Color("#0E1420"))
 	legend.add_theme_constant_override("outline_size", 8)
 	legend.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
 	legend.offset_top = -44.0

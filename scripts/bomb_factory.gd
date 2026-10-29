@@ -783,7 +783,7 @@ static func _add_label(parent: Node3D, tier: int, height: float) -> void:
 	label.pixel_size = 0.0055
 	label.outline_size = 18
 	label.modulate = Color.WHITE
-	label.outline_modulate = Color("#0B1020")
+	label.outline_modulate = Color("#0E1420")
 	label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
 	label.double_sided = true
 	label.position = Vector3(0.0, height, 0.0)
