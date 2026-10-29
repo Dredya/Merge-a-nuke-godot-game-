@@ -26,7 +26,7 @@ func _ready() -> void:
 	world = RaidWorld.new()
 	world.name = "RaidWorld"
 	sub_viewport.add_child(world)
-	world.setup(AudioManager.is_low_quality())
+	world.setup(AudioManager.is_low_quality(), GameState.highest_tier_reached)
 
 	result_ok.pressed.connect(_close_result)
 	RaidService.targets_refreshed.connect(_refresh_targets)
