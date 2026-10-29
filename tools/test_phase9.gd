@@ -66,6 +66,8 @@ func _run() -> void:
 	await _test_base_ui()
 	await _test_shop()
 	_test_save_roundtrip()
+	_test_load_grid()
+	await _test_reset()
 	_finish()
 
 
@@ -307,6 +309,48 @@ func _test_save_roundtrip() -> void:
 	SaveManager.load_save()
 	_check(GameState.slots[0] == 100, "save: tier 100 round-trips through save/load")
 	_check(absf(GameState.cash - 987654.0) < 0.5, "save: cash round-trips through save/load")
+
+
+func _test_load_grid() -> void:
+	# A save that claims a maxed grid but has level 0 upgrades must load as the
+	# base board instead of handing out free slots.
+	for upgrade in Economy.upgrades:
+		if upgrade is Dictionary:
+			Economy.upgrade_levels[str(upgrade.get("id", ""))] = 0
+	GameState.slot_count = GameState.MAX_SLOTS
+	GameState.slots.resize(GameState.MAX_SLOTS)
+	for i in range(GameState.slots.size()):
+		GameState.slots[i] = 0
+	SaveManager.save()
+	GameState.slot_count = GameState.BASE_SLOTS
+	GameState.slots.resize(GameState.BASE_SLOTS)
+	SaveManager.load_save()
+	_check(GameState.slot_count == GameState.BASE_SLOTS, "load: grid size follows upgrade level")
+
+
+# --- Reset ------------------------------------------------------------------
+
+func _test_reset() -> void:
+	_main.call("show_screen", "settings")
+	await get_tree().process_frame
+	await get_tree().process_frame
+	var settings := get_tree().root.find_child("SettingsScreen", true, false)
+	_check(settings != null, "reset: settings screen instantiated")
+	if settings == null:
+		return
+	# Simulate a player who maxed the grid upgrade.
+	GameState.cash = 5000.0
+	GameState.slot_count = GameState.MAX_SLOTS
+	GameState.slots.resize(GameState.MAX_SLOTS)
+	for i in range(GameState.slots.size()):
+		GameState.slots[i] = 10
+	Economy.upgrade_levels["slot_count"] = 5
+	settings.call("_on_reset_confirmed")
+	await get_tree().process_frame
+	_check(GameState.slot_count == GameState.BASE_SLOTS, "reset: grid returns to base size")
+	_check(GameState.slots.size() == GameState.BASE_SLOTS, "reset: board is the base 2x3 grid")
+	_check(GameState.cash == 0.0, "reset: cash cleared")
+	_check(Economy.get_upgrade_level("slot_count") == 0, "reset: grid upgrade level cleared")
 
 
 # --- Helpers ----------------------------------------------------------------

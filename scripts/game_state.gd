@@ -9,12 +9,14 @@ signal slots_changed
 signal slot_count_changed
 
 const TIER_DATA_PATH := "res://data/nuke_tiers.json"
+## Starting board size (2x3) before any Grid Size upgrades.
+const BASE_SLOTS := 6
 const MAX_SLOTS := 16
 const MAX_TIER := 100
 
 var tiers: Array[NukeTierScript] = []
 var cash: float = 0.0
-var slot_count: int = 6
+var slot_count: int = BASE_SLOTS
 var slots: Array[int] = []
 var owned_nukes: Dictionary = {}
 # Highest tier the player has ever owned; drives the raid target scale.

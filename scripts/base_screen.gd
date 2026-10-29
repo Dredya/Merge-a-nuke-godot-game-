@@ -195,7 +195,7 @@ func _ensure_slot_capacity() -> void:
 				GameState.slots[i] = 0
 	for i in range(GameState.slots.size()):
 		GameState.slots[i] = clampi(GameState.slots[i], 0, GameState.MAX_TIER)
-	GameState.slot_count = clampi(GameState.slot_count, 6, GameState.MAX_SLOTS)
+	GameState.slot_count = clampi(GameState.slot_count, GameState.BASE_SLOTS, GameState.MAX_SLOTS)
 
 
 func _grid_dims(n: int) -> Vector2i:

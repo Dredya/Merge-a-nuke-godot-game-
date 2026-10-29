@@ -129,6 +129,15 @@ func _recompute_multipliers() -> void:
 	var ou := get_upgrade("offline_cap")
 	var oeffect := float(ou.get("effect_per_level", 2.0)) if not ou.is_empty() else 2.0
 	offline_cap_hours = 8.0 + float(get_upgrade_level("offline_cap")) * oeffect
+	# Derive the board size from the Grid Size upgrade level. This keeps a reset
+	# or a legacy save from starting the player with free upgraded slots.
+	var su := get_upgrade("slot_count")
+	var seffect := int(su.get("effect_per_level", 2)) if not su.is_empty() else 2
+	GameState.slot_count = clampi(
+		GameState.BASE_SLOTS + get_upgrade_level("slot_count") * seffect,
+		GameState.BASE_SLOTS,
+		GameState.MAX_SLOTS
+	)
 
 
 func _on_income_tick() -> void:

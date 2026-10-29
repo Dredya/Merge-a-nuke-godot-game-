@@ -83,10 +83,11 @@ func _on_reset_confirmed() -> void:
 		if dir.file_exists("save.json.bak"):
 			dir.remove("save.json.bak")
 	GameState.cash = 0.0
-	GameState.slot_count = GameState.MAX_SLOTS
+	# A fresh player starts on the base 2x3 board; grid upgrades are bought again.
+	GameState.slot_count = GameState.BASE_SLOTS
 	GameState.slots.clear()
-	GameState.slots.resize(GameState.MAX_SLOTS)
-	for i in range(GameState.MAX_SLOTS):
+	GameState.slots.resize(GameState.BASE_SLOTS)
+	for i in range(GameState.BASE_SLOTS):
 		GameState.slots[i] = 0
 	GameState.highest_tier_reached = 0
 	GameState.lock_until = 0.0
@@ -106,6 +107,7 @@ func _on_reset_confirmed() -> void:
 			Economy.upgrade_levels[str(upgrade.get("id", ""))] = 0
 	Economy._recompute_multipliers()
 	GameState.cash_changed.emit(GameState.cash)
+	GameState.slot_count_changed.emit()
 	GameState.slots_changed.emit()
 	SaveManager.save()
 	var main := get_tree().root.get_node_or_null("Main")

@@ -174,8 +174,16 @@ func load_save() -> void:
 		# For now, still attempt load.
 		pass
 	GameState.cash = float(data.get("cash", 0.0))
-	var saved_slot_count := int(data.get("slot_count", 6))
-	GameState.slot_count = clampi(saved_slot_count, 6, GameState.MAX_SLOTS)
+	# Apply upgrade levels before sizing the board: the grid size is derived from
+	# the Grid Size upgrade, so a legacy or hand-edited save cannot grant free slots.
+	for upgrade in Economy.upgrades:
+		if upgrade is Dictionary:
+			Economy.upgrade_levels[str(upgrade.get("id", ""))] = 0
+	var saved_upgrades: Variant = data.get("upgrade_levels", {})
+	if saved_upgrades is Dictionary:
+		for k in saved_upgrades.keys():
+			Economy.upgrade_levels[str(k)] = int(saved_upgrades[k])
+	Economy._recompute_multipliers()
 	GameState.slots.resize(GameState.slot_count)
 	var saved_slots: Variant = data.get("slots", [])
 	var saved_size := 0
@@ -190,12 +198,6 @@ func load_save() -> void:
 	for i in range(GameState.slots.size()):
 		if i >= saved_size:
 			GameState.slots[i] = 0
-	# Upgrade levels
-	var saved_upgrades: Variant = data.get("upgrade_levels", {})
-	if saved_upgrades is Dictionary:
-		for k in saved_upgrades.keys():
-			Economy.upgrade_levels[str(k)] = int(saved_upgrades[k])
-	Economy._recompute_multipliers()
 	GameState.lock_until = float(data.get("lock_until", 0.0))
 	GameState.lock_cooldown_until = float(data.get("lock_cooldown_until", 0.0))
 	GameState.daily_streak = int(data.get("daily_streak", 0))
